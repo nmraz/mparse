@@ -148,23 +148,27 @@ ast_node* parser::parse_pow() {
 ast_node* parser::parse_atom() {
   expected_type_ = "an expression";  // at this point, we want an expression
 
-  ast_node* ret = last_token_.type == token_type::literal ?
-    parse_literal() : parse_paren();
+  ast_node* ret = nullptr;
+
+  if (last_token_.type == token_type::literal) {
+    ret = consume_literal();
+  } else if (has_delim("("sv)) {
+    ret = consume_paren();
+  } else {
+    error();
+  }
 
   expected_type_ = "an operator";  // we need an operator to follow the expression
   return ret;
 }
 
-ast_node* parser::parse_literal() {
+ast_node* parser::consume_literal() {
   token tok = last_token_;
   get_next_token();
   return ast_.make_node<literal_node>(std::strtod(tok.val.data(), nullptr), get_loc(tok));
 }
 
-ast_node* parser::parse_paren() {
-  if (!has_delim("("sv)) {
-    error();
-  }
+ast_node* parser::consume_paren() {
   std::size_t open_loc = last_token_.loc;
 
   get_next_token();

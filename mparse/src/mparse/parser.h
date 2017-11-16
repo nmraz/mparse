@@ -20,8 +20,8 @@ public:
   ast_node* parse_pow();
   
   ast_node* parse_atom();
-  ast_node* parse_literal();
-  ast_node* parse_paren();
+  ast_node* consume_literal();
+  ast_node* consume_paren();
 
   const source_stream& stream() const { return stream_; }
   token last_token() const { return last_token_; }
