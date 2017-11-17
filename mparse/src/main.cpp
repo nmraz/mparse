@@ -3,6 +3,7 @@
 #include "loc_printing.h"
 #include "mparse/error.h"
 #include "mparse/parser.h"
+#include "pretty_print.h"
 #include <cstdlib>
 #include <iostream>
 
@@ -11,7 +12,7 @@ using namespace std::literals;
 namespace {
 
 void print_help(std::string_view prog_name) {
-  std::cout << "Usage: " << prog_name << " dump|eval <expr>";
+  std::cout << "Usage: " << prog_name << " dump|eval|pretty <expr>";
   std::exit(1);
 }
 
@@ -33,7 +34,7 @@ int main(int argc, const char* const* argv) {
   }
 
   std::string_view cmd = argv[1];
-  if (cmd != "dump" && cmd != "eval") {
+  if (cmd != "dump" && cmd != "eval" && cmd != "pretty") {
     print_help(argv[0]);
   }
 
@@ -50,5 +51,7 @@ int main(int argc, const char* const* argv) {
       print_locs(err.where(), input);
       return 1;
     }
+  } else if (cmd == "pretty") {
+    std::cout << pretty_print(ast) << "\n";
   }
 }
