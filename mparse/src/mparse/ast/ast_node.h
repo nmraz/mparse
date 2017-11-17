@@ -18,7 +18,6 @@ public:
   ast_node& operator=(ast_node&&) = delete;
 
   ast_node* parent() const { return parent_; }
-  void set_parent(ast_node* parent);
 
   virtual void apply_visitor(ast_visitor& vis);
 
@@ -26,6 +25,8 @@ public:
 
 protected:
   ast_node() = default;
+  
+  void set_parent_for(ast_node* child);
 
 private:
   friend class abstract_syntax_tree;

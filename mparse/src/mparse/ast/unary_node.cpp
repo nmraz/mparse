@@ -4,7 +4,7 @@ namespace mparse {
 
 void unary_node::set_child(ast_node* child) {
   child_ = child;
-  child_->set_parent(this);
+  set_parent_for(child_);
 }
 
 }  // namespace mparse
