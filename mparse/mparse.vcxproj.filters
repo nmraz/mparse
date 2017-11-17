@@ -60,6 +60,9 @@
     <ClCompile Include="src\op_strings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\pretty_print.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\mparse\source_range.h">
@@ -108,6 +111,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\op_strings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pretty_print.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
