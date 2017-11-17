@@ -1,7 +1,6 @@
 #include "ast_dump.h"
 
 #include "mparse/ast/ast_visitor.h"
-#include "mparse/ast/root_node.h"
 #include "mparse/ast/paren_node.h"
 #include "mparse/ast/operator_nodes.h"
 #include "mparse/ast/literal_node.h"
@@ -12,7 +11,6 @@ namespace {
 
 struct ast_dump_visitor : mparse::ast_visitor {
   void visit(mparse::ast_node& node) override;
-  void visit(mparse::root_node& node) override;
   void visit(mparse::paren_node& node) override;
   void visit(mparse::unary_op_node& node) override;
   void visit(mparse::binary_op_node& node) override;
@@ -80,14 +78,6 @@ void ast_dump_visitor::visit(mparse::ast_node&) {
   }
 
   result += '-';
-}
-
-void ast_dump_visitor::visit(mparse::root_node& node) {
-  result += "root " + stringify_node_loc(node) + '\n';
-
-  ast_dump_visitor child_vis = get_child_visitor(prefix, true);
-  node.child()->apply_visitor(child_vis);
-  result += child_vis.result;
 }
 
 void ast_dump_visitor::visit(mparse::paren_node& node) {

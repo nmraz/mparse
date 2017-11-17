@@ -4,7 +4,6 @@
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
 #include "mparse/ast/paren_node.h"
-#include "mparse/ast/root_node.h"
 #include <cmath>
 
 eval_error::eval_error(std::string_view what, std::vector<mparse::source_range> where)

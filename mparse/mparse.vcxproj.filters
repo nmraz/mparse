@@ -24,9 +24,6 @@
     <ClCompile Include="src\mparse\ast\operator_nodes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\mparse\ast\root_node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\mparse\ast\paren_node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -75,9 +72,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\mparse\ast\operator_nodes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\mparse\ast\root_node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\mparse\ast\paren_node.h">

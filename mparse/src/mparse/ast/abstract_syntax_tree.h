@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mparse/ast/root_node.h"
+#include "mparse/ast/ast_node.h"
 #include <memory>
 #include <vector>
 
