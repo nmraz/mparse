@@ -158,6 +158,7 @@
     <ClCompile Include="src\mparse\lex.cpp" />
     <ClCompile Include="src\mparse\parser.cpp" />
     <ClCompile Include="src\mparse\source_stream.cpp" />
+    <ClCompile Include="src\op_strings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ast_dump.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="src\mparse\parser.h" />
     <ClInclude Include="src\mparse\source_range.h" />
     <ClInclude Include="src\mparse\source_stream.h" />
+    <ClInclude Include="src\op_strings.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,6 +4,7 @@
 #include "mparse/ast/paren_node.h"
 #include "mparse/ast/operator_nodes.h"
 #include "mparse/ast/literal_node.h"
+#include "op_strings.h"
 #include <iostream>
 #include <string>
 
@@ -26,34 +27,6 @@ struct ast_dump_visitor : mparse::ast_visitor {
 std::string stringify_node_loc(const mparse::ast_node& node) {
   auto loc = node.source_loc();
   return "<col:" + std::to_string(loc.from() + 1) + ", col:" + std::to_string(loc.to()) + ">";
-}
-
-const char* stringify_unary_op(mparse::unary_op_type type) {
-  switch (type) {
-  case mparse::unary_op_type::plus:
-    return "+";
-  case mparse::unary_op_type::neg:
-    return "-";
-  default:
-    return "";
-  }
-}
-
-const char* stringify_binary_op(mparse::binary_op_type type) {
-  switch (type) {
-  case mparse::binary_op_type::add:
-    return "+";
-  case mparse::binary_op_type::sub:
-    return "-";
-  case mparse::binary_op_type::mult:
-    return "*";
-  case mparse::binary_op_type::div:
-    return "/";
-  case mparse::binary_op_type::pow:
-    return "^";
-  default:
-    return "";
-  }
 }
 
 
