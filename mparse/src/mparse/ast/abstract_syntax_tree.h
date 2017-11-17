@@ -8,16 +8,17 @@ namespace mparse {
 
 class abstract_syntax_tree {
 public:
-  abstract_syntax_tree();
+  void set_root(ast_node* root);
 
-  root_node* root();
-  const root_node* root() const;
+  ast_node* root() { return root_; }
+  const ast_node* root() const { return root_; }
 
   template<typename Node, typename... Args>
   Node* make_node(Args&&... args);
 
 private:
   std::vector<std::unique_ptr<ast_node>> nodes_;
+  ast_node* root_ = nullptr;
 };
 
 template<typename Node, typename... Args>

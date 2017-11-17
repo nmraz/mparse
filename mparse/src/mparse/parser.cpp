@@ -68,7 +68,7 @@ void parser::parse_root() {
     error();
   }
 
-  ast_.root()->set_child(expr);
+  ast_.set_root(expr);
 }
 
 

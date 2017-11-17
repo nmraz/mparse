@@ -92,6 +92,6 @@ void eval_visitor::visit(mparse::literal_node& node) {
 
 double eval(mparse::abstract_syntax_tree& ast) {
   eval_visitor vis;
-  ast.root()->child()->apply_visitor(vis);
+  ast.root()->apply_visitor(vis);
   return vis.result;
 }
