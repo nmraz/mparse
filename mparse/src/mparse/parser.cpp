@@ -87,7 +87,8 @@ ast_node* parser::parse_add() {
     get_next_token();
     ast_node* rhs = parse_mult();
     
-    node = ast_.make_node<binary_op_node>(*op, node, rhs, op_loc);
+    node = ast_.make_node<binary_op_node>(*op, node, rhs);
+    // TODO: set source info
   }
 
   return node;
@@ -108,7 +109,8 @@ ast_node* parser::parse_mult() {
     get_next_token();
     ast_node* rhs = parse_unary();
 
-    node = ast_.make_node<binary_op_node>(*op, node, rhs, op_loc);
+    node = ast_.make_node<binary_op_node>(*op, node, rhs);
+    // TODO: set source info
   }
 
   return node;
@@ -125,7 +127,8 @@ ast_node* parser::parse_unary() {
     std::size_t op_loc = last_token_.loc;
 
     get_next_token();
-    return ast_.make_node<unary_op_node>(*op, parse_unary(), op_loc);
+    return ast_.make_node<unary_op_node>(*op, parse_unary());
+    // TODO: set source info
   }
 
   return parse_pow();
@@ -138,7 +141,8 @@ ast_node* parser::parse_pow() {
     std::size_t op_loc = last_token_.loc;
 
     get_next_token();
-    return ast_.make_node<binary_op_node>(binary_op_type::pow, node, parse_unary(), op_loc);
+    return ast_.make_node<binary_op_node>(binary_op_type::pow, node, parse_unary());
+    // TODO: set source info
   }
 
   return node;
@@ -165,7 +169,8 @@ ast_node* parser::parse_atom() {
 ast_node* parser::consume_literal() {
   token tok = last_token_;
   get_next_token();
-  return ast_.make_node<literal_node>(std::strtod(tok.val.data(), nullptr), get_loc(tok));
+  return ast_.make_node<literal_node>(std::strtod(tok.val.data(), nullptr));
+  // TODO: set source info
 }
 
 ast_node* parser::consume_paren() {
@@ -183,7 +188,8 @@ ast_node* parser::consume_paren() {
   std::size_t close_loc = last_token_.loc + last_token_.val.size();
 
   get_next_token();
-  return ast_.make_node<paren_node>(inner_expr, source_range(open_loc, close_loc));
+  return ast_.make_node<paren_node>(inner_expr);
+  // TODO: set source info
 }
 
 
