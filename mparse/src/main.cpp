@@ -51,21 +51,6 @@ int main(int argc, const char* const* argv) {
       std::cout << eval(ast.root()) << '\n';
     } catch (const eval_error& err) {
       std::cout << "Math error: " << err.what() << "\n\n";
-
-      switch (err.code()) {
-      case eval_errc::div_by_zero:
-        print_loc(static_cast<const mparse::binary_op_node*>(err.node())->rhs()->source_loc(), input);
-        break;
-      case eval_errc::bad_pow:
-      {
-        const mparse::binary_op_node* node = static_cast<const mparse::binary_op_node*>(err.node());
-
-        print_locs({ node->lhs()->source_loc(), node->rhs()->source_loc() }, input);
-      }
-      default:
-        break;
-      }
-
       return 1;
     }
   }

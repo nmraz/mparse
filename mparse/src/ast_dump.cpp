@@ -8,6 +8,8 @@
 #include <iostream>
 #include <string>
 
+using namespace std::literals;
+
 namespace {
 
 struct ast_dump_visitor : mparse::const_ast_visitor {
@@ -28,12 +30,6 @@ struct ast_dump_visitor : mparse::const_ast_visitor {
 };
 
 
-std::string stringify_node_loc(const mparse::ast_node& node) {
-  auto loc = node.source_loc();
-  return "<col:" + std::to_string(loc.from() + 1) + ", col:" + std::to_string(loc.to()) + ">";
-}
-
-
 ast_dump_visitor::ast_dump_visitor(std::string prefix, bool last_node)
   : prefix(std::move(prefix))
   , last_node(last_node) {
@@ -52,19 +48,19 @@ void ast_dump_visitor::visit(const mparse::ast_node&) {
 }
 
 void ast_dump_visitor::visit(const mparse::paren_node& node) {
-  result += "paren " + stringify_node_loc(node) + '\n';
+  result += "paren\n";
 
   dump_last_child(*node.child());
 }
 
 void ast_dump_visitor::visit(const mparse::unary_op_node& node) {
-  result += "unary " + stringify_node_loc(node) + " '" + stringify_unary_op(node.type()) + "'\n";
+  result += "unary '"s + stringify_unary_op(node.type()) + "'\n";
 
   dump_last_child(*node.child());
 }
 
 void ast_dump_visitor::visit(const mparse::binary_op_node& node) {
-  result += "binary " + stringify_node_loc(node) + " '" + stringify_binary_op(node.type()) + "'\n";
+  result += "binary '"s + stringify_binary_op(node.type()) + "'\n";
 
   ast_dump_visitor lhs_vis(prefix + " |", false);
   node.lhs()->apply_visitor(lhs_vis);
@@ -74,7 +70,7 @@ void ast_dump_visitor::visit(const mparse::binary_op_node& node) {
 }
 
 void ast_dump_visitor::visit(const mparse::literal_node& node) {
-  result += "number " + stringify_node_loc(node) + " '" + std::to_string(node.val()) + "'\n";
+  result += "number '" + std::to_string(node.val()) + "'\n";
 }
 
 
