@@ -23,4 +23,4 @@ private:
   const mparse::ast_node& node_;
 };
 
-double eval(const mparse::abstract_syntax_tree& ast);
+double eval(const mparse::ast_node* node);

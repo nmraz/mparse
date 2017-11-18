@@ -87,9 +87,9 @@ void ast_dump_visitor::dump_last_child(const mparse::ast_node& node) {
 }  // namespace
 
 
-void dump_ast(const mparse::abstract_syntax_tree& ast) {
+void dump_ast(const mparse::ast_node* node) {
   ast_dump_visitor vis("", false);
 
-  ast.root()->apply_visitor(vis);
+  node->apply_visitor(vis);
   std::cout << vis.result;
 }

@@ -43,10 +43,10 @@ int main(int argc, const char* const* argv) {
   mparse::abstract_syntax_tree ast = parse_diag(input);
 
   if (cmd == "dump") {
-    dump_ast(ast);
+    dump_ast(ast.root());
   } else if (cmd == "eval") {
     try {
-      std::cout << eval(ast) << '\n';
+      std::cout << eval(ast.root()) << '\n';
     } catch (const eval_error& err) {
       std::cout << "Math error: " << err.what() << "\n\n";
 
@@ -67,6 +67,6 @@ int main(int argc, const char* const* argv) {
       return 1;
     }
   } else if (cmd == "pretty") {
-    std::cout << pretty_print(ast) << "\n";
+    std::cout << pretty_print(ast.root()) << "\n";
   }
 }

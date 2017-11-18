@@ -84,8 +84,8 @@ void eval_visitor::visit(const mparse::literal_node& node) {
 
 }  // namespace
 
-double eval(const mparse::abstract_syntax_tree& ast) {
+double eval(const mparse::ast_node* node) {
   eval_visitor vis;
-  ast.root()->apply_visitor(vis);
+  node->apply_visitor(vis);
   return vis.result;
 }

@@ -46,8 +46,8 @@ void print_visitor::visit(const mparse::literal_node& node) {
 
 }  // namespace
 
-std::string pretty_print(const mparse::abstract_syntax_tree& ast) {
+std::string pretty_print(const mparse::ast_node* node) {
   print_visitor vis;
-  ast.root()->apply_visitor(vis);
+  node->apply_visitor(vis);
   return vis.result;
 }
