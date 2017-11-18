@@ -44,6 +44,8 @@ int main(int argc, const char* const* argv) {
 
   if (cmd == "dump") {
     dump_ast(ast.root());
+  } else if (cmd == "pretty") {
+    std::cout << pretty_print(ast.root()) << "\n";
   } else if (cmd == "eval") {
     try {
       std::cout << eval(ast.root()) << '\n';
@@ -66,7 +68,5 @@ int main(int argc, const char* const* argv) {
 
       return 1;
     }
-  } else if (cmd == "pretty") {
-    std::cout << pretty_print(ast.root()) << "\n";
   }
 }
