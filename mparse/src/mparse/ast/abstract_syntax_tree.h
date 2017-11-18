@@ -12,6 +12,7 @@ public:
   abstract_syntax_tree(abstract_syntax_tree&& rhs);
 
   abstract_syntax_tree& operator=(abstract_syntax_tree&& rhs);
+  void take_nodes(abstract_syntax_tree&& rhs);
 
   void set_root(ast_node* root);
 
