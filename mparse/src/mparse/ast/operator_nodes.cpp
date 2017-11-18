@@ -38,12 +38,10 @@ void binary_op_node::set_type(binary_op_type type) {
 
 void binary_op_node::set_lhs(ast_node* lhs) {
   lhs_ = lhs;
-  set_parent_for(lhs_);
 }
 
 void binary_op_node::set_rhs(ast_node* rhs) {
   rhs_ = rhs;
-  set_parent_for(rhs_);
 }
 
 void binary_op_node::set_op_loc(std::size_t op_loc) {

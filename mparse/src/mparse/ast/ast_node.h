@@ -17,21 +17,15 @@ public:
   ast_node& operator=(const ast_node&) = delete;
   ast_node& operator=(ast_node&&) = delete;
 
-  ast_node* parent() const { return parent_; }
-
   virtual void apply_visitor(ast_visitor& vis);
 
   virtual source_range source_loc() const = 0;
 
 protected:
   ast_node() = default;
-  
-  void set_parent_for(ast_node* child);
 
 private:
   friend class abstract_syntax_tree;
-
-  ast_node* parent_;
 };
 
 template<typename Der, typename Base = ast_node>
