@@ -116,5 +116,8 @@
     <ClInclude Include="src\pretty_print.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\util\span.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
