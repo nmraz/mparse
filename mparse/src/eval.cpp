@@ -6,9 +6,10 @@
 #include "mparse/ast/paren_node.h"
 #include <cmath>
 
-eval_error::eval_error(std::string_view what, std::vector<mparse::source_range> where)
+eval_error::eval_error(std::string_view what, eval_errc code, mparse::ast_node& node)
   : std::runtime_error(what.data())
-  , where_(std::move(where)) {
+  , code_(code)
+  , node_(node) {
 }
 
 namespace {
@@ -51,7 +52,7 @@ void eval_visitor::visit(mparse::binary_op_node& node) {
     break;
   case mparse::binary_op_type::div:
     if (rhs_val == 0) {
-      throw eval_error("Division by zero", { node.rhs()->source_loc() });
+      throw eval_error("Division by zero", eval_errc::div_by_zero, node);
     }
     result = lhs_val / rhs_val;
     break;
@@ -59,13 +60,15 @@ void eval_visitor::visit(mparse::binary_op_node& node) {
     if (lhs_val < 0 && rhs_val != static_cast<int>(rhs_val)) {
       throw eval_error(
         "Raising negative number to non-integer power",
-        { node.lhs()->source_loc(), node.rhs()->source_loc() }
+        eval_errc::bad_pow,
+        node
       );
     }
     if (lhs_val == 0 && rhs_val <= 0) {
       throw eval_error(
         "Raising zero to negative or zero power",
-        { node.lhs()->source_loc(), node.rhs()->source_loc() }
+        eval_errc::bad_pow,
+        node
       );
     }
     result = std::pow(lhs_val, rhs_val);

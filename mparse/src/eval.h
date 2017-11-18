@@ -6,14 +6,21 @@
 #include <string_view>
 #include <vector>
 
+enum class eval_errc {
+  div_by_zero,
+  bad_pow
+};
+
 class eval_error : public std::runtime_error {
 public:
-  eval_error(std::string_view what, std::vector<mparse::source_range> where);
+  eval_error(std::string_view what, eval_errc code, mparse::ast_node& node);
 
-  const std::vector<mparse::source_range>& where() const { return where_; }
+  eval_errc code() const { return code_; }
+  mparse::ast_node& node() const { return node_; }
 
 private:
-  std::vector<mparse::source_range> where_;
+  eval_errc code_;
+  mparse::ast_node& node_;
 };
 
 double eval(mparse::abstract_syntax_tree& ast);

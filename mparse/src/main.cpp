@@ -48,7 +48,6 @@ int main(int argc, const char* const* argv) {
       std::cout << eval(ast) << '\n';
     } catch (const eval_error& err) {
       std::cout << "Math error: " << err.what() << "\n\n";
-      print_locs(err.where(), input);
       return 1;
     }
   } else if (cmd == "pretty") {
