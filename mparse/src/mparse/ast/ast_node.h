@@ -15,6 +15,7 @@ public:
   ast_node& operator=(ast_node&&) = delete;
 
   virtual void apply_visitor(ast_visitor& vis);
+  virtual void apply_visitor(const_ast_visitor& vis) const;
 
   virtual source_range source_loc() const = 0;
 
@@ -33,6 +34,11 @@ public:
   void apply_visitor(ast_visitor& vis) override {
     Base::apply_visitor(vis);  // visit bases first
     vis.visit(static_cast<Der&>(*this));
+  }
+
+  void apply_visitor(const_ast_visitor& vis) const override {
+    Base::apply_visitor(vis);  // visit bases first
+    vis.visit(static_cast<const Der&>(*this));
   }
 };
 
