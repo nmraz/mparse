@@ -20,7 +20,7 @@ void print_loc(mparse::source_range where, std::string_view source) {
     << make_marker(where.to() - where.from()) << '\n';
 }
 
-void print_locs(const std::vector<mparse::source_range>& locs, std::string_view source) {
+void print_locs(std::initializer_list<mparse::source_range> locs, std::string_view source) {
   std::cout << source << '\n';
 
   mparse::source_range prev_loc;
