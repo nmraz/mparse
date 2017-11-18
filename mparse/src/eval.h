@@ -13,14 +13,14 @@ enum class eval_errc {
 
 class eval_error : public std::runtime_error {
 public:
-  eval_error(std::string_view what, eval_errc code, const mparse::ast_node& node);
+  eval_error(std::string_view what, eval_errc code, const mparse::ast_node* node);
 
   eval_errc code() const { return code_; }
-  const mparse::ast_node& node() const { return node_; }
+  const mparse::ast_node* node() const { return node_; }
 
 private:
   eval_errc code_;
-  const mparse::ast_node& node_;
+  const mparse::ast_node* node_;
 };
 
 double eval(const mparse::ast_node* node);
