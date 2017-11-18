@@ -22,6 +22,7 @@ void abstract_syntax_tree::take_nodes(abstract_syntax_tree&& rhs) {
     std::make_move_iterator(rhs.nodes_.begin()),
     std::make_move_iterator(rhs.nodes_.end())
   );
+  rhs.nodes_.clear();
   rhs.root_ = nullptr;
 }
 
