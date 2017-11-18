@@ -1,6 +1,7 @@
 #include "ast_dump.h"
 #include "eval.h"
 #include "loc_printing.h"
+#include "mparse/ast/operator_nodes.h"
 #include "mparse/error.h"
 #include "mparse/parser.h"
 #include "pretty_print.h"
@@ -48,6 +49,21 @@ int main(int argc, const char* const* argv) {
       std::cout << eval(ast) << '\n';
     } catch (const eval_error& err) {
       std::cout << "Math error: " << err.what() << "\n\n";
+
+      switch (err.code()) {
+      case eval_errc::div_by_zero:
+        print_loc(static_cast<mparse::binary_op_node&>(err.node()).rhs()->source_loc(), input);
+        break;
+      case eval_errc::bad_pow:
+      {
+        mparse::binary_op_node& node = static_cast<mparse::binary_op_node&>(err.node());
+
+        print_locs({ node.lhs()->source_loc(), node.rhs()->source_loc() }, input);
+      }
+      default:
+        break;
+      }
+
       return 1;
     }
   } else if (cmd == "pretty") {
