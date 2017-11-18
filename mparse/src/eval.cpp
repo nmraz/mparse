@@ -14,7 +14,7 @@ eval_error::eval_error(std::string_view what, std::vector<mparse::source_range> 
 namespace {
 
 struct eval_visitor : mparse::ast_visitor {
-  void visit(mparse::paren_node& node) override;
+  void visit(mparse::unary_node& node) override;
   void visit(mparse::unary_op_node& node) override;
   void visit(mparse::binary_op_node& node) override;
   void visit(mparse::literal_node& node) override;
@@ -22,21 +22,13 @@ struct eval_visitor : mparse::ast_visitor {
   double result = 0;
 };
 
-void eval_visitor::visit(mparse::paren_node& node) {
+void eval_visitor::visit(mparse::unary_node& node) {
   node.child()->apply_visitor(*this);
 }
 
 void eval_visitor::visit(mparse::unary_op_node& node) {
-  switch (node.type()) {
-  case mparse::unary_op_type::plus:
-    node.child()->apply_visitor(*this);
-    break;
-  case mparse::unary_op_type::neg:
-    node.child()->apply_visitor(*this);
+  if (node.type() == mparse::unary_op_type::neg) {
     result = -result;
-    break;
-  default:
-    throw eval_error("Unknown unary operator", { mparse::source_range(node.op_loc()) });
   }
 }
 
@@ -79,7 +71,7 @@ void eval_visitor::visit(mparse::binary_op_node& node) {
     result = std::pow(lhs_val, rhs_val);
     break;
   default:
-    throw eval_error("Unknown binary operator", { mparse::source_range(node.op_loc()) });
+    break;
   }
 }
 
