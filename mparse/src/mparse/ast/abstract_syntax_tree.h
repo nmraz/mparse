@@ -8,6 +8,11 @@ namespace mparse {
 
 class abstract_syntax_tree {
 public:
+  abstract_syntax_tree() = default;
+  abstract_syntax_tree(abstract_syntax_tree&& rhs);
+
+  abstract_syntax_tree& operator=(abstract_syntax_tree&& rhs);
+
   void set_root(ast_node* root);
 
   ast_node* root() { return root_; }
