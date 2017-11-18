@@ -17,8 +17,6 @@ public:
   virtual void apply_visitor(ast_visitor& vis);
   virtual void apply_visitor(const_ast_visitor& vis) const;
 
-  virtual source_range source_loc() const = 0;
-
 protected:
   ast_node() = default;
 
