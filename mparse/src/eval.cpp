@@ -6,7 +6,7 @@
 #include "mparse/ast/paren_node.h"
 #include <cmath>
 
-eval_error::eval_error(std::string_view what, eval_errc code, mparse::ast_node& node)
+eval_error::eval_error(std::string_view what, eval_errc code, const mparse::ast_node& node)
   : std::runtime_error(what.data())
   , code_(code)
   , node_(node) {
@@ -14,26 +14,26 @@ eval_error::eval_error(std::string_view what, eval_errc code, mparse::ast_node& 
 
 namespace {
 
-struct eval_visitor : mparse::ast_visitor {
-  void visit(mparse::unary_node& node) override;
-  void visit(mparse::unary_op_node& node) override;
-  void visit(mparse::binary_op_node& node) override;
-  void visit(mparse::literal_node& node) override;
+struct eval_visitor : mparse::const_ast_visitor {
+  void visit(const mparse::unary_node& node) override;
+  void visit(const mparse::unary_op_node& node) override;
+  void visit(const mparse::binary_op_node& node) override;
+  void visit(const mparse::literal_node& node) override;
 
   double result = 0;
 };
 
-void eval_visitor::visit(mparse::unary_node& node) {
+void eval_visitor::visit(const mparse::unary_node& node) {
   node.child()->apply_visitor(*this);
 }
 
-void eval_visitor::visit(mparse::unary_op_node& node) {
+void eval_visitor::visit(const mparse::unary_op_node& node) {
   if (node.type() == mparse::unary_op_type::neg) {
     result = -result;
   }
 }
 
-void eval_visitor::visit(mparse::binary_op_node& node) {
+void eval_visitor::visit(const mparse::binary_op_node& node) {
   node.lhs()->apply_visitor(*this);
   double lhs_val = result;
 
@@ -78,13 +78,13 @@ void eval_visitor::visit(mparse::binary_op_node& node) {
   }
 }
 
-void eval_visitor::visit(mparse::literal_node& node) {
+void eval_visitor::visit(const mparse::literal_node& node) {
   result = node.val();
 }
 
 }  // namespace
 
-double eval(mparse::abstract_syntax_tree& ast) {
+double eval(const mparse::abstract_syntax_tree& ast) {
   eval_visitor vis;
   ast.root()->apply_visitor(vis);
   return vis.result;

@@ -52,11 +52,11 @@ int main(int argc, const char* const* argv) {
 
       switch (err.code()) {
       case eval_errc::div_by_zero:
-        print_loc(static_cast<mparse::binary_op_node&>(err.node()).rhs()->source_loc(), input);
+        print_loc(static_cast<const mparse::binary_op_node&>(err.node()).rhs()->source_loc(), input);
         break;
       case eval_errc::bad_pow:
       {
-        mparse::binary_op_node& node = static_cast<mparse::binary_op_node&>(err.node());
+        const mparse::binary_op_node& node = static_cast<const mparse::binary_op_node&>(err.node());
 
         print_locs({ node.lhs()->source_loc(), node.rhs()->source_loc() }, input);
       }
