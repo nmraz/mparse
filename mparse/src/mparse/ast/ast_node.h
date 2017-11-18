@@ -7,9 +7,6 @@
 
 namespace mparse {
 
-struct ast_visitor;
-
-
 class ast_node {
 public:
   ast_node(const ast_node&) = delete;
