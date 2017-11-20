@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mparse/ast/abstract_syntax_tree.h"
+#include "mparse/ast/ast_node.h"
 #include "mparse/lex.h"
 #include "mparse/source_stream.h"
 

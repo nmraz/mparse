@@ -1,5 +1,5 @@
 #pragma once
 
-#include "mparse/ast/abstract_syntax_tree.h"
+#include "mparse/ast/ast_node.h"
 
 void dump_ast(const mparse::ast_node* node);
