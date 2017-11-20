@@ -59,19 +59,19 @@ void ast_dump_visitor::visit(const mparse::ast_node&) {
 }
 
 void ast_dump_visitor::visit(const mparse::paren_node& node) {
-  result += "paren" + stringify_source_locs(node, smap) + "\n";
+  result += "paren " + stringify_source_locs(node, smap) + "\n";
 
   dump_last_child(*node.child());
 }
 
 void ast_dump_visitor::visit(const mparse::unary_op_node& node) {
-  result += "unary '"s + stringify_unary_op(node.type()) + "'" + stringify_source_locs(node, smap) + "\n";
+  result += "unary '"s + stringify_unary_op(node.type()) + "' " + stringify_source_locs(node, smap) + "\n";
 
   dump_last_child(*node.child());
 }
 
 void ast_dump_visitor::visit(const mparse::binary_op_node& node) {
-  result += "binary '"s + stringify_binary_op(node.type()) + "'" + stringify_source_locs(node, smap) + "\n";
+  result += "binary '"s + stringify_binary_op(node.type()) + "' " + stringify_source_locs(node, smap) + "\n";
 
   ast_dump_visitor lhs_vis(prefix + " |", false, smap);
   node.lhs()->apply_visitor(lhs_vis);
@@ -81,7 +81,7 @@ void ast_dump_visitor::visit(const mparse::binary_op_node& node) {
 }
 
 void ast_dump_visitor::visit(const mparse::literal_node& node) {
-  result += "number '" + std::to_string(node.val()) + "'" + stringify_source_locs(node, smap) + "\n";
+  result += "number '" + std::to_string(node.val()) + "' " + stringify_source_locs(node, smap) + "\n";
 }
 
 
