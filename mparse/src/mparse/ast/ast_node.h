@@ -9,6 +9,8 @@ namespace mparse {
 
 class ast_node {
 public:
+  ast_node() = default;
+
   ast_node(const ast_node&) = delete;
   ast_node(ast_node&&) = delete;
   ast_node& operator=(const ast_node&) = delete;
