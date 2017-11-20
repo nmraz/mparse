@@ -14,7 +14,7 @@ public:
   ast_node& operator=(const ast_node&) = delete;
   ast_node& operator=(ast_node&&) = delete;
 
-  virtual ~ast_node() = default;
+  virtual ~ast_node() = 0;
 
   virtual void apply_visitor(ast_visitor& vis);
   virtual void apply_visitor(const_ast_visitor& vis) const;
