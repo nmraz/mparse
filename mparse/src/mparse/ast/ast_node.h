@@ -26,6 +26,9 @@ private:
   friend class abstract_syntax_tree;
 };
 
+using ast_node_ptr = std::unique_ptr<ast_node>;
+
+
 template<typename Der, typename Base = ast_node>
 class ast_node_impl : public Base {
 public:
