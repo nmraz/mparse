@@ -58,17 +58,26 @@ source_range get_loc(const token& tok) {
 }  // namespace
 
 
-parser::parser(source_stream stream)
+parser::parser(source_stream& stream)
   : stream_(stream) {
 }
+
+
+void parser::begin_parse() {
+  get_next_token();
+}
+
+void parser::end_parse() {
+  if (cur_token_.type != token_type::eof) {
+    error();
+  }
+}
+
 
 ast_node_ptr parser::parse_root() {
   begin_parse();
   ast_node_ptr expr = parse_add();
-  if (last_token_.type != token_type::eof) {
-    error();
-  }
-
+  end_parse();
   return expr;
 }
 
@@ -82,8 +91,8 @@ ast_node_ptr parser::parse_add() {
   const binary_op_type* op = nullptr;
   ast_node_ptr node = parse_mult();
 
-  while ((op = find_delim_val(ops, last_token_)) != nullptr) {
-    std::size_t op_loc = last_token_.loc;
+  while ((op = find_delim_val(ops, cur_token_)) != nullptr) {
+    std::size_t op_loc = cur_token_.loc;
   
     get_next_token();
     ast_node_ptr rhs = parse_mult();
@@ -104,8 +113,8 @@ ast_node_ptr parser::parse_mult() {
   const binary_op_type* op = nullptr;
   ast_node_ptr node = parse_unary();
 
-  while ((op = find_delim_val(ops, last_token_)) != nullptr) {
-    std::size_t op_loc = last_token_.loc;
+  while ((op = find_delim_val(ops, cur_token_)) != nullptr) {
+    std::size_t op_loc = cur_token_.loc;
 
     get_next_token();
     ast_node_ptr rhs = parse_unary();
@@ -123,9 +132,9 @@ ast_node_ptr parser::parse_unary() {
     { "-"sv, unary_op_type::neg }
   };
 
-  const unary_op_type* op = find_delim_val(ops, last_token_);
+  const unary_op_type* op = find_delim_val(ops, cur_token_);
   if (op) {
-    std::size_t op_loc = last_token_.loc;
+    std::size_t op_loc = cur_token_.loc;
 
     get_next_token();
     return make_ast_node<unary_op_node>(*op, parse_unary());
@@ -139,7 +148,7 @@ ast_node_ptr parser::parse_pow() {
   ast_node_ptr node = parse_atom();
 
   if (has_delim("^"sv)) {
-    std::size_t op_loc = last_token_.loc;
+    std::size_t op_loc = cur_token_.loc;
 
     get_next_token();
     return make_ast_node<binary_op_node>(binary_op_type::pow, std::move(node), parse_unary());
@@ -155,7 +164,7 @@ ast_node_ptr parser::parse_atom() {
 
   ast_node_ptr ret = nullptr;
 
-  if (last_token_.type == token_type::literal) {
+  if (cur_token_.type == token_type::literal) {
     ret = consume_literal();
   } else if (has_delim("("sv)) {
     ret = consume_paren();
@@ -168,25 +177,25 @@ ast_node_ptr parser::parse_atom() {
 }
 
 ast_node_ptr parser::consume_literal() {
-  token tok = last_token_;
+  token tok = cur_token_;
   get_next_token();
   return make_ast_node<literal_node>(std::strtod(tok.val.data(), nullptr));
   // TODO: set source info
 }
 
 ast_node_ptr parser::consume_paren() {
-  std::size_t open_loc = last_token_.loc;
+  std::size_t open_loc = cur_token_.loc;
 
   get_next_token();
   ast_node_ptr inner_expr = parse_add();
 
   if (!has_delim(")"sv)) {
-    if (last_token_.type == token_type::eof) {
+    if (cur_token_.type == token_type::eof) {
       throw syntax_error("Unbalanced parentheses", source_range(open_loc));
     }
     error();
   }
-  std::size_t close_loc = last_token_.loc + last_token_.val.size();
+  std::size_t close_loc = cur_token_.loc + cur_token_.val.size();
 
   get_next_token();
   return make_ast_node<paren_node>(std::move(inner_expr));
@@ -194,31 +203,32 @@ ast_node_ptr parser::consume_paren() {
 }
 
 
-// PRIVATE
-
 void parser::get_next_token() {
-  last_token_ = get_token(stream_);
+  cur_token_ = get_token(stream_);
 }
 
+
+// PRIVATE
+
 bool parser::has_delim(std::string_view val) const {
-  return last_token_.type == token_type::delim && last_token_.val == val;
+  return cur_token_.type == token_type::delim && cur_token_.val == val;
 }
 
 void parser::error() const {
-  if (last_token_.type == token_type::eof) {
+  if (cur_token_.type == token_type::eof) {
     // custom message/location for end of input
     throw syntax_error(
       "Expected "s + expected_type_,
-      source_range(last_token_.loc, last_token_.loc + 1)
+      source_range(cur_token_.loc, cur_token_.loc + 1)
     );
   }
 
-  std::string msg = "Unexpected "s + token_type_name(last_token_.type)
-    + " '" + std::string(last_token_.val) + "': expected " + expected_type_;
+  std::string msg = "Unexpected "s + token_type_name(cur_token_.type)
+    + " '" + std::string(cur_token_.val) + "': expected " + expected_type_;
 
   throw syntax_error(
     msg,
-    get_loc(last_token_)
+    get_loc(cur_token_)
   );
 }
 

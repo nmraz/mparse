@@ -8,9 +8,10 @@ namespace mparse {
 
 class parser {
 public:
-  explicit parser(source_stream stream);
+  explicit parser(source_stream& stream);
 
-  void begin_parse() { get_next_token(); }
+  void begin_parse();
+  void end_parse();
 
   ast_node_ptr parse_root();
 
@@ -23,17 +24,15 @@ public:
   ast_node_ptr consume_literal();
   ast_node_ptr consume_paren();
 
-  const source_stream& stream() const { return stream_; }
-  token last_token() const { return last_token_; }
+  void get_next_token();
+  token cur_token() const { return cur_token_; }
 
 private:
-  void get_next_token();
-
   bool has_delim(std::string_view val) const;
   void error() const;
 
-  source_stream stream_;
-  token last_token_;
+  source_stream& stream_;
+  token cur_token_;
 
   const char* expected_type_ = "";  // used for informative error messages
 };
