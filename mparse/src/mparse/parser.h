@@ -32,7 +32,7 @@ private:
   void error() const;
 
   source_stream& stream_;
-  token cur_token_;
+  token cur_token_{ token_type::unknown, 0 };
 
   const char* expected_type_ = "";  // used for informative error messages
 };
