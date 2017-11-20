@@ -2,6 +2,9 @@
 
 namespace mparse {
 
+ast_node::~ast_node() {  // definition provided because base dtors are always called (even when pure virtual)
+}
+
 void ast_node::apply_visitor(ast_visitor& vis) {
   vis.visit(*this);
 }
