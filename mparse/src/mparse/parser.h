@@ -2,13 +2,14 @@
 
 #include "mparse/ast/ast_node.h"
 #include "mparse/lex.h"
+#include "mparse/source_map.h"
 #include "mparse/source_stream.h"
 
 namespace mparse {
 
 class parser {
 public:
-  explicit parser(source_stream& stream);
+  parser(source_stream& stream, source_map* smap = nullptr);
 
   void begin_parse();
   void end_parse();
@@ -31,12 +32,16 @@ private:
   bool has_delim(std::string_view val) const;
   void error() const;
 
+  void save_bin_locs(const binary_op_node* node, source_range op_loc);
+
   source_stream& stream_;
+  source_map* smap_;
+
   token cur_token_{ token_type::unknown, 0 };
 
   const char* expected_type_ = "";  // used for informative error messages
 };
 
-ast_node_ptr parse(std::string_view source);
+ast_node_ptr parse(std::string_view source, source_map* smap = nullptr);
 
 }  // namespace mparse

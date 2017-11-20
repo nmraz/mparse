@@ -58,8 +58,9 @@ source_range get_loc(const token& tok) {
 }  // namespace
 
 
-parser::parser(source_stream& stream)
-  : stream_(stream) {
+parser::parser(source_stream& stream, source_map* smap)
+  : stream_(stream)
+  , smap_(smap) {
 }
 
 
@@ -92,13 +93,13 @@ ast_node_ptr parser::parse_add() {
   ast_node_ptr node = parse_mult();
 
   while ((op = find_delim_val(ops, cur_token_)) != nullptr) {
-    std::size_t op_loc = cur_token_.loc;
+    source_range op_loc = get_loc(cur_token_);
   
     get_next_token();
-    ast_node_ptr rhs = parse_mult();
-    
-    node = make_ast_node<binary_op_node>(*op, std::move(node), std::move(rhs));
-    // TODO: set source info
+    auto add_node = make_ast_node<binary_op_node>(*op, std::move(node), parse_mult());
+
+    save_bin_locs(add_node.get(), op_loc);
+    node = std::move(add_node);
   }
 
   return node;
@@ -114,13 +115,13 @@ ast_node_ptr parser::parse_mult() {
   ast_node_ptr node = parse_unary();
 
   while ((op = find_delim_val(ops, cur_token_)) != nullptr) {
-    std::size_t op_loc = cur_token_.loc;
+    source_range op_loc = get_loc(cur_token_);
 
     get_next_token();
-    ast_node_ptr rhs = parse_unary();
+    auto mul_node = make_ast_node<binary_op_node>(*op, std::move(node), parse_unary());
 
-    node = make_ast_node<binary_op_node>(*op, std::move(node), std::move(rhs));
-    // TODO: set source info
+    save_bin_locs(mul_node.get(), op_loc);
+    node = std::move(mul_node);
   }
 
   return node;
@@ -134,11 +135,19 @@ ast_node_ptr parser::parse_unary() {
 
   const unary_op_type* op = find_delim_val(ops, cur_token_);
   if (op) {
-    std::size_t op_loc = cur_token_.loc;
+    source_range op_loc = get_loc(cur_token_);
 
     get_next_token();
-    return make_ast_node<unary_op_node>(*op, parse_unary());
-    // TODO: set source info
+    auto node = make_ast_node<unary_op_node>(*op, parse_unary());
+    
+    if (smap_) {
+      smap_->set_locs(node.get(), {
+        source_range::merge(op_loc, smap_->find_primary_loc(node->child())),  // full range
+        op_loc  // operator
+      });
+    }
+
+    return node;
   }
 
   return parse_pow();
@@ -148,11 +157,13 @@ ast_node_ptr parser::parse_pow() {
   ast_node_ptr node = parse_atom();
 
   if (has_delim("^"sv)) {
-    std::size_t op_loc = cur_token_.loc;
+    source_range op_loc = get_loc(cur_token_);
 
     get_next_token();
-    return make_ast_node<binary_op_node>(binary_op_type::pow, std::move(node), parse_unary());
-    // TODO: set source info
+    auto pow_node = make_ast_node<binary_op_node>(binary_op_type::pow, std::move(node), parse_unary());
+
+    save_bin_locs(pow_node.get(), op_loc);
+    return pow_node;
   }
 
   return node;
@@ -177,14 +188,17 @@ ast_node_ptr parser::parse_atom() {
 }
 
 ast_node_ptr parser::consume_literal() {
-  token tok = cur_token_;
+  auto node = make_ast_node<literal_node>(std::strtod(cur_token_.val.data(), nullptr));
+  if (smap_) {
+    smap_->set_locs(node.get(), { get_loc(cur_token_) });
+  }
+
   get_next_token();
-  return make_ast_node<literal_node>(std::strtod(tok.val.data(), nullptr));
-  // TODO: set source info
+  return node;
 }
 
 ast_node_ptr parser::consume_paren() {
-  std::size_t open_loc = cur_token_.loc;
+  source_range open_loc = get_loc(cur_token_);
 
   get_next_token();
   ast_node_ptr inner_expr = parse_add();
@@ -195,11 +209,15 @@ ast_node_ptr parser::consume_paren() {
     }
     error();
   }
-  std::size_t close_loc = cur_token_.loc + cur_token_.val.size();
+  source_range close_loc = get_loc(cur_token_);
 
   get_next_token();
-  return make_ast_node<paren_node>(std::move(inner_expr));
-  // TODO: set source info
+  auto node = make_ast_node<paren_node>(std::move(inner_expr));
+  
+  if (smap_) {
+    smap_->set_locs(node.get(), { source_range::merge(open_loc, close_loc) });
+  }
+  return node;
 }
 
 
@@ -232,10 +250,19 @@ void parser::error() const {
   );
 }
 
+void parser::save_bin_locs(const binary_op_node* node, source_range op_loc) {
+  if (smap_) {
+    smap_->set_locs(node, {
+      source_range::merge(smap_->find_primary_loc(node->lhs()), smap_->find_primary_loc(node->rhs())),  // full range
+      op_loc  // operator
+    });
+  }
+}
 
-ast_node_ptr parse(std::string_view source) {
+
+ast_node_ptr parse(std::string_view source, source_map* smap) {
   source_stream stream(source);
-  parser p(stream);
+  parser p(stream, smap);
   return p.parse_root();
 }
 
