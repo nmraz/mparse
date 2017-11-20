@@ -17,7 +17,7 @@ void print_help(std::string_view prog_name) {
   std::exit(1);
 }
 
-mparse::abstract_syntax_tree parse_diag(std::string_view input) {
+mparse::ast_node_ptr parse_diag(std::string_view input) {
   try {
     return mparse::parse(input);
   } catch (const mparse::syntax_error& err) {
@@ -40,15 +40,15 @@ int main(int argc, const char* const* argv) {
   }
 
   std::string_view input = argv[2];
-  mparse::abstract_syntax_tree ast = parse_diag(input);
+  mparse::ast_node_ptr ast = parse_diag(input);
 
   if (cmd == "dump") {
-    dump_ast(ast.root());
+    dump_ast(ast.get());
   } else if (cmd == "pretty") {
-    std::cout << pretty_print(ast.root()) << "\n";
+    std::cout << pretty_print(ast.get()) << "\n";
   } else if (cmd == "eval") {
     try {
-      std::cout << eval(ast.root()) << '\n';
+      std::cout << eval(ast.get()) << '\n';
     } catch (const eval_error& err) {
       std::cout << "Math error: " << err.what() << "\n\n";
       return 1;
