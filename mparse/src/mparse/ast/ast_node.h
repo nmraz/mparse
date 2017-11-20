@@ -18,15 +18,15 @@ public:
 
   virtual void apply_visitor(ast_visitor& vis);
   virtual void apply_visitor(const_ast_visitor& vis) const;
-
-protected:
-  ast_node() = default;
-
-private:
-  friend class abstract_syntax_tree;
 };
 
 using ast_node_ptr = std::unique_ptr<ast_node>;
+
+template<typename Node, typename... Args>
+std::unique_ptr<Node> make_ast_node(Args&&... args) {
+  static_assert(std::is_base_of_v<ast_node, Node>, "make_ast_node can only be used for AST nodes");
+  return std::make_unique<Node>(std::forward<Args>(args)...);
+}
 
 
 template<typename Der, typename Base = ast_node>
