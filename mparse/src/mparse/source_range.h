@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cstdlib>
 
 namespace mparse {
@@ -16,9 +17,15 @@ public:
   constexpr void set_from(std::size_t from) { from_ = from; }
   constexpr void set_to(std::size_t to) { to_ = to; }
 
+  static constexpr source_range merge(const source_range& lhs, const source_range& rhs);
+
 private:
   std::size_t from_ = 0;
   std::size_t to_ = 0;
 };
+
+constexpr source_range source_range::merge(const source_range& lhs, const source_range& rhs) {
+  return { std::min(lhs.from(), rhs.from()), std::max(lhs.to(), rhs.to()) };
+}
 
 }  // namespace mparse

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <array>
 #include <string>
+#include <utility>
 
 using namespace std::literals;
 
@@ -57,100 +58,124 @@ source_range get_loc(const token& tok) {
 }  // namespace
 
 
-parser::parser(source_stream stream)
-  : stream_(stream) {
+parser::parser(source_stream& stream, source_map* smap)
+  : stream_(stream)
+  , smap_(smap) {
 }
 
-void parser::parse_root() {
-  begin_parse();
-  ast_node* expr = parse_add();
-  if (last_token_.type != token_type::eof) {
+
+void parser::begin_parse() {
+  get_next_token();
+}
+
+void parser::end_parse() {
+  if (cur_token_.type != token_type::eof) {
     error();
   }
-
-  ast_.set_root(expr);
 }
 
 
-ast_node* parser::parse_add() {
+ast_node_ptr parser::parse_root() {
+  begin_parse();
+  ast_node_ptr expr = parse_add();
+  end_parse();
+  return expr;
+}
+
+
+ast_node_ptr parser::parse_add() {
   static constexpr delim_val_mapping<binary_op_type> ops[] = {
     { "+"sv, binary_op_type::add },
     { "-"sv, binary_op_type::sub }
   };
 
   const binary_op_type* op = nullptr;
-  ast_node* node = parse_mult();
+  ast_node_ptr node = parse_mult();
 
-  while ((op = find_delim_val(ops, last_token_)) != nullptr) {
-    std::size_t op_loc = last_token_.loc;
+  while ((op = find_delim_val(ops, cur_token_)) != nullptr) {
+    source_range op_loc = get_loc(cur_token_);
   
     get_next_token();
-    ast_node* rhs = parse_mult();
-    
-    node = ast_.make_node<binary_op_node>(*op, node, rhs, op_loc);
+    auto add_node = make_ast_node<binary_op_node>(*op, std::move(node), parse_mult());
+
+    save_bin_locs(add_node.get(), op_loc);
+    node = std::move(add_node);
   }
 
   return node;
 }
 
-ast_node* parser::parse_mult() {
+ast_node_ptr parser::parse_mult() {
   static constexpr delim_val_mapping<binary_op_type> ops[] = {
     { "*"sv, binary_op_type::mult },
     { "/"sv, binary_op_type::div }
   };
 
   const binary_op_type* op = nullptr;
-  ast_node* node = parse_unary();
+  ast_node_ptr node = parse_unary();
 
-  while ((op = find_delim_val(ops, last_token_)) != nullptr) {
-    std::size_t op_loc = last_token_.loc;
+  while ((op = find_delim_val(ops, cur_token_)) != nullptr) {
+    source_range op_loc = get_loc(cur_token_);
 
     get_next_token();
-    ast_node* rhs = parse_unary();
+    auto mul_node = make_ast_node<binary_op_node>(*op, std::move(node), parse_unary());
 
-    node = ast_.make_node<binary_op_node>(*op, node, rhs, op_loc);
+    save_bin_locs(mul_node.get(), op_loc);
+    node = std::move(mul_node);
   }
 
   return node;
 }
 
-ast_node* parser::parse_unary() {
+ast_node_ptr parser::parse_unary() {
   static constexpr delim_val_mapping<unary_op_type> ops[] = {
     { "+"sv, unary_op_type::plus },
     { "-"sv, unary_op_type::neg }
   };
 
-  const unary_op_type* op = find_delim_val(ops, last_token_);
+  const unary_op_type* op = find_delim_val(ops, cur_token_);
   if (op) {
-    std::size_t op_loc = last_token_.loc;
+    source_range op_loc = get_loc(cur_token_);
 
     get_next_token();
-    return ast_.make_node<unary_op_node>(*op, parse_unary(), op_loc);
+    auto node = make_ast_node<unary_op_node>(*op, parse_unary());
+    
+    if (smap_) {
+      smap_->set_locs(node.get(), {
+        source_range::merge(op_loc, smap_->find_primary_loc(node->child())),  // full range
+        op_loc  // operator
+      });
+    }
+
+    return node;
   }
 
   return parse_pow();
 }
 
-ast_node* parser::parse_pow() {
-  ast_node* node = parse_atom();
+ast_node_ptr parser::parse_pow() {
+  ast_node_ptr node = parse_atom();
 
   if (has_delim("^"sv)) {
-    std::size_t op_loc = last_token_.loc;
+    source_range op_loc = get_loc(cur_token_);
 
     get_next_token();
-    return ast_.make_node<binary_op_node>(binary_op_type::pow, node, parse_unary(), op_loc);
+    auto pow_node = make_ast_node<binary_op_node>(binary_op_type::pow, std::move(node), parse_unary());
+
+    save_bin_locs(pow_node.get(), op_loc);
+    return pow_node;
   }
 
   return node;
 }
 
 
-ast_node* parser::parse_atom() {
+ast_node_ptr parser::parse_atom() {
   expected_type_ = "an expression";  // at this point, we want an expression
 
-  ast_node* ret = nullptr;
+  ast_node_ptr ret = nullptr;
 
-  if (last_token_.type == token_type::literal) {
+  if (cur_token_.type == token_type::literal) {
     ret = consume_literal();
   } else if (has_delim("("sv)) {
     ret = consume_paren();
@@ -162,65 +187,83 @@ ast_node* parser::parse_atom() {
   return ret;
 }
 
-ast_node* parser::consume_literal() {
-  token tok = last_token_;
+ast_node_ptr parser::consume_literal() {
+  auto node = make_ast_node<literal_node>(std::strtod(cur_token_.val.data(), nullptr));
+  if (smap_) {
+    smap_->set_locs(node.get(), { get_loc(cur_token_) });
+  }
+
   get_next_token();
-  return ast_.make_node<literal_node>(std::strtod(tok.val.data(), nullptr), get_loc(tok));
+  return node;
 }
 
-ast_node* parser::consume_paren() {
-  std::size_t open_loc = last_token_.loc;
+ast_node_ptr parser::consume_paren() {
+  source_range open_loc = get_loc(cur_token_);
 
   get_next_token();
-  ast_node* inner_expr = parse_add();
+  ast_node_ptr inner_expr = parse_add();
 
   if (!has_delim(")"sv)) {
-    if (last_token_.type == token_type::eof) {
+    if (cur_token_.type == token_type::eof) {
       throw syntax_error("Unbalanced parentheses", source_range(open_loc));
     }
     error();
   }
-  std::size_t close_loc = last_token_.loc + last_token_.val.size();
+  source_range close_loc = get_loc(cur_token_);
 
   get_next_token();
-  return ast_.make_node<paren_node>(inner_expr, source_range(open_loc, close_loc));
+  auto node = make_ast_node<paren_node>(std::move(inner_expr));
+  
+  if (smap_) {
+    smap_->set_locs(node.get(), { source_range::merge(open_loc, close_loc) });
+  }
+  return node;
+}
+
+
+void parser::get_next_token() {
+  cur_token_ = get_token(stream_);
 }
 
 
 // PRIVATE
 
-void parser::get_next_token() {
-  last_token_ = get_token(stream_);
-}
-
 bool parser::has_delim(std::string_view val) const {
-  return last_token_.type == token_type::delim && last_token_.val == val;
+  return cur_token_.type == token_type::delim && cur_token_.val == val;
 }
 
 void parser::error() const {
-  if (last_token_.type == token_type::eof) {
+  if (cur_token_.type == token_type::eof) {
     // custom message/location for end of input
     throw syntax_error(
       "Expected "s + expected_type_,
-      source_range(last_token_.loc, last_token_.loc + 1)
+      source_range(cur_token_.loc, cur_token_.loc + 1)
     );
   }
 
-  std::string msg = "Unexpected "s + token_type_name(last_token_.type)
-    + " '" + std::string(last_token_.val) + "': expected " + expected_type_;
+  std::string msg = "Unexpected "s + token_type_name(cur_token_.type)
+    + " '" + std::string(cur_token_.val) + "': expected " + expected_type_;
 
   throw syntax_error(
     msg,
-    get_loc(last_token_)
+    get_loc(cur_token_)
   );
 }
 
+void parser::save_bin_locs(const binary_op_node* node, source_range op_loc) {
+  if (smap_) {
+    smap_->set_locs(node, {
+      source_range::merge(smap_->find_primary_loc(node->lhs()), smap_->find_primary_loc(node->rhs())),  // full range
+      op_loc  // operator
+    });
+  }
+}
 
-abstract_syntax_tree parse(std::string_view source) {
+
+ast_node_ptr parse(std::string_view source, source_map* smap) {
   source_stream stream(source);
-  parser p(stream);
-  p.parse_root();
-  return std::move(p.ast());
+  parser p(stream, smap);
+  return p.parse_root();
 }
 
 }  // namespace mparse

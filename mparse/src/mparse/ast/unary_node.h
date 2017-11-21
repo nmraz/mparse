@@ -6,13 +6,14 @@ namespace mparse {
 
 class unary_node : public ast_node_impl<unary_node> {
 public:
-  ast_node* child() { return child_; }
-  const ast_node* child() const { return child_; }
+  ast_node* child() { return child_.get(); }
+  const ast_node* child() const { return child_.get(); }
 
-  void set_child(ast_node* child);
+  void set_child(ast_node_ptr child);
+  ast_node_ptr take_child();
 
 private:
-  ast_node* child_;
+  ast_node_ptr child_;
 };
 
 }  // namespace mparse

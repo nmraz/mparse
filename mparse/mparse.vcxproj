@@ -148,7 +148,6 @@
     <ClCompile Include="src\eval.cpp" />
     <ClCompile Include="src\loc_printing.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\mparse\ast\abstract_syntax_tree.cpp" />
     <ClCompile Include="src\mparse\ast\ast_node.cpp" />
     <ClCompile Include="src\mparse\ast\literal_node.cpp" />
     <ClCompile Include="src\mparse\ast\operator_nodes.cpp" />
@@ -157,6 +156,7 @@
     <ClCompile Include="src\mparse\error.cpp" />
     <ClCompile Include="src\mparse\lex.cpp" />
     <ClCompile Include="src\mparse\parser.cpp" />
+    <ClCompile Include="src\mparse\source_map.cpp" />
     <ClCompile Include="src\mparse\source_stream.cpp" />
     <ClCompile Include="src\op_strings.cpp" />
     <ClCompile Include="src\pretty_print.cpp" />
@@ -165,7 +165,6 @@
     <ClInclude Include="src\ast_dump.h" />
     <ClInclude Include="src\eval.h" />
     <ClInclude Include="src\loc_printing.h" />
-    <ClInclude Include="src\mparse\ast\abstract_syntax_tree.h" />
     <ClInclude Include="src\mparse\ast\ast_node.h" />
     <ClInclude Include="src\mparse\ast\ast_visitor.h" />
     <ClInclude Include="src\mparse\ast\literal_node.h" />
@@ -175,10 +174,12 @@
     <ClInclude Include="src\mparse\error.h" />
     <ClInclude Include="src\mparse\lex.h" />
     <ClInclude Include="src\mparse\parser.h" />
+    <ClInclude Include="src\mparse\source_map.h" />
     <ClInclude Include="src\mparse\source_range.h" />
     <ClInclude Include="src\mparse\source_stream.h" />
     <ClInclude Include="src\op_strings.h" />
     <ClInclude Include="src\pretty_print.h" />
+    <ClInclude Include="src\util\span.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

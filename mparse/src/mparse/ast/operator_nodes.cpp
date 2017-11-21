@@ -2,59 +2,46 @@
 
 #include <algorithm>
 #include <cassert>
+#include <utility>
 
 namespace mparse {
 
-unary_op_node::unary_op_node(unary_op_type type, ast_node* child, std::size_t op_loc) {
+unary_op_node::unary_op_node(unary_op_type type, ast_node_ptr child) {
   set_type(type);
-  set_child(child);
-  set_op_loc(op_loc);
+  set_child(std::move(child));
 }
 
 void unary_op_node::set_type(unary_op_type type) {
   type_ = type;
 }
 
-void unary_op_node::set_op_loc(std::size_t op_loc) {
-  op_loc_ = op_loc;
-}
 
-source_range unary_op_node::source_loc() const {
-  source_range inner_loc = child()->source_loc();
-  return { std::min(op_loc_, inner_loc.from()), std::max(op_loc_, inner_loc.to()) };
-}
-
-
-binary_op_node::binary_op_node(binary_op_type type, ast_node* lhs, ast_node* rhs, std::size_t op_loc) {
+binary_op_node::binary_op_node(binary_op_type type, ast_node_ptr lhs, ast_node_ptr rhs) {
   set_type(type);
-  set_lhs(lhs);
-  set_rhs(rhs);
-  set_op_loc(op_loc);
+  set_lhs(std::move(lhs));
+  set_rhs(std::move(rhs));
 }
 
 void binary_op_node::set_type(binary_op_type type) {
   type_ = type;
 }
 
-void binary_op_node::set_lhs(ast_node* lhs) {
-  lhs_ = lhs;
+
+void binary_op_node::set_lhs(ast_node_ptr lhs) {
+  lhs_ = std::move(lhs);
 }
 
-void binary_op_node::set_rhs(ast_node* rhs) {
-  rhs_ = rhs;
+ast_node_ptr binary_op_node::take_lhs() {
+  return std::move(lhs_);
 }
 
-void binary_op_node::set_op_loc(std::size_t op_loc) {
-  op_loc_ = op_loc;
+
+void binary_op_node::set_rhs(ast_node_ptr rhs) {
+  rhs_ = std::move(rhs);
 }
 
-source_range binary_op_node::source_loc() const {
-  assert(
-    op_loc_ >= lhs_->source_loc().from()
-    && op_loc_ < rhs_->source_loc().to()
-    && "Binary operator should be located between operands"
-  );
-  return { lhs_->source_loc().from(), rhs_->source_loc().to() };
+ast_node_ptr binary_op_node::take_rhs() {
+  return std::move(rhs_);
 }
 
 }  // namespace mparse

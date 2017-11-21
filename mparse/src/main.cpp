@@ -4,9 +4,11 @@
 #include "mparse/ast/operator_nodes.h"
 #include "mparse/error.h"
 #include "mparse/parser.h"
+#include "mparse/source_map.h"
 #include "pretty_print.h"
 #include <cstdlib>
 #include <iostream>
+#include <utility>
 
 using namespace std::literals;
 
@@ -17,9 +19,11 @@ void print_help(std::string_view prog_name) {
   std::exit(1);
 }
 
-mparse::abstract_syntax_tree parse_diag(std::string_view input) {
+auto parse_diag(std::string_view input) {
   try {
-    return mparse::parse(input);
+    mparse::source_map smap;
+    mparse::ast_node_ptr ast = mparse::parse(input, &smap);
+    return std::make_pair(std::move(ast), std::move(smap));
   } catch (const mparse::syntax_error& err) {
     std::cout << "Syntax error: " << err.what() << "\n\n";
     print_loc(err.where(), input);
@@ -40,28 +44,26 @@ int main(int argc, const char* const* argv) {
   }
 
   std::string_view input = argv[2];
-  mparse::abstract_syntax_tree ast = parse_diag(input);
+  auto [ast, smap] = parse_diag(input);
 
   if (cmd == "dump") {
-    dump_ast(ast.root());
+    dump_ast(ast.get(), smap);
   } else if (cmd == "pretty") {
-    std::cout << pretty_print(ast.root()) << "\n";
+    std::cout << pretty_print(ast.get()) << "\n";
   } else if (cmd == "eval") {
     try {
-      std::cout << eval(ast.root()) << '\n';
+      std::cout << eval(ast.get()) << '\n';
     } catch (const eval_error& err) {
       std::cout << "Math error: " << err.what() << "\n\n";
 
+      const mparse::binary_op_node* node = static_cast<const mparse::binary_op_node*>(err.node());
+
       switch (err.code()) {
       case eval_errc::div_by_zero:
-        print_loc(static_cast<const mparse::binary_op_node*>(err.node())->rhs()->source_loc(), input);
+        print_loc(smap.find_primary_loc(node->rhs()), input);
         break;
       case eval_errc::bad_pow:
-      {
-        const mparse::binary_op_node* node = static_cast<const mparse::binary_op_node*>(err.node());
-
-        print_locs({ node->lhs()->source_loc(), node->rhs()->source_loc() }, input);
-      }
+        print_locs({ smap.find_primary_loc(node->lhs()), smap.find_primary_loc(node->rhs()) }, input);
       default:
         break;
       }
