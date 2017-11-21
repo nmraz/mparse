@@ -15,7 +15,8 @@ using namespace std::literals;
 namespace {
 
 void print_help(std::string_view prog_name) {
-  std::cout << "Usage: " << prog_name << " dump|eval|pretty <expr>";
+  prog_name = prog_name.substr(prog_name.rfind('\\') + 1);
+  std::cout << "Usage: " << prog_name << " dump|eval|pretty <expr>\n";
   std::exit(1);
 }
 
@@ -31,7 +32,7 @@ auto parse_diag(std::string_view input) {
   }
 }
 
-}
+}  // namespace
 
 int main(int argc, const char* const* argv) {
   if (argc < 3) {
