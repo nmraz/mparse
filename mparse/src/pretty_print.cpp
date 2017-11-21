@@ -5,11 +5,46 @@
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
 #include "mparse/ast/paren_node.h"
+#include "util/auto_restore.h"
 #include <sstream>
 
 using namespace std::literals;
 
 namespace {
+
+// all operators, in order of increasing precedence
+enum class op_precedence {
+  unknown,
+  add,
+  mult,
+  unary,
+  pow
+};
+
+op_precedence get_precedence(mparse::binary_op_type op) {
+  switch (op) {
+  case mparse::binary_op_type::add:
+  case mparse::binary_op_type::sub:
+    return op_precedence::add;
+
+  case mparse::binary_op_type::mult:
+  case mparse::binary_op_type::div:
+    return op_precedence::mult;
+
+  case mparse::binary_op_type::pow:
+    return op_precedence::pow;
+  }
+
+  return op_precedence::unknown;  // force parenthesization
+}
+
+std::string parenthesize(std::string expr, op_precedence parent_precedence, op_precedence precedence) {
+  if (static_cast<int>(precedence) < static_cast<int>(parent_precedence)) {
+    return "(" + expr + ")";
+  }
+  return expr;
+}
+
 
 struct print_visitor : mparse::const_ast_visitor {
   void visit(const mparse::unary_node& node) override;
@@ -18,6 +53,7 @@ struct print_visitor : mparse::const_ast_visitor {
   void visit(const mparse::literal_node& node) override;
 
   std::string result;
+  op_precedence parent_precedence = op_precedence::unknown;
 };
 
 void print_visitor::visit(const mparse::unary_node& node) {
@@ -25,17 +61,26 @@ void print_visitor::visit(const mparse::unary_node& node) {
 }
 
 void print_visitor::visit(const mparse::unary_op_node& node) {
-  result = "("s + stringify_unary_op(node.type()) + result + ")";
+  result = parenthesize(stringify_unary_op(node.type()) + result, parent_precedence, op_precedence::unary);
 }
 
 void print_visitor::visit(const mparse::binary_op_node& node) {
-  node.lhs()->apply_visitor(*this);
-  std::string lhs_str = std::move(result);
+  mparse::binary_op_type op = node.type();
+  op_precedence prec = get_precedence(op);
 
-  node.rhs()->apply_visitor(*this);
-  std::string rhs_str = std::move(result);
+  std::string lhs_str, rhs_str;
+  {
+    util::auto_restore<op_precedence> save_parent_precedence(parent_precedence);
+    parent_precedence = prec;
 
-  result = "(" + lhs_str + " " + stringify_binary_op(node.type()) + " " + rhs_str + ")";
+    node.lhs()->apply_visitor(*this);
+    lhs_str = std::move(result);
+
+    node.rhs()->apply_visitor(*this);
+    rhs_str = std::move(result);
+  }
+
+  result = parenthesize(lhs_str + " " + stringify_binary_op(op) + " " + rhs_str, parent_precedence, prec);
 }
 
 void print_visitor::visit(const mparse::literal_node& node) {
