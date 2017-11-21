@@ -179,6 +179,7 @@
     <ClInclude Include="src\mparse\source_stream.h" />
     <ClInclude Include="src\op_strings.h" />
     <ClInclude Include="src\pretty_print.h" />
+    <ClInclude Include="src\util\auto_restore.h" />
     <ClInclude Include="src\util\span.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
