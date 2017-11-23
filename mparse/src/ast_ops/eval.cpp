@@ -1,9 +1,9 @@
 #include "eval.h"
 
 #include "mparse/ast/ast_visitor.h"
+#include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
-#include "mparse/ast/paren_node.h"
 #include <cmath>
 
 namespace ast_ops {
@@ -14,6 +14,7 @@ struct eval_visitor : mparse::const_ast_visitor {
   void visit(const mparse::unary_op_node& node) override;
   void visit(const mparse::binary_op_node& node) override;
   void visit(const mparse::literal_node& node) override;
+  void visit(const mparse::id_node& node) override;
 
   double result = 0;
 };
@@ -75,6 +76,11 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
 
 void eval_visitor::visit(const mparse::literal_node& node) {
   result = node.val();
+}
+
+void eval_visitor::visit(const mparse::id_node& node) {
+  // variables aren't supported (yet)
+  throw eval_error("Unbound variable '" + node.name() + "'", eval_errc::unbound_var, &node);
 }
 
 }  // namespace

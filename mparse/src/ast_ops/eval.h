@@ -11,7 +11,8 @@ namespace ast_ops {
 enum class eval_errc {
   unknown,
   div_by_zero,
-  bad_pow
+  bad_pow,
+  unbound_var
 };
 
 class eval_error : public std::runtime_error {
