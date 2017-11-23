@@ -65,6 +65,7 @@ int main(int argc, const char* const* argv) {
         break;
       case ast_ops::eval_errc::bad_pow:
         print_locs(input, { smap.find_primary_loc(node->lhs()), smap.find_primary_loc(node->rhs()) });
+        break;
       case ast_ops::eval_errc::unbound_var:
         print_loc(input, smap.find_primary_loc(err.node()));
       default:
