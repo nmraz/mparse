@@ -2,6 +2,7 @@
 
 #include "op_strings.h"
 #include "mparse/ast/ast_visitor.h"
+#include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
 #include "mparse/ast/paren_node.h"
@@ -52,6 +53,7 @@ struct print_visitor : mparse::const_ast_visitor {
   void visit(const mparse::unary_op_node& node) override;
   void visit(const mparse::binary_op_node& node) override;
   void visit(const mparse::literal_node& node) override;
+  void visit(const mparse::id_node& node) override;
 
   std::string result;
   op_precedence parent_precedence = op_precedence::unknown;
@@ -88,6 +90,10 @@ void print_visitor::visit(const mparse::literal_node& node) {
   std::ostringstream stream;
   stream << node.val();
   result = stream.str();
+}
+
+void print_visitor::visit(const mparse::id_node& node) {
+  result = node.name();
 }
 
 }  // namespace
