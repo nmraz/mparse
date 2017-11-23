@@ -205,7 +205,7 @@ ast_node_ptr parser::consume_paren() {
 
   if (!has_delim(")"sv)) {
     if (cur_token_.type == token_type::eof) {
-      throw syntax_error("Unbalanced parentheses", source_range(open_loc));
+      throw syntax_error("Unbalanced parentheses", open_loc);
     }
     error();
   }
