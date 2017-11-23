@@ -27,4 +27,4 @@ private:
 
 double eval(const mparse::ast_node* node);
 
-}
+}  // namespace ast_ops
