@@ -27,7 +27,7 @@ auto parse_diag(std::string_view input) {
     return std::make_pair(std::move(ast), std::move(smap));
   } catch (const mparse::syntax_error& err) {
     std::cout << "Syntax error: " << err.what() << "\n\n";
-    print_loc(err.where(), input);
+    print_loc(input, err.where());
     std::exit(1);
   }
 }
@@ -61,10 +61,10 @@ int main(int argc, const char* const* argv) {
 
       switch (err.code()) {
       case ast_ops::eval_errc::div_by_zero:
-        print_loc(smap.find_primary_loc(node->rhs()), input);
+        print_loc(input, smap.find_primary_loc(node->rhs()));
         break;
       case ast_ops::eval_errc::bad_pow:
-        print_locs({ smap.find_primary_loc(node->lhs()), smap.find_primary_loc(node->rhs()) }, input);
+        print_locs(input, { smap.find_primary_loc(node->lhs()), smap.find_primary_loc(node->rhs()) });
       default:
         break;
       }
