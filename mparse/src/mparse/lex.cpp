@@ -14,6 +14,10 @@ bool is_digit(char ch) {
   return ch >= '0' && ch <= '9';
 }
 
+bool is_alpha(char ch) {
+  return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_';
+}
+
 }  // namespace
 
 namespace mparse {
@@ -61,6 +65,16 @@ token get_token(source_stream& stream) {
 
     return token{
       token_type::unknown,
+      token_start,
+      stream.token(token_start)
+    };
+  }
+
+  if (stream.eat(is_alpha)) {
+    stream.eat_while([] (char ch) { return is_alpha(ch) || is_digit(ch); });
+
+    return token{
+      token_type::ident,
       token_start,
       stream.token(token_start)
     };

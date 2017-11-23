@@ -6,6 +6,7 @@ namespace mparse {
 
 enum class token_type {
   literal,  // number literal
+  ident,  // identifier
   delim,  // delimiter (operator)
   eof,  // end of input
   unknown  // error
