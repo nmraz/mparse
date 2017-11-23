@@ -14,10 +14,7 @@ std::string make_marker(std::size_t size) {
 }  // namespace
 
 void print_loc(mparse::source_range where, std::string_view source) {
-  std::cout << source << '\n';
-
-  std::cout << std::string(where.from(), ' ')
-    << make_marker(where.to() - where.from()) << '\n';
+  print_locs({ where }, source);
 }
 
 void print_locs(std::initializer_list<mparse::source_range> locs, std::string_view source) {
