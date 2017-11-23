@@ -23,6 +23,7 @@ public:
   
   ast_node_ptr parse_atom();
   ast_node_ptr consume_literal();
+  ast_node_ptr consume_ident();
   ast_node_ptr consume_paren();
 
   void get_next_token();

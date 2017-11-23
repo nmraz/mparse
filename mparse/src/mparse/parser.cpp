@@ -1,5 +1,6 @@
 #include "parser.h"
 
+#include "mparse/ast/id_node.h"
 #include "mparse/ast/paren_node.h"
 #include "mparse/ast/operator_nodes.h"
 #include "mparse/ast/literal_node.h"
@@ -41,6 +42,8 @@ const char* token_type_name(token_type type) {
   switch (type) {
   case token_type::literal:
     return "number";
+  case token_type::ident:
+    return "identifier";
   case token_type::delim:
     return "delimitor";
   case token_type::eof:
@@ -177,6 +180,8 @@ ast_node_ptr parser::parse_atom() {
 
   if (cur_token_.type == token_type::literal) {
     ret = consume_literal();
+  } else if (cur_token_.type == token_type::ident) {
+    ret = consume_ident();
   } else if (has_delim("("sv)) {
     ret = consume_paren();
   } else {
@@ -189,6 +194,16 @@ ast_node_ptr parser::parse_atom() {
 
 ast_node_ptr parser::consume_literal() {
   auto node = make_ast_node<literal_node>(std::strtod(cur_token_.val.data(), nullptr));
+  if (smap_) {
+    smap_->set_locs(node.get(), { get_loc(cur_token_) });
+  }
+
+  get_next_token();
+  return node;
+}
+
+ast_node_ptr parser::consume_ident() {
+  auto node = make_ast_node<id_node>(std::string(cur_token_.val));
   if (smap_) {
     smap_->set_locs(node.get(), { get_loc(cur_token_) });
   }
