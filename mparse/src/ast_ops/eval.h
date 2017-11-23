@@ -9,6 +9,7 @@
 namespace ast_ops {
 
 enum class eval_errc {
+  unknown,
   div_by_zero,
   bad_pow
 };
