@@ -6,12 +6,7 @@
 #include "mparse/ast/paren_node.h"
 #include <cmath>
 
-eval_error::eval_error(std::string_view what, eval_errc code, const mparse::ast_node* node)
-  : std::runtime_error(what.data())
-  , code_(code)
-  , node_(node) {
-}
-
+namespace ast_ops {
 namespace {
 
 struct eval_visitor : mparse::const_ast_visitor {
@@ -84,8 +79,17 @@ void eval_visitor::visit(const mparse::literal_node& node) {
 
 }  // namespace
 
+
+eval_error::eval_error(std::string_view what, eval_errc code, const mparse::ast_node* node)
+  : std::runtime_error(what.data())
+  , code_(code)
+  , node_(node) {
+}
+
 double eval(const mparse::ast_node* node) {
   eval_visitor vis;
   node->apply_visitor(vis);
   return vis.result;
 }
+
+}  // namespac ast_ops

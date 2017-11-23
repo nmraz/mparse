@@ -1,11 +1,11 @@
-#include "ast_dump.h"
-#include "eval.h"
+#include "ast_ops/ast_dump.h"
+#include "ast_ops/eval.h"
 #include "loc_printing.h"
 #include "mparse/ast/operator_nodes.h"
 #include "mparse/error.h"
 #include "mparse/parser.h"
 #include "mparse/source_map.h"
-#include "pretty_print.h"
+#include "ast_ops/pretty_print.h"
 #include <cstdlib>
 #include <iostream>
 #include <utility>
@@ -48,22 +48,22 @@ int main(int argc, const char* const* argv) {
   auto [ast, smap] = parse_diag(input);
 
   if (cmd == "dump") {
-    dump_ast(ast.get(), smap);
+    ast_ops::dump_ast(ast.get(), smap);
   } else if (cmd == "pretty") {
-    std::cout << pretty_print(ast.get()) << "\n";
+    std::cout << ast_ops::pretty_print(ast.get()) << "\n";
   } else if (cmd == "eval") {
     try {
-      std::cout << eval(ast.get()) << '\n';
-    } catch (const eval_error& err) {
+      std::cout << ast_ops::eval(ast.get()) << '\n';
+    } catch (const ast_ops::eval_error& err) {
       std::cout << "Math error: " << err.what() << "\n\n";
 
       const mparse::binary_op_node* node = static_cast<const mparse::binary_op_node*>(err.node());
 
       switch (err.code()) {
-      case eval_errc::div_by_zero:
+      case ast_ops::eval_errc::div_by_zero:
         print_loc(smap.find_primary_loc(node->rhs()), input);
         break;
-      case eval_errc::bad_pow:
+      case ast_ops::eval_errc::bad_pow:
         print_locs({ smap.find_primary_loc(node->lhs()), smap.find_primary_loc(node->rhs()) }, input);
       default:
         break;

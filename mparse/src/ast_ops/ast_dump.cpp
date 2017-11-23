@@ -11,6 +11,7 @@
 
 using namespace std::literals;
 
+namespace ast_ops {
 namespace {
 
 std::string stringify_source_locs(const mparse::ast_node& node, const mparse::source_map& smap) {
@@ -107,3 +108,5 @@ void dump_ast(const mparse::ast_node* node, const mparse::source_map& smap, std:
 void dump_ast(const mparse::ast_node* node, const mparse::source_map& smap) {
   dump_ast(node, smap, std::cout);
 }
+
+}  // namespace ast_ops

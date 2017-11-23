@@ -6,6 +6,8 @@
 #include <string_view>
 #include <vector>
 
+namespace ast_ops {
+
 enum class eval_errc {
   div_by_zero,
   bad_pow
@@ -24,3 +26,5 @@ private:
 };
 
 double eval(const mparse::ast_node* node);
+
+}

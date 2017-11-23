@@ -1,5 +1,7 @@
 #include "op_strings.h"
 
+namespace ast_ops {
+
 const char* stringify_unary_op(mparse::unary_op_type type) {
   switch (type) {
   case mparse::unary_op_type::plus:
@@ -27,3 +29,5 @@ const char* stringify_binary_op(mparse::binary_op_type type) {
     return "";
   }
 }
+
+}  // namespace ast_ops

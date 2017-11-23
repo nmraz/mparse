@@ -10,6 +10,7 @@
 
 using namespace std::literals;
 
+namespace ast_ops {
 namespace {
 
 // all operators, in order of increasing precedence
@@ -91,8 +92,11 @@ void print_visitor::visit(const mparse::literal_node& node) {
 
 }  // namespace
 
+
 std::string pretty_print(const mparse::ast_node* node) {
   print_visitor vis;
   node->apply_visitor(vis);
   return vis.result;
 }
+
+}  // namespace ast_ops
