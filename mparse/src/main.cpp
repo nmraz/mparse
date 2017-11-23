@@ -48,7 +48,7 @@ int main(int argc, const char* const* argv) {
   auto [ast, smap] = parse_diag(input);
 
   if (cmd == "dump") {
-    ast_ops::dump_ast(ast.get(), smap);
+    ast_ops::dump_ast(ast.get(), &smap);
   } else if (cmd == "pretty") {
     std::cout << ast_ops::pretty_print(ast.get()) << "\n";
   } else if (cmd == "eval") {
