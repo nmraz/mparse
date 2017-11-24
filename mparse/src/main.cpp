@@ -1,5 +1,5 @@
 #include "ast_ops/ast_dump.h"
-#include "ast_ops/eval.h"
+#include "ast_ops/eval/eval.h"
 #include "ast_ops/pretty_print.h"
 #include "loc_printing.h"
 #include "mparse/ast/operator_nodes.h"
