@@ -1,11 +1,11 @@
 #include "ast_ops/ast_dump.h"
 #include "ast_ops/eval.h"
+#include "ast_ops/pretty_print.h"
 #include "loc_printing.h"
 #include "mparse/ast/operator_nodes.h"
 #include "mparse/error.h"
 #include "mparse/parser.h"
 #include "mparse/source_map.h"
-#include "ast_ops/pretty_print.h"
 #include <cstdlib>
 #include <iostream>
 #include <utility>
