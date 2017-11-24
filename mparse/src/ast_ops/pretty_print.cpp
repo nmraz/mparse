@@ -5,7 +5,6 @@
 #include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
-#include "mparse/ast/paren_node.h"
 #include "util/auto_restore.h"
 #include <sstream>
 
