@@ -111,7 +111,7 @@ void ast_dump_visitor::dump_last_child(const mparse::ast_node& node) {
 
 
 void dump_ast(const mparse::ast_node* node, const mparse::source_map* smap, std::ostream& stream) {
-  ast_dump_visitor vis("", true, smap, stream);
+  ast_dump_visitor vis("", false, smap, stream);
   node->apply_visitor(vis);
 }
 
