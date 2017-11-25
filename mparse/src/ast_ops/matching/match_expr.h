@@ -16,12 +16,7 @@ constexpr bool is_match_expr<unique_symbol_matcher<I>> = true;
 
 
 struct literal_matcher {
-public:
-  constexpr literal_matcher(double val) : val_(val) {}
-  double val() const { return val_; }
-
-private:
-  double val_;
+  const double val;
 };
 
 template<>
@@ -38,14 +33,19 @@ constexpr bool is_match_expr<node_type_matcher<T, Node>> = true;
 
 
 template<mparse::binary_op_type Type, typename Lhs, typename Rhs>
-struct binary_op_matcher {};
+struct binary_op_matcher {
+  const Lhs lhs;
+  const Rhs rhs;
+};
 
 template<mparse::binary_op_type Type, typename Lhs, typename Rhs>
 constexpr bool is_match_expr<binary_op_matcher<Type, Lhs, Rhs>> = true;
 
 
 template<mparse::unary_op_type Type, typename Inner>
-struct unary_op_matcher {};
+struct unary_op_matcher {
+  const Inner inner;
+};
 
 template<mparse::unary_op_type Type, typename Inner>
 constexpr bool is_match_expr<unary_op_matcher<Type, Inner>> = true;
