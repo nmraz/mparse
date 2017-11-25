@@ -97,6 +97,15 @@ template<
   return { lhs, rhs };
 }
 
+template<
+  typename Lhs,
+  typename Rhs,
+  typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>
+> constexpr binary_op_matcher<mparse::binary_op_type::pow, Lhs, Rhs> pow(Lhs lhs, Rhs rhs) {
+  return { lhs, rhs };
+}
+
+
 inline namespace literals {
 
 constexpr literal_matcher operator""_lit(long double val) {
