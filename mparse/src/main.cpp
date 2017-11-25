@@ -6,6 +6,7 @@
 #include "mparse/error.h"
 #include "mparse/parser.h"
 #include "mparse/source_map.h"
+#include "parse_vardefs.h"
 #include <cstdlib>
 #include <iostream>
 #include <utility>
@@ -77,6 +78,8 @@ int main(int argc, const char* const* argv) {
       { "pi", 3.14159265 },
       { "tau", 6.28318531 }
     };
+
+    parse_vardefs(scope, argc - 3, argv + 3);
 
     try {
       std::cout << ast_ops::eval(ast.get(), scope) << '\n';
