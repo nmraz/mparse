@@ -1,29 +1,19 @@
 #include "lex.h"
 
+#include "mparse/lex_util.h"
+
 using namespace std::literals;
 
 namespace {
 
-// locale-independent, UTF-8
-constexpr auto whitespace = " \f\n\r\t\v\u00a0\u1680\u180e\u2000\u2001\u2002\u2003\u2004"
-  "\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000\ufeff"sv;
-
 constexpr auto delims = "+-*/^()"sv;
-
-bool is_digit(char ch) {
-  return ch >= '0' && ch <= '9';
-}
-
-bool is_alpha(char ch) {
-  return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_';
-}
 
 }  // namespace
 
 namespace mparse {
 
 token get_token(source_stream& stream) {
-  stream.eat_while(whitespace);
+  stream.eat_while(lex_util::whitespace);
 
   source_stream::pos_type token_start = stream.pos();
 
@@ -43,9 +33,9 @@ token get_token(source_stream& stream) {
     };
   }
 
-  if (stream.eat_while(is_digit)) {
+  if (stream.eat_while(lex_util::is_digit)) {
     if (stream.eat('.')) {
-      stream.eat_while(is_digit);
+      stream.eat_while(lex_util::is_digit);
     }
     return token{
       token_type::literal,
@@ -55,7 +45,7 @@ token get_token(source_stream& stream) {
   }
 
   if (stream.eat('.')) {
-    if (stream.eat_while(is_digit)) {
+    if (stream.eat_while(lex_util::is_digit)) {
       return token{
         token_type::literal,
         token_start,
@@ -70,8 +60,10 @@ token get_token(source_stream& stream) {
     };
   }
 
-  if (stream.eat(is_alpha)) {
-    stream.eat_while([] (char ch) { return is_alpha(ch) || is_digit(ch); });
+  if (stream.eat(lex_util::is_alpha)) {
+    stream.eat_while([] (char ch) {
+      return lex_util::is_alpha(ch) || lex_util::is_digit(ch);
+    });
 
     return token{
       token_type::ident,

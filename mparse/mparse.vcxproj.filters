@@ -134,5 +134,8 @@
     <ClInclude Include="src\ast_ops\eval\eval_scope.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\mparse\lex_util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

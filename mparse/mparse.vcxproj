@@ -177,6 +177,7 @@
     <ClInclude Include="src\mparse\ast\unary_node.h" />
     <ClInclude Include="src\mparse\error.h" />
     <ClInclude Include="src\mparse\lex.h" />
+    <ClInclude Include="src\mparse\lex_util.h" />
     <ClInclude Include="src\mparse\parser.h" />
     <ClInclude Include="src\mparse\source_map.h" />
     <ClInclude Include="src\mparse\source_range.h" />
