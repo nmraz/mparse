@@ -147,6 +147,7 @@
     <ClCompile Include="src\ast_ops\ast_dump.cpp" />
     <ClCompile Include="src\ast_ops\eval\eval.cpp" />
     <ClCompile Include="src\ast_ops\eval\eval_scope.cpp" />
+    <ClCompile Include="src\ast_ops\matching\x.cpp" />
     <ClCompile Include="src\loc_printing.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mparse\ast\ast_node.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="src\ast_ops\ast_dump.h" />
     <ClInclude Include="src\ast_ops\eval\eval.h" />
     <ClInclude Include="src\ast_ops\eval\eval_scope.h" />
+    <ClInclude Include="src\ast_ops\matching\match_expr.h" />
     <ClInclude Include="src\loc_printing.h" />
     <ClInclude Include="src\mparse\ast\ast_node.h" />
     <ClInclude Include="src\mparse\ast\ast_visitor.h" />
