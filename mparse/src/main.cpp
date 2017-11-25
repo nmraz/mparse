@@ -32,7 +32,27 @@ auto parse_diag(std::string_view input) {
   }
 }
 
+void print_math_error(const ast_ops::eval_error& err, const mparse::source_map& smap, std::string_view input) {
+  std::cout << "Math error: " << err.what() << "\n\n";
+
+  const mparse::binary_op_node* node = static_cast<const mparse::binary_op_node*>(err.node());
+
+  switch (err.code()) {
+  case ast_ops::eval_errc::div_by_zero:
+    print_loc(input, smap.find_primary_loc(node->rhs()));
+    break;
+  case ast_ops::eval_errc::bad_pow:
+    print_locs(input, { smap.find_primary_loc(node->lhs()), smap.find_primary_loc(node->rhs()) });
+    break;
+  case ast_ops::eval_errc::unbound_var:
+    print_loc(input, smap.find_primary_loc(err.node()));
+  default:
+    break;
+  }
+}
+
 }  // namespace
+
 
 int main(int argc, const char* const* argv) {
   if (argc < 3) {
@@ -61,23 +81,7 @@ int main(int argc, const char* const* argv) {
     try {
       std::cout << ast_ops::eval(ast.get(), scope) << '\n';
     } catch (const ast_ops::eval_error& err) {
-      std::cout << "Math error: " << err.what() << "\n\n";
-
-      const mparse::binary_op_node* node = static_cast<const mparse::binary_op_node*>(err.node());
-
-      switch (err.code()) {
-      case ast_ops::eval_errc::div_by_zero:
-        print_loc(input, smap.find_primary_loc(node->rhs()));
-        break;
-      case ast_ops::eval_errc::bad_pow:
-        print_locs(input, { smap.find_primary_loc(node->lhs()), smap.find_primary_loc(node->rhs()) });
-        break;
-      case ast_ops::eval_errc::unbound_var:
-        print_loc(input, smap.find_primary_loc(err.node()));
-      default:
-        break;
-      }
-
+      print_math_error(err, smap, input);
       return 1;
     }
   }
