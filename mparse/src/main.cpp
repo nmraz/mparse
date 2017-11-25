@@ -52,8 +52,14 @@ int main(int argc, const char* const* argv) {
   } else if (cmd == "pretty") {
     std::cout << ast_ops::pretty_print(ast.get()) << "\n";
   } else if (cmd == "eval") {
+    ast_ops::eval_scope scope = {
+      { "e", 2.71828183 },
+      { "pi", 3.14159265 },
+      { "tau", 6.28318531 }
+    };
+
     try {
-      std::cout << ast_ops::eval(ast.get()) << '\n';
+      std::cout << ast_ops::eval(ast.get(), scope) << '\n';
     } catch (const ast_ops::eval_error& err) {
       std::cout << "Math error: " << err.what() << "\n\n";
 
