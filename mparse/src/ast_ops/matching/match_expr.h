@@ -97,4 +97,11 @@ template<
   return { lhs, rhs };
 }
 
+inline namespace literals {
+
+constexpr literal_matcher operator""_lit(long double val) {
+  return { static_cast<double>(val) };
+}
+
+}  // namespace literals
 }  // namespace ast_ops::matching
