@@ -50,4 +50,51 @@ struct unary_op_matcher {
 template<mparse::unary_op_type Type, typename Inner>
 constexpr bool is_match_expr<unary_op_matcher<Type, Inner>> = true;
 
+
+template<
+  typename Inner,
+  typename = std::enable_if_t<is_match_expr<Inner>>
+> constexpr unary_op_matcher<mparse::unary_op_type::plus, Inner> operator+(Inner inner) {
+  return { inner };
+}
+
+template<
+  typename Inner,
+  typename = std::enable_if_t<is_match_expr<Inner>>
+> constexpr unary_op_matcher<mparse::unary_op_type::neg, Inner> operator-(Inner inner) {
+  return { inner };
+}
+
+template<
+  typename Lhs,
+  typename Rhs,
+  typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>
+> constexpr binary_op_matcher<mparse::binary_op_type::add, Lhs, Rhs> operator+(Lhs lhs, Rhs rhs) {
+  return { lhs, rhs };
+}
+
+template<
+  typename Lhs,
+  typename Rhs,
+  typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>
+> constexpr binary_op_matcher<mparse::binary_op_type::sub, Lhs, Rhs> operator-(Lhs lhs, Rhs rhs) {
+  return { lhs, rhs };
+}
+
+template<
+  typename Lhs,
+  typename Rhs,
+  typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>
+> constexpr binary_op_matcher<mparse::binary_op_type::mult, Lhs, Rhs> operator*(Lhs lhs, Rhs rhs) {
+  return { lhs, rhs };
+}
+
+template<
+  typename Lhs,
+  typename Rhs,
+  typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>
+> constexpr binary_op_matcher<mparse::binary_op_type::div, Lhs, Rhs> operator/(Lhs lhs, Rhs rhs) {
+  return { lhs, rhs };
+}
+
 }  // namespace ast_ops::matching
