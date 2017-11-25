@@ -8,12 +8,6 @@ namespace ast_ops::matching {
 template<typename T>
 constexpr bool is_match_expr = false;
 
-template<std::size_t I>
-struct unique_symbol_matcher {};
-
-template<std::size_t I>
-constexpr bool is_match_expr<unique_symbol_matcher<I>> = true;
-
 
 struct literal_matcher {
   const double val;
@@ -26,10 +20,16 @@ constexpr bool is_match_expr<literal_matcher> = true;
 template<std::size_t I, typename Node>
 struct node_type_matcher {
   static_assert(std::is_base_of_v<mparse::ast_node, Node>, "node_type_matcher can only match descendants of ast_node");
+
+  using match_type = Node;
+  static constexpr std::size_t match_index = I;
 };
 
+template<std::size_t I>
+using unique_symbol_matcher = node_type_matcher<I, mparse::ast_node>;
+
 template<std::size_t I, typename Node>
-constexpr bool is_match_expr<node_type_matcher<T, Node>> = true;
+constexpr bool is_match_expr<node_type_matcher<I, Node>> = true;
 
 
 template<mparse::binary_op_type Type, typename Lhs, typename Rhs>
