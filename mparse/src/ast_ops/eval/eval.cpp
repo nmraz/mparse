@@ -10,14 +10,21 @@ namespace ast_ops {
 namespace {
 
 struct eval_visitor : mparse::const_ast_visitor {
+  eval_visitor(const eval_scope& scope);
+
   void visit(const mparse::unary_node& node) override;
   void visit(const mparse::unary_op_node& node) override;
   void visit(const mparse::binary_op_node& node) override;
   void visit(const mparse::literal_node& node) override;
   void visit(const mparse::id_node& node) override;
 
+  const eval_scope& scope;
   double result = 0;
 };
+
+eval_visitor::eval_visitor(const eval_scope& scope)
+  : scope(scope) {
+}
 
 void eval_visitor::visit(const mparse::unary_node& node) {
   node.child()->apply_visitor(*this);
@@ -79,8 +86,11 @@ void eval_visitor::visit(const mparse::literal_node& node) {
 }
 
 void eval_visitor::visit(const mparse::id_node& node) {
-  // variables aren't supported (yet)
-  throw eval_error("Unbound variable '" + node.name() + "'", eval_errc::unbound_var, &node);
+  if (auto val = scope.lookup(node.name())) {
+    result = *val;
+  } else {
+    throw eval_error("Unbound variable '" + node.name() + "'", eval_errc::unbound_var, &node);
+  }
 }
 
 }  // namespace
@@ -92,8 +102,8 @@ eval_error::eval_error(std::string_view what, eval_errc code, const mparse::ast_
   , node_(node) {
 }
 
-double eval(const mparse::ast_node* node) {
-  eval_visitor vis;
+double eval(const mparse::ast_node* node, const eval_scope& scope) {
+  eval_visitor vis(scope);
   node->apply_visitor(vis);
   return vis.result;
 }

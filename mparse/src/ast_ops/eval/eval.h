@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ast_ops/eval/eval_scope.h"
 #include "mparse/ast/ast_node.h"
 #include <stdexcept>
 #include <string_view>
@@ -26,6 +27,6 @@ private:
   const mparse::ast_node* node_;
 };
 
-double eval(const mparse::ast_node* node);
+double eval(const mparse::ast_node* node, const eval_scope& scope);
 
 }  // namespace ast_ops
