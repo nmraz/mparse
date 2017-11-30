@@ -40,6 +40,44 @@ op_precedence get_precedence(mparse::binary_op_type op) {
   return op_precedence::unknown;  // force parenthesization
 }
 
+
+// whether we are on the right or left-hand side of a subexpression
+enum class branch_side {
+  left,
+  right
+};
+
+// default associativity of unparenthesized operators - left, right, or fully associative
+// (currently only both and left are used)
+enum class associativity {
+  left,
+  right,
+  both
+};
+
+associativity get_associativity(mparse::binary_op_type op) {
+  switch (op) {
+  case mparse::binary_op_type::sub:
+  case mparse::binary_op_type::div:
+  case mparse::binary_op_type::pow:
+    return associativity::left;
+  }
+  return associativity::both;
+}
+
+bool should_parenthesize(op_precedence parent_precedence, op_precedence precedence, branch_side side, associativity parent_assoc) {
+  if (precedence == parent_precedence) {  // tie - determine based on associativity
+    if (parent_assoc == associativity::both) {
+      return false;
+    }
+    return (side == branch_side::left && parent_assoc == associativity::right)
+      || (side == branch_side::right && parent_assoc == associativity::left);  // associativity doesn't match side
+  }
+
+  return static_cast<int>(precedence) < static_cast<int>(parent_precedence);
+}
+
+
 class auto_parenthesizer {
 public:
   auto_parenthesizer(std::string& expr, op_precedence parent_precedence, op_precedence precedence);
