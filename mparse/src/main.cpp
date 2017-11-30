@@ -17,7 +17,7 @@ namespace {
 
 void print_help(std::string_view prog_name) {
   prog_name = prog_name.substr(prog_name.rfind('\\') + 1);
-  std::cout << "Usage: " << prog_name << " dump|pretty|eval <expr> [vardefs]\n\n";
+  std::cout << "Usage: " << prog_name << " dump|pretty|eval <expr> [var1=val1 var2=val2 ...]\n\n";
   std::cout << "dump - Print a visualization of the AST.\n";
   std::cout << "pretty - Pretty print the expression.\n";
   std::cout << "eval - Evaluate the expression, using the passed variable definitions.\n";
