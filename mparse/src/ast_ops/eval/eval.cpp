@@ -60,7 +60,7 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
     result = lhs_val / rhs_val;
     break;
   case mparse::binary_op_type::pow:
-    if (lhs_val < 0 && rhs_val != static_cast<int>(rhs_val)) {
+    if (lhs_val < 0 && rhs_val != std::round(rhs_val)) {
       throw eval_error(
         "Raising negative number to non-integer power",
         eval_errc::bad_pow,
