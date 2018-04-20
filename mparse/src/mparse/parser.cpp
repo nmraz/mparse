@@ -56,7 +56,7 @@ const char* token_type_name(token_type type) {
 }
 
 source_range get_loc(const token& tok) {
-  return { tok.loc, tok.loc + tok.val.size() };
+  return { tok.loc, tok.loc + std::max(tok.val.size(), std::size_t{1}) };
 }
 
 }  // namespace
@@ -224,7 +224,7 @@ ast_node_ptr parser::consume_paren_like(std::string_view term_tok, const char* f
 
   if (!has_delim(term_tok)) {
     if (cur_token_.type == token_type::eof) {
-      throw syntax_error("Unbalanced "s + friendly_name, { open_loc, source_range(cur_token_.loc) });
+      throw syntax_error("Unbalanced "s + friendly_name, { open_loc, get_loc(cur_token_) });
     }
     error();
   }
@@ -252,16 +252,7 @@ bool parser::has_delim(std::string_view val) const {
 }
 
 void parser::error() const {
-  if (cur_token_.type == token_type::eof) {
-    // custom message/location for end of input
-    throw syntax_error(
-      "Expected "s + expected_type_,
-      { source_range(cur_token_.loc, cur_token_.loc + 1) }
-    );
-  }
-
-  std::string msg = "Unexpected "s + token_type_name(cur_token_.type)
-    + " '" + std::string(cur_token_.val) + "': expected " + expected_type_;
+  std::string msg = "Unexpected "s + token_type_name(cur_token_.type) + ": expected " + expected_type_;
 
   throw syntax_error(
     msg,
