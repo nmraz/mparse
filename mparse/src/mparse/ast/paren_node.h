@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mparse/ast/ast_node_impl.h"
 #include "mparse/ast/unary_node.h"
 
 namespace mparse {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mparse/ast/ast_node.h"
+#include "mparse/ast/ast_node_impl.h"
 #include <string>
 
 namespace mparse {
