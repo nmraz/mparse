@@ -13,11 +13,8 @@ std::string make_marker(std::size_t size) {
 
 }  // namespace
 
-void print_loc(std::string_view source, mparse::source_range where) {
-  print_locs(source, { where });
-}
 
-void print_locs(std::string_view source, std::initializer_list<mparse::source_range> locs) {
+void print_locs(std::string_view source, util::span<const mparse::source_range> locs) {
   std::cout << source << '\n';
 
   mparse::source_range prev_loc;
