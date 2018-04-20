@@ -1,6 +1,7 @@
 #include "pretty_print.h"
 
 #include "op_strings.h"
+#include "mparse/ast/abs_node.h"
 #include "mparse/ast/ast_visitor.h"
 #include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
@@ -92,6 +93,7 @@ struct print_visitor : mparse::const_ast_visitor {
     mparse::source_map* smap, std::size_t loc_offset = 0);
 
   void visit(const mparse::paren_node& node) override;
+  void visit(const mparse::abs_node& node) override;
   void visit(const mparse::unary_op_node& node) override;
   void visit(const mparse::binary_op_node& node) override;
   void visit(const mparse::literal_node& node) override;
@@ -154,6 +156,19 @@ void print_visitor::visit(const mparse::paren_node& node) {
 
   if (smap) {
     smap->set_locs(&node, { smap->find_primary_loc(node.child()) });  // copy just primary location
+  }
+}
+
+void print_visitor::visit(const mparse::abs_node& node) {
+  parent_precedence = op_precedence::unknown;
+  mparse::source_range outer_loc = record_loc([&] {
+    result += "|";
+    node.child()->apply_visitor(*this);
+    result += "|";
+  });
+
+  if (smap) {
+    smap->set_locs(&node, { outer_loc });
   }
 }
 
