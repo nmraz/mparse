@@ -1,10 +1,10 @@
 #include "parser.h"
 
-#include "mparse/ast/id_node.h"
-#include "mparse/ast/paren_node.h"
 #include "mparse/ast/abs_node.h"
-#include "mparse/ast/operator_nodes.h"
+#include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
+#include "mparse/ast/operator_nodes.h"
+#include "mparse/ast/paren_node.h"
 #include "mparse/error.h"
 #include <algorithm>
 #include <array>
