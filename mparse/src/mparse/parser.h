@@ -4,6 +4,7 @@
 #include "mparse/lex.h"
 #include "mparse/source_map.h"
 #include "mparse/source_stream.h"
+#include <vector>
 
 namespace mparse {
 
@@ -32,6 +33,10 @@ public:
   token cur_token() const { return cur_token_; }
 
 private:
+  void push_term_tok(std::string_view term_tok);
+  void pop_term_tok();
+
+  bool has_term_tok() const;
   bool has_delim(std::string_view val) const;
   void error() const;
 
@@ -42,7 +47,9 @@ private:
 
   token cur_token_{ token_type::unknown, 0 };
 
-  const char* expected_type_ = "";  // used for informative error messages
+  // used for informative error messages
+  const char* expected_type_ = "";
+  std::vector<std::string_view> term_toks_;
 };
 
 ast_node_ptr parse(std::string_view source, source_map* smap = nullptr);

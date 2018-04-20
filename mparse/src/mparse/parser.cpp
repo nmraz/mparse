@@ -218,16 +218,18 @@ ast_node_ptr parser::consume_ident() {
 template<typename T>
 ast_node_ptr parser::consume_paren_like(std::string_view term_tok, const char* friendly_name) {
   source_range open_loc = get_loc(cur_token_);
+  push_term_tok(term_tok);
 
   get_next_token();
   ast_node_ptr inner_expr = parse_add();
 
   if (!has_delim(term_tok)) {
-    if (cur_token_.type == token_type::eof) {
+    if (has_term_tok()) {
       throw syntax_error("Unbalanced "s + friendly_name, { open_loc, get_loc(cur_token_) });
     }
     error();
   }
+  pop_term_tok();
   source_range close_loc = get_loc(cur_token_);
 
   get_next_token();
@@ -246,6 +248,27 @@ void parser::get_next_token() {
 
 
 // PRIVATE
+
+void parser::push_term_tok(std::string_view term_tok) {
+  term_toks_.push_back(term_tok);
+}
+
+void parser::pop_term_tok() {
+  term_toks_.pop_back();
+}
+
+
+bool parser::has_term_tok() const {
+  if (cur_token_.type == token_type::eof) {
+    return true;
+  }
+
+  if (cur_token_.type != token_type::delim) {
+    return false;
+  }
+
+  return std::find(term_toks_.begin(), term_toks_.end(), cur_token_.val) != term_toks_.end();
+}
 
 bool parser::has_delim(std::string_view val) const {
   return cur_token_.type == token_type::delim && cur_token_.val == val;
