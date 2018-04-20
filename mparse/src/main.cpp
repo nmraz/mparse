@@ -31,7 +31,7 @@ auto parse_diag(std::string_view input) {
     return std::make_pair(std::move(ast), std::move(smap));
   } catch (const mparse::syntax_error& err) {
     std::cout << "Syntax error: " << err.what() << "\n\n";
-    print_loc(input, err.where());
+    print_locs(input, err.where());
     std::exit(1);
   }
 }

@@ -2,9 +2,9 @@
 
 namespace mparse {
 
-syntax_error::syntax_error(std::string_view what, source_range where)
+syntax_error::syntax_error(std::string_view what, std::vector<source_range> where)
   : std::runtime_error(what.data())
-  , where_(where) {
+  , where_(std::move(where)) {
 }
 
 }  // namespace mparse

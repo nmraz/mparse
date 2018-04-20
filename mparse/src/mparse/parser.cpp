@@ -224,7 +224,7 @@ ast_node_ptr parser::consume_paren_like(std::string_view term_tok, const char* f
 
   if (!has_delim(term_tok)) {
     if (cur_token_.type == token_type::eof) {
-      throw syntax_error("Unbalanced "s + friendly_name, open_loc);
+      throw syntax_error("Unbalanced "s + friendly_name, { open_loc });
     }
     error();
   }
@@ -256,7 +256,7 @@ void parser::error() const {
     // custom message/location for end of input
     throw syntax_error(
       "Expected "s + expected_type_,
-      source_range(cur_token_.loc, cur_token_.loc + 1)
+      { source_range(cur_token_.loc, cur_token_.loc + 1) }
     );
   }
 
@@ -265,7 +265,7 @@ void parser::error() const {
 
   throw syntax_error(
     msg,
-    get_loc(cur_token_)
+    { get_loc(cur_token_) }
   );
 }
 
