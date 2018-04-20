@@ -9,7 +9,7 @@ namespace mparse {
 
 class ast_node {
 public:
-  ast_node() = default;
+  constexpr ast_node() = default;
 
   ast_node(const ast_node&) = delete;
   ast_node(ast_node&&) = delete;
@@ -29,22 +29,5 @@ std::unique_ptr<Node> make_ast_node(Args&&... args) {
   static_assert(std::is_base_of_v<ast_node, Node>, "make_ast_node can only be used for AST nodes");
   return std::make_unique<Node>(std::forward<Args>(args)...);
 }
-
-
-template<typename Der, typename Base = ast_node>
-class ast_node_impl : public Base {
-public:
-  static_assert(std::is_base_of_v<ast_node, Base>, "AST nodes must derive from ast_node");
-
-  void apply_visitor(ast_visitor& vis) override {
-    Base::apply_visitor(vis);  // visit bases first
-    vis.visit(static_cast<Der&>(*this));
-  }
-
-  void apply_visitor(const_ast_visitor& vis) const override {
-    Base::apply_visitor(vis);  // visit bases first
-    vis.visit(static_cast<const Der&>(*this));
-  }
-};
 
 }  // namespace mparse

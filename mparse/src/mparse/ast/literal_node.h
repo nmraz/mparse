@@ -1,19 +1,19 @@
 #pragma once
 
-#include "mparse/ast/ast_node.h"
+#include "mparse/ast/ast_node_impl.h"
 
 namespace mparse {
 
 class literal_node : public ast_node_impl<literal_node> {
 public:
-  literal_node() = default;
-  literal_node(double val);
+  constexpr literal_node() = default;
+  constexpr literal_node(double val) : val_(val) {}
 
-  double val() const { return val_; }
-  void set_val(double val);
+  constexpr double val() const { return val_; }
+  constexpr void set_val(double val) { val_ = val; }
 
 private:
-  double val_;
+  double val_ = 0;
 };
 
 }  // namespace mparse

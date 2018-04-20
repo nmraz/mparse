@@ -87,8 +87,9 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/utf-8 /permissive- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -100,8 +101,9 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/utf-8 /permissive- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -115,9 +117,10 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/utf-8 /permissive- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -133,9 +136,10 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/utf-8 /permissive- %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -153,7 +157,6 @@
     <ClCompile Include="src\mparse\ast\abs_node.cpp" />
     <ClCompile Include="src\mparse\ast\ast_node.cpp" />
     <ClCompile Include="src\mparse\ast\id_node.cpp" />
-    <ClCompile Include="src\mparse\ast\literal_node.cpp" />
     <ClCompile Include="src\mparse\ast\operator_nodes.cpp" />
     <ClCompile Include="src\mparse\ast\paren_node.cpp" />
     <ClCompile Include="src\mparse\ast\unary_node.cpp" />
@@ -176,6 +179,7 @@
     <ClInclude Include="src\loc_printing.h" />
     <ClInclude Include="src\mparse\ast\abs_node.h" />
     <ClInclude Include="src\mparse\ast\ast_node.h" />
+    <ClInclude Include="src\mparse\ast\ast_node_impl.h" />
     <ClInclude Include="src\mparse\ast\ast_visitor.h" />
     <ClInclude Include="src\mparse\ast\id_node.h" />
     <ClInclude Include="src\mparse\ast\literal_node.h" />

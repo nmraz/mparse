@@ -18,9 +18,6 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\mparse\ast\literal_node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\mparse\ast\operator_nodes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -159,6 +156,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\mparse\ast\abs_node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mparse\ast\ast_node_impl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

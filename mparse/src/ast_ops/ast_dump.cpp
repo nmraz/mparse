@@ -1,11 +1,11 @@
 #include "ast_dump.h"
 
-#include "mparse/ast/ast_visitor.h"
 #include "mparse/ast/abs_node.h"
+#include "mparse/ast/ast_visitor.h"
 #include "mparse/ast/id_node.h"
-#include "mparse/ast/paren_node.h"
-#include "mparse/ast/operator_nodes.h"
 #include "mparse/ast/literal_node.h"
+#include "mparse/ast/operator_nodes.h"
+#include "mparse/ast/paren_node.h"
 #include "op_strings.h"
 #include "util/auto_restore.h"
 #include <iostream>

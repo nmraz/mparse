@@ -1,15 +1,16 @@
 #include "parser.h"
 
-#include "mparse/ast/id_node.h"
-#include "mparse/ast/paren_node.h"
 #include "mparse/ast/abs_node.h"
-#include "mparse/ast/operator_nodes.h"
+#include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
+#include "mparse/ast/operator_nodes.h"
+#include "mparse/ast/paren_node.h"
 #include "mparse/error.h"
 #include <algorithm>
 #include <array>
 #include <string>
 #include <utility>
+#include <vector>
 
 using namespace std::literals;
 
@@ -56,38 +57,71 @@ const char* token_type_name(token_type type) {
 }
 
 source_range get_loc(const token& tok) {
-  return { tok.loc, tok.loc + tok.val.size() };
+  return { tok.loc, tok.loc + std::max(tok.val.size(), std::size_t{1}) };
 }
 
 }  // namespace
 
 
-parser::parser(source_stream& stream, source_map* smap)
+struct parser::parser_impl {
+  parser_impl(source_stream& stream, source_map* smap = nullptr);
+
+  void begin_parse();
+  void end_parse();
+
+  ast_node_ptr parse_add();
+  ast_node_ptr parse_mult();
+  ast_node_ptr parse_unary();
+  ast_node_ptr parse_pow();
+
+  ast_node_ptr parse_atom();
+  ast_node_ptr consume_literal();
+  ast_node_ptr consume_ident();
+
+  template<typename T>
+  ast_node_ptr consume_paren_like(std::string_view term_tok, const char* friendly_name);
+
+  void get_next_token();
+  token cur_token() const { return cur_token_; }
+
+  void push_term_tok(std::string_view term_tok);
+  void pop_term_tok();
+
+  bool has_term_tok() const;
+  bool has_delim(std::string_view val) const;
+  void error() const;
+
+  void save_bin_locs(const binary_op_node* node, source_range op_loc);
+
+  source_stream& stream_;
+  source_map* smap_;
+
+  token cur_token_{ token_type::unknown, 0 };
+
+  // used for informative error messages
+  const char* expected_type_ = "";
+  std::vector<std::string_view> term_toks_;
+};
+
+
+parser::parser_impl::parser_impl(source_stream& stream, source_map* smap)
   : stream_(stream)
   , smap_(smap) {
 }
 
 
-void parser::begin_parse() {
+void parser::parser_impl::begin_parse() {
   get_next_token();
 }
 
-void parser::end_parse() {
+void parser::parser_impl::end_parse() {
   if (cur_token_.type != token_type::eof) {
     error();
   }
 }
 
 
-ast_node_ptr parser::parse_root() {
-  begin_parse();
-  ast_node_ptr expr = parse_add();
-  end_parse();
-  return expr;
-}
-
-
-ast_node_ptr parser::parse_add() {
+ast_node_ptr parser::parser_impl::parse_add() {
   static constexpr delim_val_mapping<binary_op_type> ops[] = {
     { "+"sv, binary_op_type::add },
     { "-"sv, binary_op_type::sub }
@@ -109,7 +143,7 @@ ast_node_ptr parser::parse_add() {
   return node;
 }
 
-ast_node_ptr parser::parse_mult() {
+ast_node_ptr parser::parser_impl::parse_mult() {
   static constexpr delim_val_mapping<binary_op_type> ops[] = {
     { "*"sv, binary_op_type::mult },
     { "/"sv, binary_op_type::div }
@@ -131,7 +165,7 @@ ast_node_ptr parser::parse_mult() {
   return node;
 }
 
-ast_node_ptr parser::parse_unary() {
+ast_node_ptr parser::parser_impl::parse_unary() {
   static constexpr delim_val_mapping<unary_op_type> ops[] = {
     { "+"sv, unary_op_type::plus },
     { "-"sv, unary_op_type::neg }
@@ -157,7 +191,7 @@ ast_node_ptr parser::parse_unary() {
   return parse_pow();
 }
 
-ast_node_ptr parser::parse_pow() {
+ast_node_ptr parser::parser_impl::parse_pow() {
   ast_node_ptr node = parse_atom();
 
   if (has_delim("^"sv)) {
@@ -174,7 +208,7 @@ ast_node_ptr parser::parse_pow() {
 }
 
 
-ast_node_ptr parser::parse_atom() {
+ast_node_ptr parser::parser_impl::parse_atom() {
   expected_type_ = "an expression";  // at this point, we want an expression
 
   ast_node_ptr ret = nullptr;
@@ -195,7 +229,7 @@ ast_node_ptr parser::parse_atom() {
   return ret;
 }
 
-ast_node_ptr parser::consume_literal() {
+ast_node_ptr parser::parser_impl::consume_literal() {
   auto node = make_ast_node<literal_node>(std::strtod(cur_token_.val.data(), nullptr));
   if (smap_) {
     smap_->set_locs(node.get(), { get_loc(cur_token_) });
@@ -205,7 +239,7 @@ ast_node_ptr parser::consume_literal() {
   return node;
 }
 
-ast_node_ptr parser::consume_ident() {
+ast_node_ptr parser::parser_impl::consume_ident() {
   auto node = make_ast_node<id_node>(std::string(cur_token_.val));
   if (smap_) {
     smap_->set_locs(node.get(), { get_loc(cur_token_) });
@@ -216,18 +250,20 @@ ast_node_ptr parser::consume_ident() {
 }
 
 template<typename T>
-ast_node_ptr parser::consume_paren_like(std::string_view term_tok, const char* friendly_name) {
+ast_node_ptr parser::parser_impl::consume_paren_like(std::string_view term_tok, const char* friendly_name) {
   source_range open_loc = get_loc(cur_token_);
+  push_term_tok(term_tok);
 
   get_next_token();
   ast_node_ptr inner_expr = parse_add();
 
   if (!has_delim(term_tok)) {
-    if (cur_token_.type == token_type::eof) {
-      throw syntax_error("Unbalanced "s + friendly_name, open_loc);
+    if (has_term_tok()) {
+      throw syntax_error("Unbalanced "s + friendly_name, { open_loc, get_loc(cur_token_) });
     }
     error();
   }
+  pop_term_tok();
   source_range close_loc = get_loc(cur_token_);
 
   get_next_token();
@@ -240,42 +276,110 @@ ast_node_ptr parser::consume_paren_like(std::string_view term_tok, const char* f
 }
 
 
-void parser::get_next_token() {
+void parser::parser_impl::get_next_token() {
   cur_token_ = get_token(stream_);
 }
 
 
-// PRIVATE
+void parser::parser_impl::push_term_tok(std::string_view term_tok) {
+  term_toks_.push_back(term_tok);
+}
 
-bool parser::has_delim(std::string_view val) const {
+void parser::parser_impl::pop_term_tok() {
+  term_toks_.pop_back();
+}
+
+
+bool parser::parser_impl::has_term_tok() const {
+  if (cur_token_.type == token_type::eof) {
+    return true;
+  }
+
+  if (cur_token_.type != token_type::delim) {
+    return false;
+  }
+
+  return std::find(term_toks_.begin(), term_toks_.end(), cur_token_.val) != term_toks_.end();
+}
+
+bool parser::parser_impl::has_delim(std::string_view val) const {
   return cur_token_.type == token_type::delim && cur_token_.val == val;
 }
 
-void parser::error() const {
-  if (cur_token_.type == token_type::eof) {
-    // custom message/location for end of input
-    throw syntax_error(
-      "Expected "s + expected_type_,
-      source_range(cur_token_.loc, cur_token_.loc + 1)
-    );
-  }
 
-  std::string msg = "Unexpected "s + token_type_name(cur_token_.type)
-    + " '" + std::string(cur_token_.val) + "': expected " + expected_type_;
+void parser::parser_impl::error() const {
+  std::string msg = "Unexpected "s + token_type_name(cur_token_.type) + ": expected " + expected_type_;
 
   throw syntax_error(
     msg,
-    get_loc(cur_token_)
+    { get_loc(cur_token_) }
   );
 }
 
-void parser::save_bin_locs(const binary_op_node* node, source_range op_loc) {
+
+void parser::parser_impl::save_bin_locs(const binary_op_node* node, source_range op_loc) {
   if (smap_) {
     smap_->set_locs(node, {
       source_range::merge(smap_->find_primary_loc(node->lhs()), smap_->find_primary_loc(node->rhs())),  // full range
       op_loc  // operator
     });
   }
+}
+
+
+
+// PUBLIC API
+
+parser::parser(source_stream& stream, source_map* smap)
+  : impl_(std::make_unique<parser_impl>(stream, smap)) {}
+
+parser::~parser() = default;  // parser_impl is a complete type here
+
+
+void parser::begin_parse() {
+  impl_->begin_parse();
+}
+
+void parser::end_parse() {
+  impl_->end_parse();
+}
+
+
+ast_node_ptr parser::parse_root() {
+  begin_parse();
+  ast_node_ptr expr = parse_add();
+  end_parse();
+  return expr;
+}
+
+
+ast_node_ptr parser::parse_add() {
+  return impl_->parse_add();
+}
+
+ast_node_ptr parser::parse_mult() {
+  return impl_->parse_mult();
+}
+
+ast_node_ptr parser::parse_unary() {
+  return impl_->parse_unary();
+}
+
+ast_node_ptr parser::parse_pow() {
+  return impl_->parse_pow();
+}
+
+ast_node_ptr parser::parse_atom() {
+  return impl_->parse_atom();
+}
+
+
+void parser::get_next_token() {
+  impl_->get_next_token();
+}
+
+token parser::cur_token() const {
+  return impl_->cur_token();
 }
 
 
