@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mparse/ast/util.h"
 #include <type_traits>
 
 namespace mparse {
@@ -26,9 +27,6 @@ struct ast_visitor_cv {
   virtual void visit(AddCv<id_node>&) {}
   virtual void visit(AddCv<abs_node>&) {}
 };
-
-template<typename T>
-using identity = T;
 
 }  // namespace impl
 

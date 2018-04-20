@@ -181,11 +181,13 @@
     <ClInclude Include="src\mparse\ast\ast_node.h" />
     <ClInclude Include="src\mparse\ast\ast_node_impl.h" />
     <ClInclude Include="src\mparse\ast\ast_visitor.h" />
+    <ClInclude Include="src\mparse\ast\cast.h" />
     <ClInclude Include="src\mparse\ast\id_node.h" />
     <ClInclude Include="src\mparse\ast\literal_node.h" />
     <ClInclude Include="src\mparse\ast\operator_nodes.h" />
     <ClInclude Include="src\mparse\ast\paren_node.h" />
     <ClInclude Include="src\mparse\ast\unary_node.h" />
+    <ClInclude Include="src\mparse\ast\util.h" />
     <ClInclude Include="src\mparse\error.h" />
     <ClInclude Include="src\mparse\lex.h" />
     <ClInclude Include="src\mparse\lex_util.h" />

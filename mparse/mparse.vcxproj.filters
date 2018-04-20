@@ -161,5 +161,11 @@
     <ClInclude Include="src\mparse\ast\ast_node_impl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\mparse\ast\cast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mparse\ast\util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
