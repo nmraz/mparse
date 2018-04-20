@@ -7,6 +7,7 @@ namespace mparse {
 class ast_node;
 class unary_node;
 class paren_node;
+class abs_node;
 class unary_op_node;
 class binary_op_node;
 class literal_node;
@@ -23,6 +24,7 @@ struct ast_visitor_cv {
   virtual void visit(AddCv<binary_op_node>&) {}
   virtual void visit(AddCv<literal_node>&) {}
   virtual void visit(AddCv<id_node>&) {}
+  virtual void visit(AddCv<abs_node>&) {}
 };
 
 template<typename T>
