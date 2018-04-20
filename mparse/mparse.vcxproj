@@ -156,7 +156,6 @@
     <ClCompile Include="src\mparse\ast\abs_node.cpp" />
     <ClCompile Include="src\mparse\ast\ast_node.cpp" />
     <ClCompile Include="src\mparse\ast\id_node.cpp" />
-    <ClCompile Include="src\mparse\ast\literal_node.cpp" />
     <ClCompile Include="src\mparse\ast\operator_nodes.cpp" />
     <ClCompile Include="src\mparse\ast\paren_node.cpp" />
     <ClCompile Include="src\mparse\ast\unary_node.cpp" />

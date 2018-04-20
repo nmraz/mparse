@@ -6,6 +6,8 @@ namespace mparse {
 
 class unary_node : public ast_node_impl<unary_node> {
 public:
+  constexpr unary_node() = default;
+
   ast_node* child() { return child_.get(); }
   const ast_node* child() const { return child_.get(); }
 
