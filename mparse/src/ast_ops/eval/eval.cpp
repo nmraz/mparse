@@ -1,5 +1,6 @@
 #include "eval.h"
 
+#include "mparse/ast/abs_node.h"
 #include "mparse/ast/ast_visitor.h"
 #include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
@@ -13,6 +14,7 @@ struct eval_visitor : mparse::const_ast_visitor {
   eval_visitor(const eval_scope& scope);
 
   void visit(const mparse::unary_node& node) override;
+  void visit(const mparse::abs_node& node) override;
   void visit(const mparse::unary_op_node& node) override;
   void visit(const mparse::binary_op_node& node) override;
   void visit(const mparse::literal_node& node) override;
@@ -28,6 +30,10 @@ eval_visitor::eval_visitor(const eval_scope& scope)
 
 void eval_visitor::visit(const mparse::unary_node& node) {
   node.child()->apply_visitor(*this);
+}
+
+void eval_visitor::visit(const mparse::abs_node&) {
+  result = std::abs(result);
 }
 
 void eval_visitor::visit(const mparse::unary_op_node& node) {
@@ -60,7 +66,7 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
     result = lhs_val / rhs_val;
     break;
   case mparse::binary_op_type::pow:
-    if (lhs_val < 0 && rhs_val != static_cast<int>(rhs_val)) {
+    if (lhs_val < 0 && rhs_val != std::round(rhs_val)) {
       throw eval_error(
         "Raising negative number to non-integer power",
         eval_errc::bad_pow,

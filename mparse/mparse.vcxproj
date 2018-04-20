@@ -150,6 +150,7 @@
     <ClCompile Include="src\ast_ops\matching\compare.cpp" />
     <ClCompile Include="src\loc_printing.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\mparse\ast\abs_node.cpp" />
     <ClCompile Include="src\mparse\ast\ast_node.cpp" />
     <ClCompile Include="src\mparse\ast\id_node.cpp" />
     <ClCompile Include="src\mparse\ast\literal_node.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="src\ast_ops\matching\match_expr.h" />
     <ClInclude Include="src\ast_ops\matching\util.h" />
     <ClInclude Include="src\loc_printing.h" />
+    <ClInclude Include="src\mparse\ast\abs_node.h" />
     <ClInclude Include="src\mparse\ast\ast_node.h" />
     <ClInclude Include="src\mparse\ast\ast_visitor.h" />
     <ClInclude Include="src\mparse\ast\id_node.h" />

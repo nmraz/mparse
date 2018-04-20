@@ -1,6 +1,7 @@
 #include "ast_dump.h"
 
 #include "mparse/ast/ast_visitor.h"
+#include "mparse/ast/abs_node.h"
 #include "mparse/ast/id_node.h"
 #include "mparse/ast/paren_node.h"
 #include "mparse/ast/operator_nodes.h"
@@ -33,6 +34,7 @@ struct ast_dump_visitor : mparse::const_ast_visitor {
 
   void visit(const mparse::ast_node& node) override;
   void visit(const mparse::paren_node& node) override;
+  void visit(const mparse::abs_node& node) override;
   void visit(const mparse::unary_op_node& node) override;
   void visit(const mparse::binary_op_node& node) override;
   void visit(const mparse::literal_node& node) override;
@@ -69,6 +71,12 @@ void ast_dump_visitor::visit(const mparse::ast_node&) {
 
 void ast_dump_visitor::visit(const mparse::paren_node& node) {
   stream << "paren" << stringify_source_locs(node, smap) << "\n";
+
+  dump_last_child(*node.child());
+}
+
+void ast_dump_visitor::visit(const mparse::abs_node& node) {
+  stream << "abs" << stringify_source_locs(node, smap) << "\n";
 
   dump_last_child(*node.child());
 }

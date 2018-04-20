@@ -24,7 +24,9 @@ public:
   ast_node_ptr parse_atom();
   ast_node_ptr consume_literal();
   ast_node_ptr consume_ident();
-  ast_node_ptr consume_paren();
+  
+  template<typename T>
+  ast_node_ptr consume_paren_like(std::string_view term_tok, const char* friendly_name);
 
   void get_next_token();
   token cur_token() const { return cur_token_; }

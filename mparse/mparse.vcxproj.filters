@@ -75,6 +75,9 @@
     <ClCompile Include="src\ast_ops\matching\compare.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\mparse\ast\abs_node.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\mparse\source_range.h">
@@ -153,6 +156,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ast_ops\matching\util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mparse\ast\abs_node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,6 +2,7 @@
 
 #include "mparse/ast/id_node.h"
 #include "mparse/ast/paren_node.h"
+#include "mparse/ast/abs_node.h"
 #include "mparse/ast/operator_nodes.h"
 #include "mparse/ast/literal_node.h"
 #include "mparse/error.h"
@@ -183,7 +184,9 @@ ast_node_ptr parser::parse_atom() {
   } else if (cur_token_.type == token_type::ident) {
     ret = consume_ident();
   } else if (has_delim("("sv)) {
-    ret = consume_paren();
+    ret = consume_paren_like<paren_node>(")"sv, "parentheses");
+  } else if (has_delim("|"sv)) {
+    ret = consume_paren_like<abs_node>("|"sv, "absolute value bars");
   } else {
     error();
   }
@@ -212,23 +215,24 @@ ast_node_ptr parser::consume_ident() {
   return node;
 }
 
-ast_node_ptr parser::consume_paren() {
+template<typename T>
+ast_node_ptr parser::consume_paren_like(std::string_view term_tok, const char* friendly_name) {
   source_range open_loc = get_loc(cur_token_);
 
   get_next_token();
   ast_node_ptr inner_expr = parse_add();
 
-  if (!has_delim(")"sv)) {
+  if (!has_delim(term_tok)) {
     if (cur_token_.type == token_type::eof) {
-      throw syntax_error("Unbalanced parentheses", open_loc);
+      throw syntax_error("Unbalanced "s + friendly_name, open_loc);
     }
     error();
   }
   source_range close_loc = get_loc(cur_token_);
 
   get_next_token();
-  auto node = make_ast_node<paren_node>(std::move(inner_expr));
-  
+  auto node = make_ast_node<T>(std::move(inner_expr));
+
   if (smap_) {
     smap_->set_locs(node.get(), { source_range::merge(open_loc, close_loc) });
   }
