@@ -8,20 +8,20 @@
 namespace mparse {
 namespace impl {
 
-template<typename T, template<typename> AddCv>
-struct cast_visitor : ast_visitor_cv<AddCv> {
-  void visit(AddCv<T>& node) override {
+template<typename T>
+struct cast_visitor : ast_visitor {
+  void visit(T& node) override {
     result = &to;
   }
 
-  AddCv<T>* result = nullptr;
+  T* result = nullptr;
 };
 
-template<typename T, typename U, template<typename> AddCv>
+template<typename T, typename U>
 struct cast_helper {
   static_assert(std::is_base_of_v<ast_node, T>, "ast_node_cast can only be used for AST nodes");
 
-  static AddCv<T>* do_cast(AddCv<U>* node) {
+  static T* do_cast(U* node) {
     if constexpr (std::is_base_of_v<T, U>) {  // upcast
       return node;
     } else {  // downcast
@@ -31,7 +31,7 @@ struct cast_helper {
         return nullptr;
       }
 
-      cast_visitor<T, AddCv> vis;
+      cast_visitor<T> vis;
       node->apply_visitor(vis);
       return vis.result;
     }
@@ -42,12 +42,12 @@ struct cast_helper {
 
 template<typename T, typename U>
 inline T* ast_node_cast(U* node) {
-  return impl::cast_helper<T, U, impl::identity>::do_cast(node);
+  return impl::cast_helper<T, U>::do_cast(node);
 }
 
 template<typename T, typename U>
 inline const T* ast_node_cast(const U* node) {
-  return impl::cast_helper<T, U, std::add_const_t>::do_cast(node);
+  return impl::cast_helper<T, U>::do_cast(const_cast<U*>(node));
 }
 
 }  // namespace mparse
