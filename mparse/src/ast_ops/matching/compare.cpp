@@ -12,7 +12,7 @@ namespace ast_ops::matching {
 namespace {
 
 struct compare_visitor : mparse::const_ast_visitor {
-  explicit compare_visitor(const mparse::ast_node* other, compare_cache& cache);
+  explicit compare_visitor(const mparse::ast_node* other);
 
   void visit(const mparse::paren_node& node) override;
   void visit(const mparse::unary_op_node& node) override;
@@ -21,26 +21,24 @@ struct compare_visitor : mparse::const_ast_visitor {
   void visit(const mparse::literal_node& node) override;
 
   const mparse::ast_node* other;
-  compare_cache& cache;
 
   bool result;
 };
 
-compare_visitor::compare_visitor(const mparse::ast_node* other, compare_cache& cache)
-  : other(other)
-  , cache(cache) {
+compare_visitor::compare_visitor(const mparse::ast_node* other)
+  : other(other) {
 }
 
 void compare_visitor::visit(const mparse::paren_node& node) {
   if (auto other_paren = mparse::ast_node_cast<const mparse::paren_node>(other)) {
-    result = compare_exprs(node.child(), other_paren->child(), cache);
+    result = compare_exprs(node.child(), other_paren->child());
   }
 }
 
 void compare_visitor::visit(const mparse::unary_op_node& node) {
   if (auto other_unary = mparse::ast_node_cast<const mparse::unary_op_node>(other)) {
     result = node.type() == other_unary->type()
-      && compare_exprs(node.child(), other_unary->child(), cache);
+      && compare_exprs(node.child(), other_unary->child());
     return;
   }
   result = false;
@@ -53,13 +51,13 @@ void compare_visitor::visit(const mparse::binary_op_node& node) {
       return;
     }
 
-    if (compare_exprs(node.lhs(), other_binary->lhs(), cache)
-      && compare_exprs(node.rhs(), other_binary->rhs(), cache)) {
+    if (compare_exprs(node.lhs(), other_binary->lhs())
+      && compare_exprs(node.rhs(), other_binary->rhs())) {
       result = true;
       return;
     } else if (is_commutative(node.type())) {
-      result = compare_exprs(node.lhs(), other_binary->rhs(), cache)
-        && compare_exprs(node.rhs(), other_binary->lhs(), cache);
+      result = compare_exprs(node.lhs(), other_binary->rhs())
+        && compare_exprs(node.rhs(), other_binary->lhs());
       return;
     }
   }
@@ -85,19 +83,14 @@ void compare_visitor::visit(const mparse::literal_node& node) {
 }  // namespace
 
 
-bool compare_exprs(const mparse::ast_node* first, const mparse::ast_node* second, compare_cache& cache) {
+bool compare_exprs(const mparse::ast_node* first, const mparse::ast_node* second) {
   if (first == second) {
     return true;
   }
 
-  impl::compare_cache_key key = { first, second };
-  if (auto it = cache.find(key); it != cache.end()) {
-    return it->second;
-  }
-
-  compare_visitor vis(second, cache);
+  compare_visitor vis(second);
   first->apply_visitor(vis);
-  return cache[key] = vis.result;
+  return vis.result;
 }
 
 }  // namespace ast_ops::matching
