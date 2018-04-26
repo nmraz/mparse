@@ -11,7 +11,7 @@ namespace impl {
 template<typename T>
 struct cast_visitor : ast_visitor {
   void visit(T& node) override {
-    result = &to;
+    result = &node;
   }
 
   T* result = nullptr;
