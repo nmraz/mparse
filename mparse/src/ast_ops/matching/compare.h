@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ast_ops/matching/util.h"
+#include "mparse/ast/abs_node.h"
 #include "mparse/ast/ast_node.h"
 #include "mparse/ast/ast_visitor.h"
 #include "mparse/ast/cast.h"
@@ -18,6 +19,7 @@ struct compare_visitor : mparse::const_ast_visitor {
   explicit compare_visitor(const mparse::ast_node* other, Comp& comp);
 
   void visit(const mparse::paren_node& node) override;
+  void visit(const mparse::abs_node& node) override;
   void visit(const mparse::unary_op_node& node) override;
   void visit(const mparse::binary_op_node& node) override;
   void visit(const mparse::id_node& node) override;
@@ -39,6 +41,15 @@ template<typename Comp>
 void compare_visitor<Comp>::visit(const mparse::paren_node& node) {
   if (auto other_paren = mparse::ast_node_cast<const mparse::paren_node>(other)) {
     result = comp.compare_paren(node, *other_paren);
+    return;
+  }
+  result = false;
+}
+
+template<typename Comp>
+void compare_visitor<Comp>::visit(const mparse::abs_node& node) {
+  if (auto other_abs = mparse::ast_node_cast<const mparse::abs_node>(other)) {
+    result = comp.compare_abs(node, *other_abs);
     return;
   }
   result = false;
@@ -85,6 +96,10 @@ void compare_visitor<Comp>::visit(const mparse::literal_node& node) {
 template<typename Der>
 struct basic_expr_comparer_base {
   bool compare_paren(const mparse::paren_node& first, const mparse::paren_node& second) {
+    return compare_exprs(first.child(), second.child(), static_cast<Der&>(*this));
+  }
+
+  bool compare_abs(const mparse::abs_node& first, const mparse::abs_node& second) {
     return compare_exprs(first.child(), second.child(), static_cast<Der&>(*this));
   }
 
