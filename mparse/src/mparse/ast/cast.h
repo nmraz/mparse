@@ -19,7 +19,8 @@ struct cast_visitor : ast_visitor {
 
 template<typename T, typename U>
 struct cast_helper {
-  static_assert(std::is_base_of_v<ast_node, T>, "ast_node_cast can only be used for AST nodes");
+  static_assert(std::is_base_of_v<ast_node, T>, "ast_node_cast can only cast AST nodes");
+  static_assert(std::is_base_of_v<ast_node, U>, "ast_node_cast can only cast AST nodes");
 
   static T* do_cast(U* node) {
     if constexpr (std::is_base_of_v<T, U>) {  // upcast
