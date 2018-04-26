@@ -2,6 +2,7 @@
 
 #include "ast_ops/matching/util.h"
 #include "mparse/ast/ast_visitor.h"
+#include "mparse/ast/cast.h"
 #include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
@@ -9,25 +10,6 @@
 
 namespace ast_ops::matching {
 namespace {
-
-template<typename To>
-const To* cast_ignore_paren(const mparse::ast_node* node) {
-  struct cast_visitor : mparse::const_ast_visitor {
-    void visit(const mparse::paren_node& node) override {
-      node.child()->apply_visitor(*this);
-    }
-
-    void visit(const To& node) override {
-      result = &node;
-    }
-
-    const To* result = nullptr;
-  };
-
-  cast_visitor vis;
-  node->apply_visitor(vis);
-  return vis.result;
-}
 
 struct compare_visitor : mparse::const_ast_visitor {
   explicit compare_visitor(const mparse::ast_node* other, compare_cache& cache);
@@ -50,11 +32,13 @@ compare_visitor::compare_visitor(const mparse::ast_node* other, compare_cache& c
 }
 
 void compare_visitor::visit(const mparse::paren_node& node) {
-  node.child()->apply_visitor(*this);
+  if (auto other_paren = mparse::ast_node_cast<const mparse::paren_node>(other)) {
+    result = compare_exprs(node.child(), other_paren->child(), cache);
+  }
 }
 
 void compare_visitor::visit(const mparse::unary_op_node& node) {
-  if (auto other_unary = cast_ignore_paren<mparse::unary_op_node>(other)) {
+  if (auto other_unary = mparse::ast_node_cast<const mparse::unary_op_node>(other)) {
     result = node.type() == other_unary->type()
       && compare_exprs(node.child(), other_unary->child(), cache);
     return;
@@ -63,7 +47,7 @@ void compare_visitor::visit(const mparse::unary_op_node& node) {
 }
 
 void compare_visitor::visit(const mparse::binary_op_node& node) {
-  if (auto other_binary = cast_ignore_paren<mparse::binary_op_node>(other)) {
+  if (auto other_binary = mparse::ast_node_cast<const mparse::binary_op_node>(other)) {
     if (node.type() != other_binary->type()) {
       result = false;
       return;
@@ -83,7 +67,7 @@ void compare_visitor::visit(const mparse::binary_op_node& node) {
 }
 
 void compare_visitor::visit(const mparse::id_node& node) {
-  if (auto other_lit = cast_ignore_paren<mparse::id_node>(other)) {
+  if (auto other_lit = mparse::ast_node_cast<const mparse::id_node>(other)) {
     result = node.name() == other_lit->name();
     return;
   }
@@ -91,7 +75,7 @@ void compare_visitor::visit(const mparse::id_node& node) {
 }
 
 void compare_visitor::visit(const mparse::literal_node& node) {
-  if (auto other_lit = cast_ignore_paren<mparse::literal_node>(other)) {
+  if (auto other_lit = mparse::ast_node_cast<const mparse::literal_node>(other)) {
     result = node.val() == other_lit->val();
     return;
   }
