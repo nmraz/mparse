@@ -42,12 +42,13 @@ struct cast_helper {
 
 template<typename T, typename U>
 inline T* ast_node_cast(U* node) {
-  return impl::cast_helper<T, U>::do_cast(node);
+  return static_cast<T*>(impl::cast_helper<std::remove_cv_t<T>, U>::do_cast(node));
 }
 
 template<typename T, typename U>
-inline const T* ast_node_cast(const U* node) {
-  return impl::cast_helper<T, U>::do_cast(const_cast<U*>(node));
+inline T* ast_node_cast(const U* node) {
+  static_assert(std::is_const_v<T>, "ast_node_cast cannot remove const qualification");
+  return ast_node_cast<T>(const_cast<U*>(node));
 }
 
 }  // namespace mparse
