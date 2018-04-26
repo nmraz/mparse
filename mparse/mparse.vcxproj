@@ -151,7 +151,6 @@
     <ClCompile Include="src\ast_ops\ast_dump.cpp" />
     <ClCompile Include="src\ast_ops\eval\eval.cpp" />
     <ClCompile Include="src\ast_ops\eval\eval_scope.cpp" />
-    <ClCompile Include="src\ast_ops\matching\compare.cpp" />
     <ClCompile Include="src\loc_printing.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mparse\ast\abs_node.cpp" />

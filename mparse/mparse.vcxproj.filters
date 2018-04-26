@@ -69,9 +69,6 @@
     <ClCompile Include="src\parse_vardefs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ast_ops\matching\compare.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\mparse\ast\abs_node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
