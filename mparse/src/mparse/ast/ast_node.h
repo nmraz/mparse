@@ -22,12 +22,24 @@ public:
   virtual void apply_visitor(const_ast_visitor& vis) const;
 };
 
-using ast_node_ptr = std::unique_ptr<ast_node>;
+namespace impl {
+
+template<typename T>
+struct get_node_ptr {
+  static_assert(std::is_base_of_v<ast_node, T>, "node_ptr can only be used for AST nodes");
+  using type = std::shared_ptr<T>;
+};
+
+}  // namespace impl
+
+template<typename T>
+using node_ptr = typename impl::get_node_ptr<T>::type;
+using ast_node_ptr = node_ptr<ast_node>;
 
 template<typename Node, typename... Args>
-std::unique_ptr<Node> make_ast_node(Args&&... args) {
+node_ptr<Node> make_ast_node(Args&&... args) {
   static_assert(std::is_base_of_v<ast_node, Node>, "make_ast_node can only be used for AST nodes");
-  return std::make_unique<Node>(std::forward<Args>(args)...);
+  return std::make_shared<Node>(std::forward<Args>(args)...);
 }
 
 }  // namespace mparse
