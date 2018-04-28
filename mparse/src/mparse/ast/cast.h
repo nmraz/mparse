@@ -52,4 +52,18 @@ inline T* ast_node_cast(const U* node) {
   return ast_node_cast<T>(const_cast<U*>(node));
 }
 
+
+template<typename T, typename U>
+inline node_ptr<T> static_ast_node_ptr_cast(const node_ptr<U>& node) {
+  return std::static_pointer_cast<T>(node);
+}
+
+template<typename T, typename U>
+inline node_ptr<T> ast_node_ptr_cast(const node_ptr<U>& node) {
+  if (auto cast = ast_node_cast<T>(node.get())) {
+    return node_ptr<T>(node, cast);
+  }
+  return nullptr;
+}
+
 }  // namespace mparse
