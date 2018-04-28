@@ -47,9 +47,11 @@ public:
 
   void set_lhs(ast_node_ptr lhs);
   ast_node_ptr take_lhs();
+  ast_node_ptr ref_lhs();
 
   void set_rhs(ast_node_ptr rhs);
   ast_node_ptr take_rhs();
+  ast_node_ptr ref_rhs();
 
 private:
   binary_op_type type_;

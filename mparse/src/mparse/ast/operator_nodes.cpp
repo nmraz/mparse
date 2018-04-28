@@ -35,6 +35,10 @@ ast_node_ptr binary_op_node::take_lhs() {
   return std::move(lhs_);
 }
 
+ast_node_ptr binary_op_node::ref_lhs() {
+  return lhs_;
+}
+
 
 void binary_op_node::set_rhs(ast_node_ptr rhs) {
   rhs_ = std::move(rhs);
@@ -42,6 +46,10 @@ void binary_op_node::set_rhs(ast_node_ptr rhs) {
 
 ast_node_ptr binary_op_node::take_rhs() {
   return std::move(rhs_);
+}
+
+ast_node_ptr binary_op_node::ref_rhs() {
+  return rhs_;
 }
 
 }  // namespace mparse

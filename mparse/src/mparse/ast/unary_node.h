@@ -13,6 +13,7 @@ public:
 
   void set_child(ast_node_ptr child);
   ast_node_ptr take_child();
+  ast_node_ptr ref_child();
 
 private:
   ast_node_ptr child_;

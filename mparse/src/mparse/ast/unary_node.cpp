@@ -12,4 +12,8 @@ ast_node_ptr unary_node::take_child() {
   return std::move(child_);
 }
 
+ast_node_ptr unary_node::ref_child() {
+  return child_;
+}
+
 }  // namespace mparse
