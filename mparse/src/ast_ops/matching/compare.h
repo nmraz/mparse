@@ -39,7 +39,7 @@ compare_visitor<Comp>::compare_visitor(const mparse::ast_node* other, Comp& comp
 
 template<typename Comp>
 void compare_visitor<Comp>::visit(const mparse::paren_node& node) {
-  if (auto other_paren = mparse::ast_node_cast<const mparse::paren_node>(other)) {
+  if (auto* other_paren = mparse::ast_node_cast<const mparse::paren_node>(other)) {
     result = comp.compare_paren(node, *other_paren);
     return;
   }
@@ -48,7 +48,7 @@ void compare_visitor<Comp>::visit(const mparse::paren_node& node) {
 
 template<typename Comp>
 void compare_visitor<Comp>::visit(const mparse::abs_node& node) {
-  if (auto other_abs = mparse::ast_node_cast<const mparse::abs_node>(other)) {
+  if (auto* other_abs = mparse::ast_node_cast<const mparse::abs_node>(other)) {
     result = comp.compare_abs(node, *other_abs);
     return;
   }
@@ -57,7 +57,7 @@ void compare_visitor<Comp>::visit(const mparse::abs_node& node) {
 
 template<typename Comp>
 void compare_visitor<Comp>::visit(const mparse::unary_op_node& node) {
-  if (auto other_unary = mparse::ast_node_cast<const mparse::unary_op_node>(other)) {
+  if (auto* other_unary = mparse::ast_node_cast<const mparse::unary_op_node>(other)) {
     result = comp.compare_unary(node, *other_unary);
     return;
   }
@@ -66,7 +66,7 @@ void compare_visitor<Comp>::visit(const mparse::unary_op_node& node) {
 
 template<typename Comp>
 void compare_visitor<Comp>::visit(const mparse::binary_op_node& node) {
-  if (auto other_binary = mparse::ast_node_cast<const mparse::binary_op_node>(other)) {
+  if (auto* other_binary = mparse::ast_node_cast<const mparse::binary_op_node>(other)) {
     result = comp.compare_binary(node, *other_binary);
     return;
   }
@@ -75,7 +75,7 @@ void compare_visitor<Comp>::visit(const mparse::binary_op_node& node) {
 
 template<typename Comp>
 void compare_visitor<Comp>::visit(const mparse::id_node& node) {
-  if (auto other_id = mparse::ast_node_cast<const mparse::id_node>(other)) {
+  if (auto* other_id = mparse::ast_node_cast<const mparse::id_node>(other)) {
     result = comp.compare_id(node, *other_id);
     return;
   }
@@ -84,7 +84,7 @@ void compare_visitor<Comp>::visit(const mparse::id_node& node) {
 
 template<typename Comp>
 void compare_visitor<Comp>::visit(const mparse::literal_node& node) {
-  if (auto other_lit = mparse::ast_node_cast<const mparse::literal_node>(other)) {
+  if (auto* other_lit = mparse::ast_node_cast<const mparse::literal_node>(other)) {
     result = comp.compare_literal(node, *other_lit);
     return;
   }
