@@ -10,6 +10,8 @@ template<typename T>
 constexpr bool is_match_expr = false;
 
 
+/* ARITHMETIC MATCHERS */
+
 struct literal_matcher {
   using match_type = mparse::literal_node;
 
@@ -146,6 +148,61 @@ template<
   typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>
 > constexpr binary_op_matcher<mparse::binary_op_type::pow, Lhs, Rhs> pow(Lhs lhs, Rhs rhs) {
   return { lhs, rhs };
+}
+
+
+/* COMBINATORS */
+
+template<typename Matcher>
+struct negation_matcher {
+  const Matcher matcher;
+};
+
+template<typename Matcher>
+constexpr bool is_match_expr<negation_matcher<Matcher>> = true;
+
+
+template<typename First, typename Second>
+struct conjunction_matcher {
+  const First first;
+  const Second second;
+};
+
+template<typename First, typename Second>
+constexpr bool is_match_expr<conjunction_matcher<First, Second>> = true;
+
+
+template<typename First, typename Second>
+struct disjunction_matcher {
+  const First first;
+  const Second second;
+};
+
+template<typename First, typename Second>
+constexpr bool is_match_expr<disjunction_matcher<First, Second>> = true;
+
+
+template<
+  typename Matcher,
+  typename = std::enable_if_t<is_match_expr<Matcher>>
+> constexpr negation_matcher<Matcher> match_not(Matcher matcher) {
+  return { matcher };
+}
+
+template<
+  typename First,
+  typename Second,
+  typename = std::enable_if_t<is_match_expr<First> && is_match_expr<Second>>
+> constexpr conjunction_matcher<First, Second> match_and(First first, Second second) {
+  return { first, second };
+}
+
+template<
+  typename First,
+  typename Second,
+  typename = std::enable_if_t<is_match_expr<First> && is_match_expr<Second>>
+> constexpr disjunction_matcher<First, Second> match_or(First first, Second second) {
+  return { first, second };
 }
 
 
