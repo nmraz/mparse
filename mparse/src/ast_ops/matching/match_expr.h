@@ -104,6 +104,14 @@ template<
   typename Lhs,
   typename Rhs,
   typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>
+> constexpr binary_op_matcher<mparse::binary_op_type::add, Lhs, Rhs, false> add_nocomm(Lhs lhs, Rhs rhs) {
+  return { lhs, rhs };
+}
+
+template<
+  typename Lhs,
+  typename Rhs,
+  typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>
 > constexpr binary_op_matcher<mparse::binary_op_type::sub, Lhs, Rhs> operator-(Lhs lhs, Rhs rhs) {
   return { lhs, rhs };
 }
@@ -113,6 +121,14 @@ template<
   typename Rhs,
   typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>
 > constexpr binary_op_matcher<mparse::binary_op_type::mult, Lhs, Rhs> operator*(Lhs lhs, Rhs rhs) {
+  return { lhs, rhs };
+}
+
+template<
+  typename Lhs,
+  typename Rhs,
+  typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>
+> constexpr binary_op_matcher<mparse::binary_op_type::mult, Lhs, Rhs, false> mul_nocomm(Lhs lhs, Rhs rhs) {
   return { lhs, rhs };
 }
 
