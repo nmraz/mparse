@@ -30,16 +30,16 @@ template<typename Node>
 constexpr bool is_match_expr<node_type_matcher<Node>> = true;
 
 
-template<mparse::binary_op_type Type, typename Lhs, typename Rhs, bool Commute = is_commutative(Type)>
-struct binary_op_matcher {
+template<typename Pred, typename Lhs, typename Rhs, bool Commute>
+struct binary_op_pred_matcher {
   using match_type = mparse::binary_op_node;
 
   const Lhs lhs;
   const Rhs rhs;
 };
 
-template<mparse::binary_op_type Type, typename Lhs, typename Rhs, bool Commute>
-constexpr bool is_match_expr<binary_op_matcher<Type, Lhs, Rhs, Commute>> = true;
+template<typename Pred, typename Lhs, typename Rhs, bool Commute>
+constexpr bool is_match_expr<binary_op_pred_matcher<Pred, Lhs, Rhs, Commute>> = true;
 
 
 template<typename Node, typename Inner>
@@ -53,15 +53,29 @@ template<typename Node, typename Inner>
 constexpr bool is_match_expr<unary_matcher<Node, Inner>> = true;
 
 
-template<mparse::unary_op_type Type, typename Inner>
-struct unary_op_matcher {
+template<typename Pred, typename Inner>
+struct unary_op_pred_matcher {
   using match_type = mparse::unary_op_node;
 
   const Inner inner;
 };
 
+template<typename Pred, typename Inner>
+constexpr bool is_match_expr<unary_op_pred_matcher<Pred, Inner>> = true;
+
+
+template<typename T, T Val>
+struct type_eq_pred {
+  constexpr bool operator()(T val) {
+    return val == Val;
+  }
+};
+
+template<mparse::binary_op_type Type, typename Lhs, typename Rhs, bool Commute = is_commutative(Type)>
+using binary_op_matcher = binary_op_pred_matcher<type_eq_pred<mparse::binary_op_type, Type>, Lhs, Rhs, Commute>;
+
 template<mparse::unary_op_type Type, typename Inner>
-constexpr bool is_match_expr<unary_op_matcher<Type, Inner>> = true;
+using unary_op_matcher = unary_op_pred_matcher<type_eq_pred<mparse::unary_op_type, Type>, Inner>;
 
 
 template<
