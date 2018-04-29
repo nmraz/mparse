@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ast_ops/matching/util.h"
 #include "mparse/ast/operator_nodes.h"
 #include <type_traits>
 
@@ -10,6 +11,8 @@ constexpr bool is_match_expr = false;
 
 
 struct literal_matcher {
+  using match_type = mparse::literal_node;
+
   const double val;
 };
 
@@ -17,33 +20,43 @@ template<>
 constexpr bool is_match_expr<literal_matcher> = true;
 
 
-template<std::size_t I, typename Node>
+template<typename Node>
 struct node_type_matcher {
   static_assert(std::is_base_of_v<mparse::ast_node, Node>, "node_type_matcher can only match descendants of ast_node");
-
   using match_type = Node;
-  static constexpr std::size_t match_index = I;
 };
 
-template<std::size_t I>
-using unique_symbol_matcher = node_type_matcher<I, mparse::ast_node>;
-
-template<std::size_t I, typename Node>
-constexpr bool is_match_expr<node_type_matcher<I, Node>> = true;
+template<typename Node>
+constexpr bool is_match_expr<node_type_matcher<Node>> = true;
 
 
-template<mparse::binary_op_type Type, typename Lhs, typename Rhs>
+template<mparse::binary_op_type Type, typename Lhs, typename Rhs, bool Commute = is_commutative(Type)>
 struct binary_op_matcher {
+  using match_type = mparse::binary_op_node;
+
   const Lhs lhs;
   const Rhs rhs;
 };
 
-template<mparse::binary_op_type Type, typename Lhs, typename Rhs>
-constexpr bool is_match_expr<binary_op_matcher<Type, Lhs, Rhs>> = true;
+template<mparse::binary_op_type Type, typename Lhs, typename Rhs, bool Commute>
+constexpr bool is_match_expr<binary_op_matcher<Type, Lhs, Rhs, Commute>> = true;
+
+
+template<typename Node, typename Inner>
+struct unary_matcher {
+  static_assert(std::is_base_of_v<mparse::unary_node, Node>, "unary_node_matcher can only match descendants of unary_node");
+
+  const Inner inner;
+};
+
+template<typename Node, typename Inner>
+constexpr bool is_match_expr<unary_matcher<Node, Inner>> = true;
 
 
 template<mparse::unary_op_type Type, typename Inner>
 struct unary_op_matcher {
+  using match_type = mparse::unary_op_node;
+
   const Inner inner;
 };
 
