@@ -90,6 +90,20 @@ using unary_op_matcher = unary_op_pred_matcher<type_eq_pred<mparse::unary_op_typ
 template<
   typename Inner,
   typename = std::enable_if_t<is_match_expr<Inner>>
+> constexpr unary_matcher<mparse::abs_node, Inner> abs(Inner inner) {
+  return { inner };
+}
+
+template<
+  typename Inner,
+  typename = std::enable_if_t<is_match_expr<Inner>>
+> constexpr unary_matcher<mparse::paren_node, Inner> paren(Inner inner) {
+  return { inner };
+}
+
+template<
+  typename Inner,
+  typename = std::enable_if_t<is_match_expr<Inner>>
 > constexpr unary_op_matcher<mparse::unary_op_type::plus, Inner> operator+(Inner inner) {
   return { inner };
 }
