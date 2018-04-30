@@ -22,6 +22,14 @@ constexpr bool is_match_expr = false;
 struct literal_matcher {
   using match_type = mparse::literal_node;
 
+  template<typename Ctx>
+  bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) const {
+    if (auto* lit_node = mparse::ast_node_cast<const mparse::literal_node>(node.get())) {
+      return lit_node->val() == val;
+    }
+    return false;
+  }
+
   const double val;
 };
 
@@ -33,6 +41,11 @@ template<typename Node>
 struct node_type_matcher {
   static_assert(std::is_base_of_v<mparse::ast_node, Node>, "node_type_matcher can only match descendants of ast_node");
   using match_type = Node;
+
+  template<typename Ctx>
+  bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) const {
+    return mparse::ast_node_cast<const Node>(node.get()) != nullptr;
+  }
 };
 
 template<typename Node>
@@ -42,6 +55,25 @@ constexpr bool is_match_expr<node_type_matcher<Node>> = true;
 template<typename Pred, typename Lhs, typename Rhs, bool Commute>
 struct binary_op_pred_matcher {
   using match_type = mparse::binary_op_node;
+
+  template<typename Ctx>
+  bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) const {
+    if (auto* bin_node = mparse::ast_node_cast<mparse::binary_op_node>(node.get())) {
+      if (!Pred{}(bin_node->type())) {
+        return false;
+      }
+
+      auto node_lhs = bin_node->ref_lhs();
+      auto node_rhs = bin_node->ref_rhs();
+
+      if (lhs.matches(node_lhs, ctx) && rhs.matches(node_rhs, ctx)) {
+        return true;
+      } else if (Commute && rhs.matches(node_lhs, ctx) && lhs.matches(node_rhs, ctx)) {
+        return true;
+      }
+      return false;
+    }
+  }
 
   const Lhs lhs;
   const Rhs rhs;
@@ -55,6 +87,14 @@ template<typename Node, typename Inner>
 struct unary_matcher {
   static_assert(std::is_base_of_v<mparse::unary_node, Node>, "unary_node_matcher can only match descendants of unary_node");
 
+  template<typename Ctx>
+  bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) const {
+    if (auto* un_node = mparse::ast_node_cast<mparse::unary_node>(node.get())) {
+      return inner.matches(un_node->ref_child(), ctx);
+    }
+    return false;
+  }
+
   const Inner inner;
 };
 
@@ -65,6 +105,13 @@ constexpr bool is_match_expr<unary_matcher<Node, Inner>> = true;
 template<typename Pred, typename Inner>
 struct unary_op_pred_matcher {
   using match_type = mparse::unary_op_node;
+
+  template<typename Ctx>
+  bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) const {
+    if (auto* un_op_node = mparse::ast_node_cast<mparse::unary_op_node>(node.get())) {
+      return Pred{}(un_op_node->type()) && inner.matches(un_op_node->ref_child(), ctx);
+    }
+  }
 
   const Inner inner;
 };
@@ -176,6 +223,11 @@ template<
 
 template<typename Matcher>
 struct negation_matcher {
+  template<typename Ctx>
+  bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) const {
+    return !matcher.matches(node, ctx);
+  }
+
   const Matcher matcher;
 };
 
@@ -185,6 +237,11 @@ constexpr bool is_match_expr<negation_matcher<Matcher>> = true;
 
 template<typename First, typename Second>
 struct conjunction_matcher {
+  template<typename Ctx>
+  bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) const {
+    return first.matches(node, ctx) && second.matches(node, ctx);
+  }
+
   const First first;
   const Second second;
 };
@@ -195,6 +252,11 @@ constexpr bool is_match_expr<conjunction_matcher<First, Second>> = true;
 
 template<typename First, typename Second>
 struct disjunction_matcher {
+  template<typename Ctx>
+  bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) const {
+    return first.matches(node, ctx) || second.matches(node, ctx);
+  }
+
   const First first;
   const Second second;
 };
