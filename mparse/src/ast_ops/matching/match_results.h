@@ -138,16 +138,16 @@ using caplist_append = impl::type_list_append_t<List, Caps...>;
 
 
 template<typename E>
-struct get_caplist {
+struct get_captures {
   using type = caplist<>;
 };
 
 template<typename E>
-using get_caplist_t = typename get_caplist<E>::type;
+using get_captures_t = typename get_captures<E>::type;
 
 
 template<typename E>
-class match_results : private impl::get_match_results_base_t<get_caplist_t<E>> {
+class match_results : private impl::get_match_results_base_t<get_captures_t<E>> {
   template<typename Tag, typename E>
   friend decltype(auto) get_result(match_results<E>& match) {
     return match.get(Tag{});

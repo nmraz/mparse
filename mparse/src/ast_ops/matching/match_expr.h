@@ -85,8 +85,8 @@ template<typename Pred, typename Lhs, typename Rhs, bool Commute>
 constexpr bool is_match_expr<binary_op_pred_matcher<Pred, Lhs, Rhs, Commute>> = true;
 
 template<typename Pred, typename Lhs, typename Rhs, bool Commute>
-struct get_caplist<binary_op_pred_matcher<Pred, Lhs, Rhs, Commute>> {
-  using type = caplist_cat<get_caplist_t<Lhs>, get_caplist_t<Rhs>>;
+struct get_captures<binary_op_pred_matcher<Pred, Lhs, Rhs, Commute>> {
+  using type = caplist_cat<get_captures_t<Lhs>, get_captures_t<Rhs>>;
 };
 
 
@@ -111,7 +111,7 @@ template<typename Node, typename Inner>
 constexpr bool is_match_expr<unary_matcher<Node, Inner>> = true;
 
 template<typename Node, typename Inner>
-struct get_caplist<unary_matcher<Node, Inner>> : get_caplist<Inner> {};
+struct get_captures<unary_matcher<Node, Inner>> : get_captures<Inner> {};
 
 
 template<typename Pred, typename Inner>
@@ -132,7 +132,7 @@ template<typename Pred, typename Inner>
 constexpr bool is_match_expr<unary_op_pred_matcher<Pred, Inner>> = true;
 
 template<typename Pred, typename Inner>
-struct get_caplist<unary_op_pred_matcher<Pred, Inner>> : get_caplist<Inner> {};
+struct get_captures<unary_op_pred_matcher<Pred, Inner>> : get_captures<Inner> {};
 
 
 template<typename T, T Val>
@@ -250,7 +250,7 @@ template<typename Matcher>
 constexpr bool is_match_expr<negation_matcher<Matcher>> = true;
 
 template<typename Matcher>
-struct get_caplist<negation_matcher<Matcher>> : get_caplist<Matcher> {};
+struct get_captures<negation_matcher<Matcher>> : get_captures<Matcher> {};
 
 
 template<typename First, typename Second>
@@ -268,8 +268,8 @@ template<typename First, typename Second>
 constexpr bool is_match_expr<conjunction_matcher<First, Second>> = true;
 
 template<typename First, typename Second>
-struct get_caplist<conjunction_matcher<First, Second>> {
-  using type = caplist_cat<get_caplist_t<First>, get_caplist_t<Second>>;
+struct get_captures<conjunction_matcher<First, Second>> {
+  using type = caplist_cat<get_captures_t<First>, get_captures_t<Second>>;
 };
 
 
@@ -288,8 +288,8 @@ template<typename First, typename Second>
 constexpr bool is_match_expr<disjunction_matcher<First, Second>> = true;
 
 template<typename First, typename Second>
-struct get_caplist<disjunction_matcher<First, Second>> {
-  using type = caplist_cat<get_caplist_t<First>, get_caplist_t<Second>>;
+struct get_captures<disjunction_matcher<First, Second>> {
+  using type = caplist_cat<get_captures_t<First>, get_captures_t<Second>>;
 };
 
 
@@ -358,9 +358,9 @@ template<int N, typename Matcher>
 constexpr bool is_match_expr<capture_matcher<N, Matcher>> = true;
 
 template<int N, typename Matcher>
-struct get_caplist<capture_matcher<N, Matcher>> {
+struct get_captures<capture_matcher<N, Matcher>> {
   using type = caplist_append<
-    get_caplist_t<Matcher>,
+    get_captures_t<Matcher>,
     capture<capture_matcher_tag<N>, mparse::node_ptr<get_match_type_t<Matcher>>>
   >;
 };
@@ -393,7 +393,7 @@ template<char C, typename Comp>
 constexpr bool is_match_expr<subexpr_matcher<C, Comp>> = true;
 
 template<char C, typename Comp>
-struct get_caplist<subexpr_matcher<C, Comp>> {
+struct get_captures<subexpr_matcher<C, Comp>> {
   using type = caplist<capture<subexpr_matcher_tag<C>, mparse::ast_node_ptr>;
 };
 
