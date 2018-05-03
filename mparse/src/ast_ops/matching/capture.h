@@ -4,15 +4,6 @@
 #include <type_traits>
 
 namespace ast_ops::matching {
-
-template<typename Tag, typename Node>
-struct capture {
-  static_assert(std::is_base_of_v<mparse::ast_node, Node>, "Capture types must be derived from ast_node");
-
-  using tag_type = Tag;
-  using node_type = Node;
-};
-
 namespace impl {
 
 template<typename...>
@@ -33,25 +24,59 @@ template<typename List, typename... Ts>
 using type_list_append_t = type_list_cat_t<List, type_list<Ts...>>;
 
 
-template<typename T, typename List, template<typename, typename> typename Pred>
-struct is_in;
+template<typename T, typename U>
+struct is_same_capture : std::is_same<typename T::tag_type, typename U::tag_type> {
+  static_assert(!is_same_capture::value || std::is_same_v<typename T::cap_type, typename U::cap_type>,
+    "Captures with the same tag must capture the same type");
+};
 
-template<typename T, typename U, typename... Ts, template<typename, typename> typename Pred>
-struct is_in<T, type_list<U, Ts...>, Pred> :
+template<typename T, typename List>
+struct is_in_caplist;
+
+template<typename T, typename U, typename... Ts>
+struct is_in_caplist<T, type_list<U, Ts...>> :
   std::disjunction<
-    Pred<T, U>,
-    is_in<T, type_list<Ts...>, Pred>
+    is_same_capture<T, U>,
+    is_in_caplist<T, type_list<Ts...>>
   >
 {};
 
 template<typename T>
-struct is_in<T, type_list<>> : std::false_type {};
+struct is_in_caplist<T, type_list<>> : std::false_type {};
 
-template<typename T, typename List, template<typename, typename> typename Pred>
-constexpr bool is_in_v = is_in<T, List, Pred>::value;
+template<typename T, typename List>
+constexpr bool is_in_caplist_v = is_in_caplist<T, List>::value;
 
 
+template<typename List, typename T>
+using caplist_append_unique = std::conditional_t<
+  is_in_caplist_v<T, List>,
+  List,
+  type_list_append_t<List, T>
+>;
+
+template<typename List, typename... Ts>
+struct caplist_append_multi_unique {
+  using type = List;
+};
+
+template<typename List, typename T, typename... Ts>
+struct caplist_append_multi_unique<List, T, Ts...>
+  : caplist_append_multi_unique<caplist_append_unique<List, T>, Ts..> {};
+
+template<typename List>
+struct unique_caplist;
+
+template<typename... Ts>
+struct unique_caplist<type_list<Ts...>> : caplist_append_multi_unique<type_list<>, Ts...> {};
 
 }  // namespace impl
+
+
+template<typename Tag, typename Cap>
+struct capture {
+  using tag_type = Tag;
+  using cap_type = Cap;
+};
 
 }  // namespace ast_ops::matching
