@@ -2,6 +2,7 @@
 
 #include "mparse/ast/ast_node.h"
 #include <type_traits>
+#include <utility>
 
 namespace ast_ops::matching {
 namespace impl {
@@ -69,6 +70,52 @@ struct unique_caplist;
 
 template<typename... Ts>
 struct unique_caplist<type_list<Ts...>> : caplist_append_multi_unique<type_list<>, Ts...> {};
+
+
+template<typename... Caps>
+class match_results_base {
+public:
+  void get() {}  // dummy
+};
+
+template<typename Cap, typename... Caps>
+class match_results_base<Cap, Caps...> : match_results_base<Caps...> {
+  using tag_type = typename Cap::tag_type;
+  using cap_type = typename Cap::cap_type;
+
+public:
+  using match_results_base<Caps...>::get;
+
+  cap_type& get(tag_type) & {
+    return cap;
+  }
+
+  const cap_type& get(tag_type) const & {
+    return cap;
+  }
+
+  cap_type&& get(tag_type) && {
+    return std::move(cap_);
+  }
+
+  const cap_type&& get(tag_type) const && {
+    return std::move(cap_);
+  }
+
+private:
+  cap_type cap_;
+};
+
+template<typename List>
+struct get_match_results_base;
+
+template<typename... Caps>
+struct get_match_results_base<type_list<Caps...>> {
+  using type = match_results_base<Caps...>;
+};
+
+template<typename List>
+using get_match_results_base_t = typename get_match_results_base<typename unique_caplist<List>::type>::type;
 
 }  // namespace impl
 
