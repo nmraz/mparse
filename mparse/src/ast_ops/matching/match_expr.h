@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ast_ops/matching/capture.h"
+#include "ast_ops/matching/compare.h"
 #include "ast_ops/matching/util.h"
 #include "mparse/ast/abs_node.h"
 #include "mparse/ast/ast_node.h"
@@ -82,6 +84,11 @@ struct binary_op_pred_matcher {
 template<typename Pred, typename Lhs, typename Rhs, bool Commute>
 constexpr bool is_match_expr<binary_op_pred_matcher<Pred, Lhs, Rhs, Commute>> = true;
 
+template<typename Pred, typename Lhs, typename Rhs, bool Commute>
+struct get_caplist<binary_op_pred_matcher<Pred, Lhs, Rhs, Commute>> {
+  using type = caplist_cat<get_caplist_t<Lhs>, get_caplist_t<Rhs>>;
+};
+
 
 template<typename Node, typename Inner>
 struct unary_matcher {
@@ -101,6 +108,9 @@ struct unary_matcher {
 template<typename Node, typename Inner>
 constexpr bool is_match_expr<unary_matcher<Node, Inner>> = true;
 
+template<typename Node, typename Inner>
+struct get_caplist<unary_matcher<Node, Inner>> : get_caplist<Inner> {};
+
 
 template<typename Pred, typename Inner>
 struct unary_op_pred_matcher {
@@ -118,6 +128,9 @@ struct unary_op_pred_matcher {
 
 template<typename Pred, typename Inner>
 constexpr bool is_match_expr<unary_op_pred_matcher<Pred, Inner>> = true;
+
+template<typename Pred, typename Inner>
+struct get_caplist<unary_op_pred_matcher<Pred, Inner>> : get_caplist<Inner> {};
 
 
 template<typename T, T Val>
@@ -234,6 +247,9 @@ struct negation_matcher {
 template<typename Matcher>
 constexpr bool is_match_expr<negation_matcher<Matcher>> = true;
 
+template<typename Matcher>
+struct get_caplist<negation_matcher<Matcher>> : get_caplist<Matcher> {};
+
 
 template<typename First, typename Second>
 struct conjunction_matcher {
@@ -249,6 +265,11 @@ struct conjunction_matcher {
 template<typename First, typename Second>
 constexpr bool is_match_expr<conjunction_matcher<First, Second>> = true;
 
+template<typename First, typename Second>
+struct get_caplist<conjunction_matcher<First, Second>> {
+  using type = caplist_cat<get_caplist_t<First>, get_caplist_t<Second>>;
+};
+
 
 template<typename First, typename Second>
 struct disjunction_matcher {
@@ -263,6 +284,11 @@ struct disjunction_matcher {
 
 template<typename First, typename Second>
 constexpr bool is_match_expr<disjunction_matcher<First, Second>> = true;
+
+template<typename First, typename Second>
+struct get_caplist<disjunction_matcher<First, Second>> {
+  using type = caplist_cat<get_caplist_t<First>, get_caplist_t<Second>>;
+};
 
 
 template<
@@ -287,6 +313,74 @@ template<
 > constexpr disjunction_matcher<First, Second> match_or(First first, Second second) {
   return { first, second };
 }
+
+
+/* CAPTURING MATCHERS */
+
+template<int N>
+struct capture_matcher_tag {};
+
+template<int N, typename Res>
+decltype(auto) get_capture(Res&& results) {
+  return get_result<capture_matcher_tag<N>>(std::forward<Res>(results));
+}
+
+template<int N, typename Matcher>
+struct capture_matcher {
+  template<typename Ctx>
+  bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) {
+    if (matcher.matches(node, ctx)) {
+      get_capture<N>(ctx) = node;
+      return true;
+    }
+    return false;
+  }
+
+  const Matcher matcher;
+};
+
+template<int N, typename Matcher>
+constexpr bool is_match_expr<capture_matcher<N, Matcher>> = true;
+
+template<int N, typename Matcher>
+struct get_caplist<capture_matcher<N, Matcher>> {
+  using type = caplist_append<
+    get_caplist_t<Matcher>,
+    capture<capture_matcher_tag<N>, mparse::node_ptr<typename Matcher::match_type>>
+  >;
+};
+
+
+template<char C>
+struct subexpr_matcher_tag {};
+
+template<char C, typename Res>
+decltype(auto) get_subexpr(Res&& results) {
+  return get_result<subexpr_matcher_tag<C>>(std::forward<Res>(results));
+}
+
+template<char C, typename Comp = commutative_expr_comparer>
+struct subexpr_matcher {
+  template<typename Ctx>
+  bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) {
+    mparse::ast_node_ptr& saved = get_subexpr<C>(ctx);
+    if (!saved) {
+      saved = node;
+      return true;
+    }
+    return compare_exprs(saved.get(), node.get(), comp);
+  }
+
+  const Comp comp;
+};
+
+template<char C, typename Comp>
+constexpr bool is_match_expr<subexpr_matcher<C, Comp>> = true;
+
+template<char C, typename Comp>
+struct get_caplist<subexpr_matcher<C, Comp>> {
+  using type = caplist<capture<subexpr_matcher_tag<C>, mparse::ast_node_ptr>;
+};
 
 
 inline namespace literals {
