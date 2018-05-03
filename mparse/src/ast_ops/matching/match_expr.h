@@ -386,7 +386,7 @@ struct subexpr_matcher {
     return compare_exprs(saved.get(), node.get(), comp);
   }
 
-  const Comp comp;
+  const Comp comp{};
 };
 
 template<char C, typename Comp>

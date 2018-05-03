@@ -95,28 +95,28 @@ void compare_visitor<Comp>::visit(const mparse::literal_node& node) {
 
 template<typename Der>
 struct basic_expr_comparer_base {
-  bool compare_paren(const mparse::paren_node& first, const mparse::paren_node& second) {
-    return compare_exprs(first.child(), second.child(), static_cast<Der&>(*this));
+  bool compare_paren(const mparse::paren_node& first, const mparse::paren_node& second) const {
+    return compare_exprs(first.child(), second.child(), static_cast<const Der&>(*this));
   }
 
-  bool compare_abs(const mparse::abs_node& first, const mparse::abs_node& second) {
-    return compare_exprs(first.child(), second.child(), static_cast<Der&>(*this));
+  bool compare_abs(const mparse::abs_node& first, const mparse::abs_node& second) const {
+    return compare_exprs(first.child(), second.child(), static_cast<const Der&>(*this));
   }
 
-  bool compare_unary(const mparse::unary_op_node& first, const mparse::unary_op_node& second) {
-    return first.type() == second.type() && compare_exprs(first.child(), second.child(), static_cast<Der&>(*this));
+  bool compare_unary(const mparse::unary_op_node& first, const mparse::unary_op_node& second) const {
+    return first.type() == second.type() && compare_exprs(first.child(), second.child(), static_cast<const Der&>(*this));
   }
 
-  bool compare_binary(const mparse::binary_op_node& first, const mparse::binary_op_node& second) {
-    return first.type() == second.type() && compare_exprs(first.lhs(), second.lhs(), static_cast<Der&>(*this))
-      && compare_exprs(first.rhs(), second.rhs(), static_cast<Der&>(*this));
+  bool compare_binary(const mparse::binary_op_node& first, const mparse::binary_op_node& second) const {
+    return first.type() == second.type() && compare_exprs(first.lhs(), second.lhs(), static_cast<const Der&>(*this))
+      && compare_exprs(first.rhs(), second.rhs(), static_cast<const Der&>(*this));
   }
 
-  bool compare_id(const mparse::id_node& first, const mparse::id_node& second) {
+  bool compare_id(const mparse::id_node& first, const mparse::id_node& second) const {
     return first.name() == second.name();
   }
 
-  bool compare_literal(const mparse::literal_node& first, const mparse::literal_node& second) {
+  bool compare_literal(const mparse::literal_node& first, const mparse::literal_node& second) const {
     return first.val() == second.val();
   }
 };
@@ -127,16 +127,16 @@ struct basic_expr_comparer : basic_expr_comparer_base<basic_expr_comparer> {
 
 template<typename Der>
 struct commutative_expr_comparer_base : public basic_expr_comparer_base<Der> {
-  bool compare_binary(const mparse::binary_op_node& first, const mparse::binary_op_node& second) {
+  bool compare_binary(const mparse::binary_op_node& first, const mparse::binary_op_node& second) const {
     if (first.type() != second.type()) {
       return false;
     }
 
-    if (compare_exprs(first.lhs(), second.lhs(), static_cast<Der&>(*this))
-      && compare_exprs(first.rhs(), second.rhs(), static_cast<Der&>(*this))) {
+    if (compare_exprs(first.lhs(), second.lhs(), static_cast<const Der&>(*this))
+      && compare_exprs(first.rhs(), second.rhs(), static_cast<const Der&>(*this))) {
       return true;
-    } else if (is_commutative(first.type()) && compare_exprs(first.lhs(), second.rhs(), static_cast<Der&>(*this))
-      && compare_exprs(first.rhs(), second.lhs(), static_cast<Der&>(*this))) {
+    } else if (is_commutative(first.type()) && compare_exprs(first.lhs(), second.rhs(), static_cast<const Der&>(*this))
+      && compare_exprs(first.rhs(), second.lhs(), static_cast<const Der&>(*this))) {
       return true;
     }
 
