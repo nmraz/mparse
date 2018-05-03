@@ -325,12 +325,25 @@ decltype(auto) get_capture(Res&& results) {
   return get_result<capture_matcher_tag<N>>(std::forward<Res>(results));
 }
 
+template<typename Matcher, typename = void>
+struct get_match_type {
+  using type = mparse::ast_node;
+};
+
+template<typename Matcher>
+struct get_match_type<Matcher, std::void_t<typename Matcher::match_type>> {
+  using type = typename Matcher::match_type;
+};
+
+template<typename Matcher>
+using get_match_type_t = typename get_match_type<Matcher>::type;
+
 template<int N, typename Matcher>
 struct capture_matcher {
   template<typename Ctx>
   bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) {
     if (matcher.matches(node, ctx)) {
-      get_capture<N>(ctx) = node;
+      get_capture<N>(ctx) = mparse::static_ast_node_ptr_cast<get_match_type_t<Matcher>>(node);
       return true;
     }
     return false;
@@ -346,7 +359,7 @@ template<int N, typename Matcher>
 struct get_caplist<capture_matcher<N, Matcher>> {
   using type = caplist_append<
     get_caplist_t<Matcher>,
-    capture<capture_matcher_tag<N>, mparse::node_ptr<typename Matcher::match_type>>
+    capture<capture_matcher_tag<N>, mparse::node_ptr<get_match_type_t<Matcher>>>
   >;
 };
 
