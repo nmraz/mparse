@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ast_ops/matching/capture.h"
+#include "ast_ops/matching/match_results.h"
 #include "ast_ops/matching/compare.h"
 #include "ast_ops/matching/util.h"
 #include "mparse/ast/abs_node.h"
