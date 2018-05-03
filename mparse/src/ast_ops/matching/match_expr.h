@@ -94,6 +94,8 @@ template<typename Node, typename Inner>
 struct unary_matcher {
   static_assert(std::is_base_of_v<mparse::unary_node, Node>, "unary_node_matcher can only match descendants of unary_node");
 
+  using match_type = mparse::unary_node;
+
   template<typename Ctx>
   bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) const {
     if (auto* un_node = mparse::ast_node_cast<mparse::unary_node>(node.get())) {
