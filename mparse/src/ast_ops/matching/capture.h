@@ -126,4 +126,47 @@ struct capture {
   using cap_type = Cap;
 };
 
+
+template<typename... Caps>
+using caplist = impl::type_list<Caps...>;
+
+template<typename First, typename Second>
+using caplist_cat = impl::type_list_cat_t<First, Second>;
+
+template<typename List, typename... Caps>
+using caplist_append = impl::type_list_append_t<List, Caps...>;
+
+
+template<typename E>
+struct get_caplist {
+  using type = caplist<>;
+};
+
+template<typename E>
+using get_caplist_t = typename get_caplist<E>::type;
+
+
+template<typename E>
+class match_results : private impl::get_match_results_base_t<get_caplist_t<E>> {
+  template<typename Tag, typename E>
+  friend decltype(auto) get_result(match_results<E>& match) {
+    return match.get(Tag{});
+  }
+
+  template<typename Tag, typename E>
+  friend decltype(auto) get_result(const match_results<E>& match) {
+    return match.get(Tag{});
+  }
+
+  template<typename Tag, typename E>
+  friend decltype(auto) get_result(match_results<E>&& match) {
+    return std::move(match).get(Tag{});
+  }
+
+  template<typename Tag, typename E>
+  friend decltype(auto) get_result(const match_results<E>&& match) {
+    return std::move(match).get(Tag{});
+  }
+};
+
 }  // namespace ast_ops::matching
