@@ -137,9 +137,14 @@ template<typename List, typename... Caps>
 using caplist_append = impl::type_list_append_t<List, Caps...>;
 
 
-template<typename E>
+template<typename E, typename = void>
 struct get_captures {
   using type = caplist<>;
+};
+
+template<typename E>
+struct get_captures<E, std::void_t<typename E::captures>> {
+  using type = typename E::captures;
 };
 
 template<typename E>
