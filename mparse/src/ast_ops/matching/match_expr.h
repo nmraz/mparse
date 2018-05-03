@@ -57,6 +57,7 @@ constexpr bool is_match_expr<node_type_matcher<Node>> = true;
 template<typename Pred, typename Lhs, typename Rhs, bool Commute>
 struct binary_op_pred_matcher {
   using match_type = mparse::binary_op_node;
+  using captures = caplist_cat<get_captures_t<Lhs>, get_captures_t<Rhs>>;
 
   template<typename Ctx>
   bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) const {
@@ -84,17 +85,13 @@ struct binary_op_pred_matcher {
 template<typename Pred, typename Lhs, typename Rhs, bool Commute>
 constexpr bool is_match_expr<binary_op_pred_matcher<Pred, Lhs, Rhs, Commute>> = true;
 
-template<typename Pred, typename Lhs, typename Rhs, bool Commute>
-struct get_captures<binary_op_pred_matcher<Pred, Lhs, Rhs, Commute>> {
-  using type = caplist_cat<get_captures_t<Lhs>, get_captures_t<Rhs>>;
-};
-
 
 template<typename Node, typename Inner>
 struct unary_matcher {
   static_assert(std::is_base_of_v<mparse::unary_node, Node>, "unary_node_matcher can only match descendants of unary_node");
 
   using match_type = mparse::unary_node;
+  using captures = get_captures_t<Inner>;
 
   template<typename Ctx>
   bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) const {
@@ -110,13 +107,11 @@ struct unary_matcher {
 template<typename Node, typename Inner>
 constexpr bool is_match_expr<unary_matcher<Node, Inner>> = true;
 
-template<typename Node, typename Inner>
-struct get_captures<unary_matcher<Node, Inner>> : get_captures<Inner> {};
-
 
 template<typename Pred, typename Inner>
 struct unary_op_pred_matcher {
   using match_type = mparse::unary_op_node;
+  using captures = get_captures_t<Inner>;
 
   template<typename Ctx>
   bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) const {
@@ -130,9 +125,6 @@ struct unary_op_pred_matcher {
 
 template<typename Pred, typename Inner>
 constexpr bool is_match_expr<unary_op_pred_matcher<Pred, Inner>> = true;
-
-template<typename Pred, typename Inner>
-struct get_captures<unary_op_pred_matcher<Pred, Inner>> : get_captures<Inner> {};
 
 
 template<typename T, T Val>
@@ -238,6 +230,8 @@ template<
 
 template<typename Matcher>
 struct negation_matcher {
+  using captures = get_captures_t<Matcher>;
+
   template<typename Ctx>
   bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) const {
     return !matcher.matches(node, ctx);
@@ -249,12 +243,11 @@ struct negation_matcher {
 template<typename Matcher>
 constexpr bool is_match_expr<negation_matcher<Matcher>> = true;
 
-template<typename Matcher>
-struct get_captures<negation_matcher<Matcher>> : get_captures<Matcher> {};
-
 
 template<typename First, typename Second>
 struct conjunction_matcher {
+  using captures = caplist_cat<get_captures_t<First>, get_captures_t<Second>>;
+
   template<typename Ctx>
   bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) const {
     return first.matches(node, ctx) && second.matches(node, ctx);
@@ -267,14 +260,11 @@ struct conjunction_matcher {
 template<typename First, typename Second>
 constexpr bool is_match_expr<conjunction_matcher<First, Second>> = true;
 
-template<typename First, typename Second>
-struct get_captures<conjunction_matcher<First, Second>> {
-  using type = caplist_cat<get_captures_t<First>, get_captures_t<Second>>;
-};
-
 
 template<typename First, typename Second>
 struct disjunction_matcher {
+  using captures = caplist_cat<get_captures_t<First>, get_captures_t<Second>>;
+
   template<typename Ctx>
   bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) const {
     return first.matches(node, ctx) || second.matches(node, ctx);
@@ -286,11 +276,6 @@ struct disjunction_matcher {
 
 template<typename First, typename Second>
 constexpr bool is_match_expr<disjunction_matcher<First, Second>> = true;
-
-template<typename First, typename Second>
-struct get_captures<disjunction_matcher<First, Second>> {
-  using type = caplist_cat<get_captures_t<First>, get_captures_t<Second>>;
-};
 
 
 template<
@@ -342,10 +327,15 @@ using get_match_type_t = typename get_match_type<Matcher>::type;
 
 template<int N, typename Matcher>
 struct capture_matcher {
+  using captures = caplist_append<
+    get_captures_t<Matcher>,
+    capture<Tag, mparse::node_ptr<get_match_type_t<Matcher>>>
+  >;
+
   template<typename Ctx>
   bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) {
     if (matcher.matches(node, ctx)) {
-      get_capture<N>(ctx) = mparse::static_ast_node_ptr_cast<get_match_type_t<Matcher>>(node);
+      get_result<Tag>(ctx) = mparse::static_ast_node_ptr_cast<get_match_type_t<Matcher>>(node);
       return true;
     }
     return false;
@@ -376,6 +366,8 @@ decltype(auto) get_subexpr(Res&& results) {
 
 template<char C, typename Comp = commutative_expr_comparer>
 struct subexpr_matcher {
+  using captures = caplist<capture<subexpr_matcher_tag<C>, mparse::ast_node_ptr>>;
+
   template<typename Ctx>
   bool matches(const mparse::ast_node_ptr& node, Ctx& ctx) {
     mparse::ast_node_ptr& saved = get_subexpr<C>(ctx);
@@ -391,11 +383,6 @@ struct subexpr_matcher {
 
 template<char C, typename Comp>
 constexpr bool is_match_expr<subexpr_matcher<C, Comp>> = true;
-
-template<char C, typename Comp>
-struct get_captures<subexpr_matcher<C, Comp>> {
-  using type = caplist<capture<subexpr_matcher_tag<C>, mparse::ast_node_ptr>;
-};
 
 
 inline namespace literals {
