@@ -304,14 +304,6 @@ template<
 
 /* CAPTURING MATCHERS */
 
-template<int N>
-struct capture_matcher_tag {};
-
-template<int N, typename Res>
-decltype(auto) get_capture(Res&& results) {
-  return get_result<capture_matcher_tag<N>>(std::forward<Res>(results));
-}
-
 template<typename Matcher, typename = void>
 struct get_match_type {
   using type = mparse::ast_node;
@@ -325,8 +317,8 @@ struct get_match_type<Matcher, std::void_t<typename Matcher::match_type>> {
 template<typename Matcher>
 using get_match_type_t = typename get_match_type<Matcher>::type;
 
-template<int N, typename Matcher>
-struct capture_matcher {
+template<typename Tag, typename Matcher>
+struct capture_matcher_impl {
   using captures = caplist_append<
     get_captures_t<Matcher>,
     capture<Tag, mparse::node_ptr<get_match_type_t<Matcher>>>
@@ -344,16 +336,32 @@ struct capture_matcher {
   const Matcher matcher;
 };
 
-template<int N, typename Matcher>
-constexpr bool is_match_expr<capture_matcher<N, Matcher>> = true;
+template<typename Tag, typename Matcher>
+constexpr bool is_match_expr<capture_matcher_impl<Tag, Matcher>> = true;
+
+
+template<int N>
+struct capture_matcher_tag {};
+
+template<int N, typename Res>
+decltype(auto) get_capture(Res&& results) {
+  return get_result<capture_matcher_tag<N>>(std::forward<Res>(results));
+}
 
 template<int N, typename Matcher>
-struct get_captures<capture_matcher<N, Matcher>> {
-  using type = caplist_append<
-    get_captures_t<Matcher>,
-    capture<capture_matcher_tag<N>, mparse::node_ptr<get_match_type_t<Matcher>>>
-  >;
-};
+using capture_matcher = capture_matcher_impl<capture_matcher_tag<N>, Matcher>;
+
+
+template<int N>
+struct constant_tag {};
+
+template<int N, typename Res>
+decltype(auto) get_constant(Res&& results) {
+  return get_result<constant_tag<N>>(std::forward<Res>(results));
+}
+
+template<int N>
+using constant_matcher = capture_matcher_impl<constant_tag<N>, node_type_matcher<mparse::literal_node>>;
 
 
 template<char C>
