@@ -151,8 +151,8 @@ template<typename E>
 using get_captures_t = typename get_captures<E>::type;
 
 
-template<typename E>
-class match_results : private impl::get_match_results_base_t<get_captures_t<E>> {
+template<typename Caps>
+class match_results : private impl::get_match_results_base_t<Caps> {
   template<typename Tag, typename E>
   friend decltype(auto) get_result(match_results<E>& match) {
     return match.get(Tag{});
@@ -173,5 +173,8 @@ class match_results : private impl::get_match_results_base_t<get_captures_t<E>> 
     return std::move(match).get(Tag{});
   }
 };
+
+template<typename E>
+using match_results_for = match_results<get_captures_t<E>>;
 
 }  // namespace ast_ops::matching
