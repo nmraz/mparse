@@ -167,5 +167,8 @@
     <ClInclude Include="src\ast_ops\matching\match_results.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ast_ops\matching\match.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
