@@ -259,7 +259,7 @@ ast_node_ptr parser::parser_impl::consume_paren_like(std::string_view term_tok, 
 
   if (!has_delim(term_tok)) {
     if (has_term_tok()) {
-      throw syntax_error("Unbalanced "s + friendly_name, { open_loc, get_loc(cur_token_) });
+      throw syntax_error("Unbalanced " + std::string(friendly_name), { open_loc, get_loc(cur_token_) });
     }
     error();
   }
