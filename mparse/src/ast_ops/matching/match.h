@@ -12,6 +12,14 @@ constexpr literal_matcher operator""_lit(long double val) {
   return { static_cast<double>(val) };
 }
 
+constexpr constant_matcher<1> c1{};
+constexpr constant_matcher<2> c2{};
+constexpr constant_matcher<3> c3{};
+
+constexpr subexpr_matcher<'x'> x{};
+constexpr subexpr_matcher<'y'> y{};
+constexpr subexpr_matcher<'z'> z{};
+
 }  // namespace literals
 
 
