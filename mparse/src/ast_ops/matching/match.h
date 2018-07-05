@@ -6,6 +6,14 @@
 #include <optional>
 
 namespace ast_ops::matching {
+inline namespace literals {
+
+constexpr literal_matcher operator""_lit(long double val) {
+  return { static_cast<double>(val) };
+}
+
+}  // namespace literals
+
 
 template<typename Matcher, typename = std::enable_if_t<is_match_expr<Matcher>>>
 std::optional<match_results_for<Matcher>> exec_match(Matcher&& matcher, const mparse::ast_node_ptr& node) {

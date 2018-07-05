@@ -392,12 +392,4 @@ struct subexpr_matcher {
 template<char C, typename Comp>
 constexpr bool is_match_expr<subexpr_matcher<C, Comp>> = true;
 
-
-inline namespace literals {
-
-constexpr literal_matcher operator""_lit(long double val) {
-  return { static_cast<double>(val) };
-}
-
-}  // namespace literals
 }  // namespace ast_ops::matching
