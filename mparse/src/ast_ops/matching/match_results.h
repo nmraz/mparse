@@ -63,7 +63,7 @@ struct caplist_append_multi_unique {
 
 template<typename List, typename T, typename... Ts>
 struct caplist_append_multi_unique<List, T, Ts...>
-  : caplist_append_multi_unique<caplist_append_unique<List, T>, Ts..> {};
+  : caplist_append_multi_unique<caplist_append_unique<List, T>, Ts...> {};
 
 template<typename List>
 struct unique_caplist;
