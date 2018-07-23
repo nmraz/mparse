@@ -72,9 +72,6 @@
     <ClCompile Include="src\mparse\ast\abs_node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ast_ops\simplify.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\mparse\source_range.h">
@@ -146,15 +143,6 @@
     <ClInclude Include="src\parse_vardefs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ast_ops\matching\match_expr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ast_ops\matching\compare.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ast_ops\matching\util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\mparse\ast\abs_node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -165,15 +153,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\mparse\ast\util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ast_ops\matching\match_results.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ast_ops\matching\match.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ast_ops\simplify.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
