@@ -72,6 +72,9 @@
     <ClCompile Include="src\mparse\ast\abs_node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ast_ops\simplify.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\mparse\source_range.h">
@@ -168,6 +171,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ast_ops\matching\match.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ast_ops\simplify.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
