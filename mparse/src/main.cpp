@@ -1,6 +1,7 @@
 #include "ast_ops/ast_dump.h"
 #include "ast_ops/eval/eval.h"
 #include "ast_ops/pretty_print.h"
+#include "ast_ops/strip_parens.h"
 #include "loc_printing.h"
 #include "mparse/ast/operator_nodes.h"
 #include "mparse/error.h"
@@ -64,7 +65,7 @@ int main(int argc, const char* const* argv) {
   }
 
   std::string_view cmd = argv[1];
-  if (cmd != "dump" && cmd != "eval" && cmd != "pretty") {
+  if (cmd != "dump" && cmd != "eval" && cmd != "pretty" && cmd != "strip") {
     print_help(argv[0]);
   }
 
@@ -74,6 +75,9 @@ int main(int argc, const char* const* argv) {
   if (cmd == "dump") {
     ast_ops::dump_ast(ast.get(), &smap);
   } else if (cmd == "pretty") {
+    std::cout << ast_ops::pretty_print(ast.get()) << "\n";
+  } else if (cmd == "strip") {
+    ast_ops::strip_parens(ast);
     std::cout << ast_ops::pretty_print(ast.get()) << "\n";
   } else if (cmd == "eval") {
     ast_ops::eval_scope scope = {
