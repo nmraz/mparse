@@ -1,5 +1,6 @@
 #include "ast_ops/ast_dump.h"
 #include "ast_ops/eval/eval.h"
+#include "ast_ops/eval/exceptions.h"
 #include "ast_ops/pretty_print.h"
 #include "ast_ops/strip_parens.h"
 #include "loc_printing.h"

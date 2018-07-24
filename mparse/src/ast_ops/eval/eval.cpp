@@ -1,5 +1,6 @@
 #include "eval.h"
 
+#include "ast_ops/eval/exceptions.h"
 #include "mparse/ast/abs_node.h"
 #include "mparse/ast/ast_visitor.h"
 #include "mparse/ast/id_node.h"
@@ -101,12 +102,6 @@ void eval_visitor::visit(const mparse::id_node& node) {
 
 }  // namespace
 
-
-eval_error::eval_error(std::string_view what, eval_errc code, const mparse::ast_node* node)
-  : std::runtime_error(what.data())
-  , code_(code)
-  , node_(node) {
-}
 
 double eval(const mparse::ast_node* node, const var_scope& scope) {
   eval_visitor vis(scope);
