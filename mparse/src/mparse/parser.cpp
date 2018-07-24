@@ -268,7 +268,7 @@ ast_node_ptr parser::parser_impl::consume_ident() {
 
   auto node = make_ast_node<id_node>(std::string(name.val));
   if (smap_) {
-    smap_->set_locs(node.get(), { get_loc(cur_token_) });
+    smap_->set_locs(node.get(), { get_loc(name) });
   }
 
   return node;
