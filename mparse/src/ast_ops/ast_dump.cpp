@@ -2,6 +2,7 @@
 
 #include "mparse/ast/abs_node.h"
 #include "mparse/ast/ast_visitor.h"
+#include "mparse/ast/func_node.h"
 #include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
@@ -37,9 +38,11 @@ struct ast_dump_visitor : mparse::const_ast_visitor {
   void visit(const mparse::abs_node& node) override;
   void visit(const mparse::unary_op_node& node) override;
   void visit(const mparse::binary_op_node& node) override;
+  void visit(const mparse::func_node& node) override;
   void visit(const mparse::literal_node& node) override;
   void visit(const mparse::id_node& node) override;
 
+  void dump_child(const mparse::ast_node& node);
   void dump_last_child(const mparse::ast_node& node);
 
   std::string prefix;
@@ -90,14 +93,20 @@ void ast_dump_visitor::visit(const mparse::unary_op_node& node) {
 void ast_dump_visitor::visit(const mparse::binary_op_node& node) {
   stream << "binary '" << stringify_binary_op(node.type()) << "'" << stringify_source_locs(node, smap) << "\n";
 
-  {
-    util::auto_restore save_prefix(prefix);
-    prefix += " |";
-    last_node = false;
-    node.lhs()->apply_visitor(*this);
-  }
-
+  dump_child(*node.lhs());
   dump_last_child(*node.rhs());
+}
+
+void ast_dump_visitor::visit(const mparse::func_node& node) {
+  stream << "func '" << node.name() << "'" << stringify_source_locs(node, smap) << "\n";
+
+  for (const auto& arg : node.args()) {
+    if (arg == node.args().back()) {
+      dump_last_child(*arg);
+    } else {
+      dump_child(*arg);
+    }
+  }
 }
 
 void ast_dump_visitor::visit(const mparse::literal_node& node) {
@@ -108,6 +117,13 @@ void ast_dump_visitor::visit(const mparse::id_node& node) {
   stream << "variable '" << node.name() << "'" << stringify_source_locs(node, smap) << "\n";
 }
 
+
+void ast_dump_visitor::dump_child(const mparse::ast_node& node) {
+  util::auto_restore save_prefix(prefix);
+  prefix += " |";
+  last_node = false;
+  node.apply_visitor(*this);
+}
 
 void ast_dump_visitor::dump_last_child(const mparse::ast_node& node) {
   prefix += " ";
