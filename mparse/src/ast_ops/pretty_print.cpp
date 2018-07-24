@@ -98,6 +98,8 @@ struct print_visitor : mparse::const_ast_visitor {
   void visit(const mparse::literal_node& node) override;
   void visit(const mparse::id_node& node) override;
 
+  void set_locs(const mparse::ast_node& node, std::vector<mparse::source_range> locs);
+
   template<typename F>
   mparse::source_range record_loc(F&& f) const {
     std::size_t begin = result.size();
@@ -169,9 +171,7 @@ void print_visitor::visit(const mparse::paren_node& node) {
     result += ")";
   });
 
-  if (smap) {
-    smap->set_locs(&node, { loc });
-  }
+  set_locs(node, { loc });
 }
 
 void print_visitor::visit(const mparse::abs_node& node) {
@@ -184,9 +184,7 @@ void print_visitor::visit(const mparse::abs_node& node) {
     result += "|";
   });
 
-  if (smap) {
-    smap->set_locs(&node, { loc });
-  }
+  set_locs(node, { loc });
 }
 
 void print_visitor::visit(const mparse::unary_op_node& node) {
@@ -202,9 +200,7 @@ void print_visitor::visit(const mparse::unary_op_node& node) {
     node.child()->apply_visitor(*this);
   });
 
-  if (smap) {
-    smap->set_locs(&node, { expr_loc, op_loc });
-  }
+  set_locs(node, { expr_loc, op_loc });
 }
 
 void print_visitor::visit(const mparse::binary_op_node& node) {
@@ -232,9 +228,7 @@ void print_visitor::visit(const mparse::binary_op_node& node) {
     }
   });
 
-  if (smap) {
-    smap->set_locs(&node, { expr_loc, op_loc });
-  }
+  set_locs(node, { expr_loc, op_loc });
 }
 
 void print_visitor::visit(const mparse::literal_node& node) {
@@ -245,18 +239,21 @@ void print_visitor::visit(const mparse::literal_node& node) {
     result += stream.str();
   });
 
-  if (smap) {
-    smap->set_locs(&node, { loc });
-  }
+  set_locs(node, { loc });
 }
 
 void print_visitor::visit(const mparse::id_node& node) {
   mparse::source_range loc = record_loc([&] {
     result += node.name();
   });
+  
+  set_locs(node, { loc });
+}
 
+
+void print_visitor::set_locs(const mparse::ast_node& node, std::vector<mparse::source_range> locs) {
   if (smap) {
-    smap->set_locs(&node, { loc });
+    smap->set_locs(&node, std::move(locs));
   }
 }
 
