@@ -38,7 +38,7 @@ void strip_paren_visitor::visit(mparse::binary_op_node& node) {
 }  // namespace
 
 
-void strip_paren(mparse::ast_node_ptr& node) {
+void strip_parens(mparse::ast_node_ptr& node) {
   strip_paren_visitor vis;
   node->apply_visitor(vis);
   node = strip_paren(std::move(node));
