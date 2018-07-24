@@ -244,12 +244,17 @@ ast_node_ptr parser::parser_impl::consume_literal() {
 }
 
 ast_node_ptr parser::parser_impl::consume_ident() {
-  auto node = make_ast_node<id_node>(std::string(cur_token_.val));
+  token name = cur_token_;
+  get_next_token();
+  if (has_delim("("sv)) {
+    return consume_func(name);
+  }
+
+  auto node = make_ast_node<id_node>(std::string(name.val));
   if (smap_) {
     smap_->set_locs(node.get(), { get_loc(cur_token_) });
   }
 
-  get_next_token();
   return node;
 }
 
