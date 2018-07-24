@@ -65,6 +65,22 @@ source_range get_loc(const token& tok) {
 
 
 struct parser::parser_impl {
+  class term_tok_pusher {
+  public:
+    term_tok_pusher(parser_impl& parser, std::string_view tok)
+      : parser_(parser) {
+      parser_.push_term_tok(tok);
+    }
+
+    ~term_tok_pusher() {
+      parser_.pop_term_tok();
+    }
+
+  private:
+    parser_impl& parser_;
+  };
+
+
   parser_impl(source_stream& stream, source_map* smap = nullptr);
 
   void begin_parse();
@@ -262,22 +278,23 @@ ast_node_ptr parser::parser_impl::consume_func(token name) {
   source_range name_loc = get_loc(name);
   source_range open_loc = get_loc(cur_token_);
 
-  push_term_tok(")"sv);
-  push_term_tok(","sv);
-  
-  get_next_token();
   func_node::child_list args;
-  if (!has_delim(")"sv)) {
-    args.push_back(parse_add());
-    while (has_delim(","sv)) {
-      get_next_token();
+  {
+    term_tok_pusher push_paren(*this, ")"sv);
+    term_tok_pusher push_comma(*this, ","sv);
+
+    get_next_token();
+    if (!has_delim(")"sv)) {
       args.push_back(parse_add());
+      while (has_delim(","sv)) {
+        get_next_token();
+        args.push_back(parse_add());
+      }
     }
+
+    check_balanced(open_loc, ")"sv, "parentheses in function call");
   }
 
-  check_balanced(open_loc, ")"sv, "parentheses in function call");
-  pop_term_tok();
-  pop_term_tok();
   source_range close_loc = get_loc(cur_token_);
 
   get_next_token();
@@ -293,13 +310,16 @@ ast_node_ptr parser::parser_impl::consume_func(token name) {
 template<typename T>
 ast_node_ptr parser::parser_impl::consume_paren_like(std::string_view term_tok, const char* friendly_name) {
   source_range open_loc = get_loc(cur_token_);
-  push_term_tok(term_tok);
+  ast_node_ptr inner_expr;
+  
+  {
+    term_tok_pusher push(*this, term_tok);
 
-  get_next_token();
-  ast_node_ptr inner_expr = parse_add();
-  check_balanced(open_loc, term_tok, friendly_name);
-
-  pop_term_tok();
+    get_next_token();
+    inner_expr = parse_add();
+    check_balanced(open_loc, term_tok, friendly_name);
+  }
+  
   source_range close_loc = get_loc(cur_token_);
 
   get_next_token();
