@@ -89,6 +89,8 @@ struct parser::parser_impl {
 
   bool has_term_tok() const;
   bool has_delim(std::string_view val) const;
+
+  void check_balanced(source_range open_loc, std::string_view term_tok, const char* friendly_name) const;
   void error() const;
 
   void save_bin_locs(const binary_op_node* node, source_range op_loc);
@@ -256,16 +258,8 @@ ast_node_ptr parser::parser_impl::consume_paren_like(std::string_view term_tok, 
 
   get_next_token();
   ast_node_ptr inner_expr = parse_add();
+  check_balanced(open_loc, term_tok, friendly_name);
 
-  if (!has_delim(term_tok)) {
-    if (has_term_tok()) {
-      throw syntax_error(
-        "Unbalanced " + std::string(friendly_name) + ": expected a '" + term_tok.data() + "'",
-        { open_loc, get_loc(cur_token_) }
-      );
-    }
-    error();
-  }
   pop_term_tok();
   source_range close_loc = get_loc(cur_token_);
 
@@ -309,6 +303,19 @@ bool parser::parser_impl::has_delim(std::string_view val) const {
   return cur_token_.type == token_type::delim && cur_token_.val == val;
 }
 
+
+void parser::parser_impl::check_balanced(source_range open_loc, std::string_view term_tok,
+  const char* friendly_name) const {
+  if (!has_delim(term_tok)) {
+    if (has_term_tok()) {
+      throw syntax_error(
+        "Unbalanced " + std::string(friendly_name) + ": expected a '" + term_tok.data() + "'",
+        { open_loc, get_loc(cur_token_) }
+      );
+    }
+    error();
+  }
+}
 
 void parser::parser_impl::error() const {
   std::string msg = "Unexpected "s + token_type_name(cur_token_.type) + ": expected " + expected_type_;
