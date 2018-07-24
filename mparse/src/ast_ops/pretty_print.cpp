@@ -3,6 +3,7 @@
 #include "op_strings.h"
 #include "mparse/ast/abs_node.h"
 #include "mparse/ast/ast_visitor.h"
+#include "mparse/ast/func_node.h"
 #include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
@@ -95,6 +96,7 @@ struct print_visitor : mparse::const_ast_visitor {
   void visit(const mparse::abs_node& node) override;
   void visit(const mparse::unary_op_node& node) override;
   void visit(const mparse::binary_op_node& node) override;
+  void visit(const mparse::func_node& node) override;
   void visit(const mparse::literal_node& node) override;
   void visit(const mparse::id_node& node) override;
 
@@ -229,6 +231,32 @@ void print_visitor::visit(const mparse::binary_op_node& node) {
   });
 
   set_locs(node, { expr_loc, op_loc });
+}
+
+void print_visitor::visit(const mparse::func_node& node) {
+  mparse::source_range name_loc, open_loc;
+  mparse::source_range expr_loc = record_loc([&] {
+    name_loc = record_loc([&] {
+      result += node.name();
+    });
+    open_loc = record_loc([&] {
+      result += "(";
+    });
+
+    {
+      child_visitor_scope scope(*this, op_precedence::unknown, associativity::none, branch_side::none);
+      for (const auto& arg : node.args()) {
+        if (arg != node.args().front()) {
+          result += ", ";
+        }
+        arg->apply_visitor(*this);
+      }
+    }
+
+    result += ")";
+  });
+
+  set_locs(node, { expr_loc, name_loc, open_loc });
 }
 
 void print_visitor::visit(const mparse::literal_node& node) {
