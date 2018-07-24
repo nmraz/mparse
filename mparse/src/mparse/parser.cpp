@@ -111,7 +111,7 @@ struct parser::parser_impl {
   void check_balanced(source_range open_loc, std::string_view term_tok, const char* friendly_name) const;
   void error() const;
 
-  void save_bin_locs(const binary_op_node* node, source_range op_loc);
+  void set_bin_locs(const binary_op_node* node, source_range op_loc);
 
   source_stream& stream_;
   source_map* smap_;
@@ -156,7 +156,7 @@ ast_node_ptr parser::parser_impl::parse_add() {
     get_next_token();
     auto add_node = make_ast_node<binary_op_node>(*op, std::move(node), parse_mult());
 
-    save_bin_locs(add_node.get(), op_loc);
+    set_bin_locs(add_node.get(), op_loc);
     node = std::move(add_node);
   }
 
@@ -178,7 +178,7 @@ ast_node_ptr parser::parser_impl::parse_mult() {
     get_next_token();
     auto mul_node = make_ast_node<binary_op_node>(*op, std::move(node), parse_unary());
 
-    save_bin_locs(mul_node.get(), op_loc);
+    set_bin_locs(mul_node.get(), op_loc);
     node = std::move(mul_node);
   }
 
@@ -220,7 +220,7 @@ ast_node_ptr parser::parser_impl::parse_pow() {
     get_next_token();
     auto pow_node = make_ast_node<binary_op_node>(binary_op_type::pow, std::move(node), parse_unary());
 
-    save_bin_locs(pow_node.get(), op_loc);
+    set_bin_locs(pow_node.get(), op_loc);
     return pow_node;
   }
 
@@ -386,7 +386,7 @@ void parser::parser_impl::error() const {
 }
 
 
-void parser::parser_impl::save_bin_locs(const binary_op_node* node, source_range op_loc) {
+void parser::parser_impl::set_bin_locs(const binary_op_node* node, source_range op_loc) {
   if (smap_) {
     smap_->set_locs(node, {
       source_range::merge(smap_->find_primary_loc(node->lhs()), smap_->find_primary_loc(node->rhs())),  // full range
