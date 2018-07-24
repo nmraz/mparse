@@ -89,6 +89,8 @@ bool should_parenthesize(op_precedence parent_precedence, op_precedence preceden
 
 
 struct print_visitor : mparse::const_ast_visitor {
+  print_visitor(mparse::source_map* smap) : smap(smap) {}
+
   void visit(const mparse::paren_node& node) override;
   void visit(const mparse::abs_node& node) override;
   void visit(const mparse::unary_op_node& node) override;
