@@ -91,7 +91,7 @@ void ast_dump_visitor::visit(const mparse::binary_op_node& node) {
   stream << "binary '" << stringify_binary_op(node.type()) << "'" << stringify_source_locs(node, smap) << "\n";
 
   {
-    util::auto_restore<std::string> save_prefix(prefix);
+    util::auto_restore save_prefix(prefix);
     prefix += " |";
     last_node = false;
     node.lhs()->apply_visitor(*this);
