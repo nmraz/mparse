@@ -80,7 +80,7 @@ int main(int argc, const char* const* argv) {
     ast_ops::strip_parens(ast);
     std::cout << ast_ops::pretty_print(ast.get()) << "\n";
   } else if (cmd == "eval") {
-    ast_ops::eval_scope scope = {
+    ast_ops::var_scope scope = {
       { "e", 2.71828183 },
       { "pi", 3.14159265 },
       { "tau", 6.28318531 }

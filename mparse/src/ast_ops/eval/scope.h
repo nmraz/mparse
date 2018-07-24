@@ -7,7 +7,7 @@
 
 namespace ast_ops {
 
-class eval_scope {
+class var_scope {
   using impl_type = std::map<std::string, double, std::less<>>;
 
 public:
@@ -16,8 +16,8 @@ public:
   using reverse_iterator = impl_type::reverse_iterator;
   using const_reverse_iterator = impl_type::const_reverse_iterator;
 
-  eval_scope() = default;
-  eval_scope(std::initializer_list<impl_type::value_type> ilist);
+  var_scope() = default;
+  var_scope(std::initializer_list<impl_type::value_type> ilist);
 
   iterator begin() { return map_.begin(); }
   const_iterator begin() const { return map_.begin(); }

@@ -18,7 +18,7 @@ std::string accumulate_argv(int argc, const char* const* argv) {
 
 }  // namespace
 
-void parse_vardefs(ast_ops::eval_scope& scope, int argc, const char* const* argv) {
+void parse_vardefs(ast_ops::var_scope& scope, int argc, const char* const* argv) {
   std::string input = accumulate_argv(argc, argv);
   mparse::source_stream stream(input);
 

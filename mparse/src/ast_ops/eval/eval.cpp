@@ -11,7 +11,7 @@ namespace ast_ops {
 namespace {
 
 struct eval_visitor : mparse::const_ast_visitor {
-  eval_visitor(const eval_scope& scope);
+  eval_visitor(const var_scope& scope);
 
   void visit(const mparse::unary_node& node) override;
   void visit(const mparse::abs_node& node) override;
@@ -20,11 +20,11 @@ struct eval_visitor : mparse::const_ast_visitor {
   void visit(const mparse::literal_node& node) override;
   void visit(const mparse::id_node& node) override;
 
-  const eval_scope& scope;
+  const var_scope& scope;
   double result = 0;
 };
 
-eval_visitor::eval_visitor(const eval_scope& scope)
+eval_visitor::eval_visitor(const var_scope& scope)
   : scope(scope) {
 }
 
@@ -108,7 +108,7 @@ eval_error::eval_error(std::string_view what, eval_errc code, const mparse::ast_
   , node_(node) {
 }
 
-double eval(const mparse::ast_node* node, const eval_scope& scope) {
+double eval(const mparse::ast_node* node, const var_scope& scope) {
   eval_visitor vis(scope);
   node->apply_visitor(vis);
   return vis.result;
