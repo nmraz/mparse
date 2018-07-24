@@ -11,6 +11,7 @@ class paren_node;
 class abs_node;
 class unary_op_node;
 class binary_op_node;
+class func_node;
 class literal_node;
 class id_node;
 
@@ -23,6 +24,7 @@ struct ast_visitor_cv {
   virtual void visit(AddCv<paren_node>&) {}
   virtual void visit(AddCv<unary_op_node>&) {}
   virtual void visit(AddCv<binary_op_node>&) {}
+  virtual void visit(AddCv<func_node>&) {}
   virtual void visit(AddCv<literal_node>&) {}
   virtual void visit(AddCv<id_node>&) {}
   virtual void visit(AddCv<abs_node>&) {}
