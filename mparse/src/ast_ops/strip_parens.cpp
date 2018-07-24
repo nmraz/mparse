@@ -2,6 +2,7 @@
 
 #include "mparse/ast/ast_visitor.h"
 #include "mparse/ast/cast.h"
+#include "mparse/ast/func_node.h"
 #include "mparse/ast/operator_nodes.h"
 #include "mparse/ast/paren_node.h"
 #include "mparse/ast/unary_node.h"
@@ -20,6 +21,7 @@ mparse::ast_node_ptr strip_paren(mparse::ast_node_ptr node) {
 struct strip_paren_visitor : mparse::ast_visitor {
   void visit(mparse::unary_node& node) override;
   void visit(mparse::binary_op_node& node) override;
+  void visit(mparse::func_node& node) override;
 };
 
 void strip_paren_visitor::visit(mparse::unary_node& node) {
@@ -33,6 +35,13 @@ void strip_paren_visitor::visit(mparse::binary_op_node& node) {
 
   node.rhs()->apply_visitor(*this);
   node.set_rhs(strip_paren(node.take_rhs()));
+}
+
+void strip_paren_visitor::visit(mparse::func_node& node) {
+  for (auto& arg : node.args()) {
+    arg->apply_visitor(*this);
+    arg = strip_paren(arg);
+  }
 }
 
 }  // namespace
