@@ -221,9 +221,11 @@ void print_visitor::visit(const mparse::binary_op_node& node) {
       node.lhs()->apply_visitor(*this);
     }
 
+    result += " ";
     op_loc = record_loc([&] {
       result += stringify_binary_op(node.type());
     });
+    result += " ";
 
     {
       child_visitor_scope scope(*this, prec, assoc, branch_side::right);
