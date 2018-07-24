@@ -13,9 +13,15 @@ public:
   auto_restore& operator=(const auto_restore&) = delete;
   auto_restore& operator=(auto_restore&&) = delete;
 
-  auto_restore(T& var)
+  explicit auto_restore(T& var)
     : var_(var)
     , old_val_(var) {
+  }
+
+  template<typename U>
+  auto_restore(T& var, U&& new_val)
+    : auto_restore(var) {
+    var_ = std::forward<U>(new_val);
   }
 
   ~auto_restore() {
