@@ -109,8 +109,8 @@ struct print_visitor : mparse::const_ast_visitor {
     return { begin, end };
   }
 
-  op_precedence parent_precedence;
-  bool assoc_paren;
+  op_precedence parent_precedence = op_precedence::unknown;
+  bool assoc_paren = should_parenthesize_assoc(branch_side::none, associativity::none);
 
   mparse::source_map* smap;
   std::string result;
