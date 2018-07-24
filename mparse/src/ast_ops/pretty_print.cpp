@@ -89,9 +89,6 @@ bool should_parenthesize(op_precedence parent_precedence, op_precedence preceden
 
 
 struct print_visitor : mparse::const_ast_visitor {
-  print_visitor(op_precedence parent_precedence, branch_side side, associativity parent_assoc,
-    mparse::source_map* smap, std::size_t loc_offset = 0);
-
   void visit(const mparse::paren_node& node) override;
   void visit(const mparse::abs_node& node) override;
   void visit(const mparse::unary_op_node& node) override;
@@ -105,15 +102,13 @@ struct print_visitor : mparse::const_ast_visitor {
     std::forward<F>(f)();
     std::size_t end = result.size();
 
-    return { begin + loc_offset, end + loc_offset };
+    return { begin, end };
   }
 
   op_precedence parent_precedence;
   bool assoc_paren;
 
   mparse::source_map* smap;
-  std::size_t loc_offset;
-
   std::string result;
 };
 
@@ -142,123 +137,10 @@ auto_parenthesizer::~auto_parenthesizer() {
   }
 }
 
-
-print_visitor::print_visitor(op_precedence parent_precedence, branch_side side, associativity parent_assoc,
-  mparse::source_map* smap, std::size_t loc_offset)
-  : parent_precedence(parent_precedence)
-  , assoc_paren(should_parenthesize_assoc(side, parent_assoc))
-  , smap(smap)
-  , loc_offset(loc_offset) {
-}
-
-void print_visitor::visit(const mparse::paren_node& node) {
-  node.child()->apply_visitor(*this);
-
-  if (smap) {
-    smap->set_locs(&node, { smap->find_primary_loc(node.child()) });  // copy just primary location
-  }
-}
-
-void print_visitor::visit(const mparse::abs_node& node) {
-  parent_precedence = op_precedence::unknown;
-  mparse::source_range outer_loc = record_loc([&] {
-    result += "|";
-    node.child()->apply_visitor(*this);
-    result += "|";
-  });
-
-  if (smap) {
-    smap->set_locs(&node, { outer_loc });
-  }
-}
-
-void print_visitor::visit(const mparse::unary_op_node& node) {
-  print_visitor child_vis(op_precedence::unary, branch_side::none, associativity::none, smap, result.size());
-  node.child()->apply_visitor(child_vis);
-
-  mparse::source_range op_loc;
-  mparse::source_range expr_loc = record_loc([&] {
-    auto_parenthesizer paren(*this, op_precedence::unary);
-    
-    op_loc = record_loc([&] {
-      result += stringify_unary_op(node.type());
-    });
-
-    result += child_vis.result;
-  });
-
-  if (smap) {
-    smap->set_locs(&node, { expr_loc, op_loc });
-  }
-}
-
-void print_visitor::visit(const mparse::binary_op_node& node) {
-  mparse::binary_op_type op = node.type();
-  op_precedence prec = get_precedence(op);
-  associativity assoc = get_associativity(op);
-
-  std::string lhs_str, rhs_str;
-
-  {
-    print_visitor lhs_vis(prec, branch_side::left, assoc, smap, result.size());
-    node.lhs()->apply_visitor(lhs_vis);
-    lhs_str = std::move(lhs_vis.result);
-  }
-
-  {
-    print_visitor rhs_vis(prec, branch_side::right, assoc, smap, result.size());
-    node.rhs()->apply_visitor(rhs_vis);
-    rhs_str = std::move(rhs_vis.result);
-  }
-
-  mparse::source_range op_loc;
-  mparse::source_range expr_loc = record_loc([&] {
-    auto_parenthesizer paren(*this, prec);
-
-    result += lhs_str + " ";
-
-    op_loc = record_loc([&] {
-      result += stringify_binary_op(op);
-    });
-
-    result += " " + rhs_str;
-  });
-
-  if (smap) {
-    smap->set_locs(&node, { expr_loc, op_loc });
-  }
-}
-
-void print_visitor::visit(const mparse::literal_node& node) {
-  std::ostringstream stream;
-  stream << node.val();
-
-  mparse::source_range tok_loc = record_loc([&] {
-    result += stream.str();
-  });
-
-  if (smap) {
-    smap->set_locs(&node, { tok_loc });
-  }
-}
-
-void print_visitor::visit(const mparse::id_node& node) {
-  mparse::source_range tok_loc = record_loc([&] {
-    result += node.name();
-  });
-
-  if (smap) {
-    smap->set_locs(&node, { tok_loc });
-  }
-}
-
 }  // namespace
 
 
 std::string pretty_print(const mparse::ast_node* node, mparse::source_map* smap) {
-  print_visitor vis(op_precedence::unknown, branch_side::none, associativity::none, smap);
-  node->apply_visitor(vis);
-  return vis.result;
 }
 
 }  // namespace ast_ops
