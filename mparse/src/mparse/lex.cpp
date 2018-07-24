@@ -6,7 +6,7 @@ using namespace std::literals;
 
 namespace {
 
-constexpr auto delims = "+-*/^()|"sv;
+constexpr auto delims = "+-*/^()|,"sv;
 
 }  // namespace
 

@@ -263,9 +263,11 @@ ast_node_ptr parser::parser_impl::consume_func(token name) {
   get_next_token();
   func_node::child_list args;
   if (!has_delim(")"sv)) {
-    do {
+    args.push_back(parse_add());
+    while (has_delim(","sv)) {
+      get_next_token();
       args.push_back(parse_add());
-    } while (has_delim(","sv));
+    }
   }
 
   check_balanced(open_loc, ")"sv, "parentheses in function call");
@@ -273,6 +275,7 @@ ast_node_ptr parser::parser_impl::consume_func(token name) {
   pop_term_tok();
   source_range close_loc = get_loc(cur_token_);
 
+  get_next_token();
   auto node = make_ast_node<func_node>(std::string(name.val), std::move(args));
 
   if (smap_) {
