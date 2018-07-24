@@ -1,6 +1,7 @@
 #include "parser.h"
 
 #include "mparse/ast/abs_node.h"
+#include "mparse/ast/func_node.h"
 #include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
@@ -77,6 +78,7 @@ struct parser::parser_impl {
   ast_node_ptr parse_atom();
   ast_node_ptr consume_literal();
   ast_node_ptr consume_ident();
+  ast_node_ptr consume_func(token name);
 
   template<typename T>
   ast_node_ptr consume_paren_like(std::string_view term_tok, const char* friendly_name);
@@ -248,6 +250,35 @@ ast_node_ptr parser::parser_impl::consume_ident() {
   }
 
   get_next_token();
+  return node;
+}
+
+ast_node_ptr parser::parser_impl::consume_func(token name) {
+  source_range name_loc = get_loc(name);
+  source_range open_loc = get_loc(cur_token_);
+
+  push_term_tok(")"sv);
+  push_term_tok(","sv);
+  
+  get_next_token();
+  func_node::child_list args;
+  if (!has_delim(")"sv)) {
+    do {
+      args.push_back(parse_add());
+    } while (has_delim(","sv));
+  }
+
+  check_balanced(open_loc, ")"sv, "parentheses in function call");
+  pop_term_tok();
+  pop_term_tok();
+  source_range close_loc = get_loc(cur_token_);
+
+  auto node = make_ast_node<func_node>(std::string(name.val), std::move(args));
+
+  if (smap_) {
+    smap_->set_locs(node.get(), { source_range::merge(name_loc, close_loc), name_loc, open_loc });
+  }
+
   return node;
 }
 
