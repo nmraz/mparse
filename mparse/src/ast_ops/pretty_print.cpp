@@ -139,6 +139,33 @@ auto_parenthesizer::~auto_parenthesizer() {
   }
 }
 
+
+class child_visitor_scope {
+public:
+  child_visitor_scope(print_visitor& vis, op_precedence parent_precedence,
+    associativity parent_assoc, branch_side side);
+  ~child_visitor_scope();
+
+private:
+  print_visitor& vis_;
+  op_precedence old_precedence_;
+  bool old_assoc_paren_;
+};
+
+child_visitor_scope::child_visitor_scope(print_visitor& vis, op_precedence parent_precedence,
+  associativity parent_assoc, branch_side side)
+  : vis_(vis)
+  , old_precedence_(vis.parent_precedence)
+  , old_assoc_paren_(vis.assoc_paren) {
+  vis.parent_precedence = parent_precedence;
+  vis.assoc_paren = should_parenthesize_assoc(side, parent_assoc);
+}
+
+child_visitor_scope::~child_visitor_scope() {
+  vis_.parent_precedence = old_precedence_;
+  vis_.assoc_paren = old_assoc_paren_;
+}
+
 }  // namespace
 
 
