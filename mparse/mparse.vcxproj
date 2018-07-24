@@ -156,6 +156,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mparse\ast\abs_node.cpp" />
     <ClCompile Include="src\mparse\ast\ast_node.cpp" />
+    <ClCompile Include="src\mparse\ast\func_node.cpp" />
     <ClCompile Include="src\mparse\ast\id_node.cpp" />
     <ClCompile Include="src\mparse\ast\operator_nodes.cpp" />
     <ClCompile Include="src\mparse\ast\paren_node.cpp" />
@@ -180,6 +181,7 @@
     <ClInclude Include="src\mparse\ast\ast_node_impl.h" />
     <ClInclude Include="src\mparse\ast\ast_visitor.h" />
     <ClInclude Include="src\mparse\ast\cast.h" />
+    <ClInclude Include="src\mparse\ast\func_node.h" />
     <ClInclude Include="src\mparse\ast\id_node.h" />
     <ClInclude Include="src\mparse\ast\literal_node.h" />
     <ClInclude Include="src\mparse\ast\operator_nodes.h" />

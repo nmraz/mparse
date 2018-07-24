@@ -75,6 +75,9 @@
     <ClCompile Include="src\ast_ops\strip_parens.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\mparse\ast\func_node.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\mparse\source_range.h">
@@ -159,6 +162,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ast_ops\strip_parens.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mparse\ast\func_node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
