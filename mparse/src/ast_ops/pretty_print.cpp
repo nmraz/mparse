@@ -168,10 +168,17 @@ child_visitor_scope::~child_visitor_scope() {
 
 
 void print_visitor::visit(const mparse::paren_node& node) {
-  node.child()->apply_visitor(*this);
+  mparse::source_range loc = record_loc([&] {
+    result += "(";
+    {
+      child_visitor_scope scope(*this, op_precedence::unknown, associativity::none, branch_side::none);
+      node.child()->apply_visitor(*this);
+    }
+    result += ")";
+  });
 
   if (smap) {
-    smap->set_locs(&node, { smap->find_primary_loc(node.child()) });
+    smap->set_locs(&node, { loc });
   }
 }
 
