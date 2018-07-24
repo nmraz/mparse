@@ -214,7 +214,7 @@ void print_visitor::visit(const mparse::binary_op_node& node) {
 
   mparse::source_range op_loc;
   mparse::source_range expr_loc = record_loc([&] {
-    auto_parenthesizer(*this, prec);
+    auto_parenthesizer paren(*this, prec);
     
     {
       child_visitor_scope scope(*this, prec, assoc, branch_side::left);
