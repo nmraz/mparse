@@ -278,7 +278,7 @@ ast_node_ptr parser::parser_impl::consume_func(token name) {
   source_range name_loc = get_loc(name);
   source_range open_loc = get_loc(cur_token_);
 
-  func_node::child_list args;
+  func_node::arg_list args;
   {
     term_tok_pusher push_paren(*this, ")"sv);
     term_tok_pusher push_comma(*this, ","sv);

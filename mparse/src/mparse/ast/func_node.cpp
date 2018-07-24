@@ -2,9 +2,9 @@
 
 namespace mparse {
 
-func_node::func_node(std::string name, child_list children)
+func_node::func_node(std::string name, arg_list args)
   : name_(std::move(name))
-  , children_(std::move(children)) {
+  , args_(std::move(args)) {
 }
 
 void func_node::set_name(std::string name) {
