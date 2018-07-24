@@ -195,42 +195,18 @@ constexpr bool operator>=(const span<T>& lhs, const span<T>& rhs) {
 
 
 template<typename T>
-constexpr inline span<T> make_span(T* data, std::ptrdiff_t size) {
-  return { data, size };
-}
+span(T*, std::ptrdiff_t) -> span<T>;
 
 template<typename T>
-constexpr inline span<T> make_span(T* begin, T* end) {
-  return { begin, end };
-}
+span(T*, T*) -> span<T>;
 
 template<typename T, std::size_t N>
-constexpr inline span<T> make_span(T(&array)[N]) {
-  return { array };
-}
+span(T(&)[N]) -> span<T>;
 
-template<
-  typename Cont,
-  typename T = typename Cont::value_type,
-  typename = std::enable_if_t<impl::is_compatible_container<Cont, T>>
-> constexpr inline span<T> make_span(Cont& cont) {
-  return { cont };
-}
+template<typename Cont>
+span(Cont&) -> span<typename Cont::value_type>;
 
-template<
-  typename Cont,
-  typename T = const typename Cont::value_type,
-  typename = std::enable_if_t<impl::is_compatible_container<const Cont, T>>
-> constexpr inline span<T> make_span(const Cont& cont) {
-  return { cont };
-}
-
-template<typename Cont, typename = std::enable_if_t<!impl::is_span<Cont>>>
-constexpr void make_span(const Cont&&) = delete;  // temporary
-
-template<typename T>
-constexpr inline span<T> make_span(const span<T>& sp) {
-  return sp;
-}
+template<typename Cont>
+span(const Cont&) -> span<const typename Cont::value_type>;
 
 }  // namespace util
