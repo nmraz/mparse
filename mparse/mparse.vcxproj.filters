@@ -48,9 +48,6 @@
     <ClCompile Include="src\ast_ops\ast_dump.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ast_ops\op_strings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ast_ops\pretty_print.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

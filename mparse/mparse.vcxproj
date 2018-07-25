@@ -168,7 +168,6 @@
     <ClCompile Include="src\mparse\parser.cpp" />
     <ClCompile Include="src\mparse\source_map.cpp" />
     <ClCompile Include="src\mparse\source_stream.cpp" />
-    <ClCompile Include="src\ast_ops\op_strings.cpp" />
     <ClCompile Include="src\ast_ops\pretty_print.cpp" />
     <ClCompile Include="src\scope_helpers.cpp" />
   </ItemGroup>
