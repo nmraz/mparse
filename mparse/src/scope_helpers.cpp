@@ -48,6 +48,13 @@ ast_ops::var_scope default_var_scope() {
 ast_ops::func_scope default_func_scope() {
   ast_ops::func_scope scope;
 
+  scope.set_binding("mod", [] (double a, double b) {
+    if (b == 0) {
+      throw std::domain_error("mod by zero");
+    }
+    return std::fmod(a, b);
+  });
+
   scope.set_binding("sin", wrap_errno([] (double x) { return std::sin(x); }));
   scope.set_binding("cos", wrap_errno([] (double x) { return std::cos(x); }));
   scope.set_binding("tan", wrap_errno([] (double x) { return std::tan(x); }));
