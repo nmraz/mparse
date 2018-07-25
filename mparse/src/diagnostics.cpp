@@ -16,7 +16,6 @@ std::string make_marker(std::size_t size) {
 
 constexpr auto esc_white = "\x1b[37m"sv;
 constexpr auto esc_red = "\x1b[31m"sv;
-constexpr auto esc_blue = "\x1b[36m"sv;
 constexpr auto esc_green = "\x1b[32m"sv;
 constexpr auto esc_bold = "\x1b[1m"sv;
 
