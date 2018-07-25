@@ -117,7 +117,7 @@ void eval_visitor::visit(const mparse::func_node& node) {
     if (ent->arity && ent->arity != node.args().size()) {
       throw_arity_error(*ent->arity, static_cast<int>(node.args().size()));
     }
-    ent->func(std::move(args));
+    result = ent->func(std::move(args));
   } catch (...) {
     eval_error err("Error in function '" + node.name() + "'", eval_errc::bad_func_call, &node);
     std::throw_with_nested(std::move(err));
