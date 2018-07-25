@@ -3,6 +3,7 @@
 #include "mparse/lex.h"
 #include <cmath>
 #include <cstdlib>
+#include <stdexcept>
 #include <string>
 #include <system_error>
 
@@ -76,6 +77,38 @@ ast_ops::func_scope default_func_scope() {
   scope.set_binding("acosh", arccosh);
   scope.set_binding("arctanh", arctanh);
   scope.set_binding("atanh", arctanh);
+
+
+  scope.set_binding("exp", wrap_errno([] (double x) { return std::exp(x); }));
+  scope.set_binding("ln", wrap_errno([] (double x) { return std::log(x); }));
+  scope.set_binding("log", [] (double base, double val) {
+    if (val <= 0) {
+      throw std::domain_error("argument out of domain");
+    }
+    if (base <= 0 || base == 1) {
+      throw std::domain_error("base out of domain");
+    }
+    return std::log(val) / std::log(base);
+  });
+
+  scope.set_binding("sqrt", wrap_errno([] (double x) { return std::sqrt(x); }));
+  scope.set_binding("cbrt", wrap_errno([] (double x) { return std::cbrt(x); }));
+  scope.set_binding("nroot", [] (double n, double val) {
+    if (val < 0 && std::fmod(n, 2) != 1) {
+      throw std::domain_error("taking non-odd nth-root of negative number");
+    }
+    if (n == 0) {
+      throw std::domain_error("taking zero-th root of number");
+    }
+    if (val == 0 && n < 0) {
+      throw std::domain_error("taking negative root of zero");
+    }
+
+    if (val < 0) {
+      return -std::pow(-val, 1 / n);
+    }
+    return std::pow(val, 1 / n);
+  });
 
   return scope;
 }
