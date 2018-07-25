@@ -1,7 +1,5 @@
 #include "scope.h"
 
-#include <sstream>
-
 namespace ast_ops {
 
 var_scope::var_scope(std::initializer_list<impl_type::value_type> ilist)
@@ -28,23 +26,16 @@ std::optional<double> var_scope::lookup(std::string_view name) const {
 }
 
 
-namespace impl {
-
-[[noreturn]] void throw_arity_error(int expected, int provided) {
-  std::ostringstream msg;
-  msg << "wrong number of arguments (" << expected << " expected, " << provided << " provided)";
-  throw arity_error(msg.str(), expected, provided);
-}
-
-}  // namespace impl
-
-
 func_scope::func_scope(std::initializer_list<impl_type::value_type> ilist) 
   : map_(ilist) {
 }
 
-void func_scope::set_binding(std::string name, func_type func) {
-  map_[std::move(name)] = std::move(func);
+void func_scope::set_binding(std::string name, entry ent) {
+  map_[std::move(name)] = std::move(ent);
+}
+
+void func_scope::set_binding(std::string name, func_type func, std::optional<int> arity) {
+  set_binding(std::move(name), { std::move(func), arity });
 }
 
 void func_scope::remove_binding(std::string_view name) {
@@ -54,7 +45,7 @@ void func_scope::remove_binding(std::string_view name) {
   }
 }
 
-const func_scope::func_type* func_scope::lookup(std::string_view name) const {
+const func_scope::entry* func_scope::lookup(std::string_view name) const {
   auto it = map_.find(name);
   if (it != map_.end()) {
     return &it->second;

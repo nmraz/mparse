@@ -8,10 +8,28 @@
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
 #include <cmath>
+#include <sstream>
 #include <vector>
 
 namespace ast_ops {
 namespace {
+
+[[noreturn]] void throw_arity_error(int expected, int provided) {
+  std::ostringstream msg;
+  msg << "wrong number of arguments (" << expected << " expected, " << provided << " provided)";
+  throw arity_error(msg.str(), expected, provided);
+}
+
+template<typename F>
+void call_with_err_wrap(F&& func, const mparse::func_node& node) {
+  try {
+    std::forward<F>(func)();
+  } catch (...) {
+    eval_error err("Error in function '" + node.name() + "'", eval_errc::bad_func_call, &node);
+    std::throw_with_nested(std::move(err));
+  }
+}
+
 
 struct eval_visitor : mparse::const_ast_visitor {
   eval_visitor(const var_scope& vscope, const func_scope& fscope);
@@ -94,23 +112,26 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
 }
 
 void eval_visitor::visit(const mparse::func_node& node) {
-  auto* func = fscope.lookup(node.name());
-  if (!func) {
+  auto* ent = fscope.lookup(node.name());
+  if (!ent) {
     throw eval_error("Function '" + node.name() + "' not found.", eval_errc::bad_func_call, &node);
   }
+
+  call_with_err_wrap([&] {
+    if (ent->arity && ent->arity != node.args().size()) {
+      throw_arity_error(*ent->arity, static_cast<int>(node.args().size()));
+    }
+  }, node);
 
   std::vector<double> args;
   for (const auto& arg : node.args()) {
     arg->apply_visitor(*this);
     args.push_back(result);
   }
-  
-  try {
-    result = (*func)(std::move(args));
-  } catch (...) {
-    eval_error err("Error in function '" + node.name() + "'", eval_errc::bad_func_call, &node);
-    std::throw_with_nested(std::move(err));
-  }
+
+  call_with_err_wrap([&] {
+    ent->func(std::move(args));
+  }, node);
 }
 
 void eval_visitor::visit(const mparse::literal_node& node) {
