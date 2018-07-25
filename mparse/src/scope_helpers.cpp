@@ -1,4 +1,4 @@
-#include "parse_vardefs.h"
+#include "scope_helpers.h"
 
 #include "mparse/lex.h"
 #include <cstdlib>

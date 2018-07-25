@@ -3,19 +3,13 @@
 #include "ast_ops/eval/exceptions.h"
 #include "ast_ops/pretty_print.h"
 #include "ast_ops/strip_parens.h"
-#include "loc_printing.h"
-#include "mparse/ast/operator_nodes.h"
-#include "mparse/ast/func_node.h"
+#include "error_handling.h"
 #include "mparse/error.h"
 #include "mparse/parser.h"
 #include "mparse/source_map.h"
-#include "parse_vardefs.h"
-#include <exception>
-#include <cstdlib>
+#include "scope_helpers.h"
 #include <iostream>
-#include <sstream>
 #include <utility>
-#include <vector>
 
 using namespace std::literals;
 
@@ -36,66 +30,8 @@ auto parse_diag(std::string_view input) {
     mparse::ast_node_ptr ast = mparse::parse(input, &smap);
     return std::make_pair(std::move(ast), std::move(smap));
   } catch (const mparse::syntax_error& err) {
-    std::cout << "Syntax error: " << err.what() << "\n\n";
-    print_locs(input, err.where());
+    handle_syntax_error(err, input);
     std::exit(1);
-  }
-}
-
-void print_math_error(std::string_view msg) {
-  std::cout << "Math error: " << msg << "\n\n";
-}
-
-void handle_bad_func_call(const ast_ops::eval_error& err, const mparse::source_map& smap,
-  std::string_view input) {
-  auto* node = static_cast<const mparse::func_node*>(err.node());
-
-  std::ostringstream msg;
-  std::vector<mparse::source_range> locs{ smap.find_locs(node)[1] };  // function name
-
-  msg << err.what();
-
-  try {
-    std::rethrow_if_nested(err);
-  } catch (const ast_ops::arity_error& arity_err) {
-    msg << ": " << arity_err.what();
-
-    int exp = arity_err.expected();
-    int prov = arity_err.provided();
-
-    if (exp < prov) {
-      for (const auto& arg : util::span(node->args()).last(prov - exp)) {
-        locs.push_back(smap.find_primary_loc(arg.get()));
-      }
-    }
-  } catch (const std::exception& inner) {
-    msg << ": " << inner.what();
-  } catch (...) {}
-
-  print_math_error(msg.str());
-  print_locs(input, locs);
-}
-
-void handle_math_error(const ast_ops::eval_error& err, const mparse::source_map& smap, std::string_view input) {
-  auto* node = static_cast<const mparse::binary_op_node*>(err.node());
-
-  switch (err.code()) {
-  case ast_ops::eval_errc::div_by_zero:
-    print_math_error(err.what());
-    print_loc(input, smap.find_primary_loc(node->rhs()));
-    break;
-  case ast_ops::eval_errc::bad_pow:
-    print_math_error(err.what());
-    print_locs(input, { smap.find_primary_loc(node->lhs()), smap.find_primary_loc(node->rhs()) });
-    break;
-  case ast_ops::eval_errc::unbound_var:
-    print_math_error(err.what());
-    print_loc(input, smap.find_primary_loc(err.node()));
-    break;
-  case ast_ops::eval_errc::bad_func_call:
-    handle_bad_func_call(err, smap, input);
-  default:
-    break;
   }
 }
 
