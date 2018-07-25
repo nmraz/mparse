@@ -129,10 +129,15 @@ int main(int argc, const char* const* argv) {
       { "tau", 6.283185307179586 }
     };
 
+    ast_ops::func_scope fscope;
+    fscope.set_binding("sin", [] (double x) {
+      return std::sin(x);
+    });
+
     parse_vardefs(vscope, argc - 3, argv + 3);
 
     try {
-      std::cout << ast_ops::eval(ast.get(), vscope, {}) << '\n';
+      std::cout << ast_ops::eval(ast.get(), vscope, fscope) << '\n';
     } catch (const ast_ops::eval_error& err) {
       handle_math_error(err, smap, input);
       return 1;
