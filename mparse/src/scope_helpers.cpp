@@ -26,15 +26,13 @@ constexpr auto wrap_errno(F func) {
     errno = 0;
     double ret = func(x);
     if (errno) {
-      throw std::system_error(errno, std::generic_category());
+      throw ast_ops::func_arg_error(std::error_code(errno, std::generic_category()).message(), { 0 });
     }
     return ret;
   };
 }
 
 }  // namespace
-
-
 
 
 ast_ops::var_scope default_var_scope() {
@@ -50,7 +48,7 @@ ast_ops::func_scope default_func_scope() {
 
   scope.set_binding("mod", [] (double a, double b) {
     if (b == 0) {
-      throw std::domain_error("mod by zero");
+      throw ast_ops::func_arg_error("mod by zero", { 1 });
     }
     return std::fmod(a, b);
   });
@@ -91,10 +89,10 @@ ast_ops::func_scope default_func_scope() {
   scope.set_binding("ln", wrap_errno([] (double x) { return std::log(x); }));
   scope.set_binding("log", [] (double base, double val) {
     if (val <= 0) {
-      throw std::domain_error("argument out of domain");
+      throw ast_ops::func_arg_error("argument out of domain", { 1 });
     }
     if (base <= 0 || base == 1) {
-      throw std::domain_error("base out of domain");
+      throw ast_ops::func_arg_error("base out of domain", { 0 });
     }
     return std::log(val) / std::log(base);
   });
@@ -103,13 +101,13 @@ ast_ops::func_scope default_func_scope() {
   scope.set_binding("cbrt", wrap_errno([] (double x) { return std::cbrt(x); }));
   scope.set_binding("nroot", [] (double n, double val) {
     if (val < 0 && std::fmod(n, 2) != 1) {
-      throw std::domain_error("taking non-odd nth-root of negative number");
+      throw ast_ops::func_arg_error("taking non-odd nth-root of negative number", { 0, 1 });
     }
     if (n == 0) {
-      throw std::domain_error("taking zero-th root of number");
+      throw ast_ops::func_arg_error("taking zero-th root of number", { 0 });
     }
     if (val == 0 && n < 0) {
-      throw std::domain_error("taking negative root of zero");
+      throw ast_ops::func_arg_error("taking negative root of zero", { 0, 1 });
     }
 
     if (val < 0) {
