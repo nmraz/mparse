@@ -41,6 +41,12 @@ void handle_bad_func_call(const ast_ops::eval_error& err, const mparse::source_m
         locs.push_back(smap.find_primary_loc(arg.get()));
       }
     }
+  } catch (const ast_ops::func_arg_error& arg_err) {
+    msg << ": " << arg_err.what();
+    
+    for (int index : arg_err.indices()) {
+      locs.push_back(smap.find_primary_loc(node->args()[index].get()));
+    }
   } catch (const std::exception& inner) {
     msg << ": " << inner.what();
   } catch (...) {}
