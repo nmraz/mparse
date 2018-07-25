@@ -10,7 +10,8 @@ enum class eval_errc {
   unknown,
   div_by_zero,
   bad_pow,
-  unbound_var
+  unbound_var,
+  bad_func_call,
 };
 
 class eval_error : public std::runtime_error {
