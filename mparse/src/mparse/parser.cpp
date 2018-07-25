@@ -6,7 +6,7 @@
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
 #include "mparse/ast/paren_node.h"
-#include "mparse/error.h"
+#include "mparse/parse_error.h"
 #include <algorithm>
 #include <array>
 #include <string>

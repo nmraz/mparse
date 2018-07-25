@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ast_ops/eval/exceptions.h"
+#include "ast_ops/eval/eval_error.h"
 #include <functional>
 #include <initializer_list>
 #include <map>

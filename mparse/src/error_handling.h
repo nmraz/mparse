@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ast_ops/eval/exceptions.h"
-#include "mparse/error.h"
+#include "ast_ops/eval/eval_error.h"
+#include "mparse/parse_error.h"
 #include "mparse/source_map.h"
 #include <string_view>
 

@@ -36,9 +36,6 @@
     <ClCompile Include="src\mparse\parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\mparse\error.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\mparse\ast\unary_node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -75,13 +72,16 @@
     <ClCompile Include="src\ast_ops\eval\scope.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ast_ops\eval\exceptions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\error_handling.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\scope_helpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mparse\parse_error.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ast_ops\eval\eval_error.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -111,9 +111,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\mparse\parser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\mparse\error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\mparse\ast\unary_node.h">
@@ -170,13 +167,16 @@
     <ClInclude Include="src\ast_ops\eval\scope.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ast_ops\eval\exceptions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\error_handling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\scope_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mparse\parse_error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ast_ops\eval\eval_error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

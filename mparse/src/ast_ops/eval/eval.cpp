@@ -1,6 +1,6 @@
 #include "eval.h"
 
-#include "ast_ops/eval/exceptions.h"
+#include "ast_ops/eval/eval_error.h"
 #include "mparse/ast/abs_node.h"
 #include "mparse/ast/ast_visitor.h"
 #include "mparse/ast/func_node.h"
