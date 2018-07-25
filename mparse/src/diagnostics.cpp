@@ -40,5 +40,4 @@ void print_locs(std::string_view source, util::span<const mparse::source_range> 
       << make_marker(loc.to() - loc.from());
     prev_underline_loc = loc;
   }
-  std::cout << "\n" << esc_reset;
-}
+}  std::cout << esc_reset << "\n";
