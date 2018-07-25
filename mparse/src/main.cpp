@@ -52,6 +52,9 @@ void print_math_error(const ast_ops::eval_error& err, const mparse::source_map& 
     break;
   case ast_ops::eval_errc::unbound_var:
     print_loc(input, smap.find_primary_loc(err.node()));
+    break;
+  case ast_ops::eval_errc::bad_func_call:
+    print_loc(input, smap.find_locs(err.node())[1]); // function name
   default:
     break;
   }
