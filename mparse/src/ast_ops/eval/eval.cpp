@@ -119,7 +119,7 @@ void eval_visitor::visit(const mparse::func_node& node) {
     }
     result = ent->func(std::move(args));
   } catch (...) {
-    eval_error err("Error in function '" + node.name() + "'", eval_errc::bad_func_call, &node);
+    eval_error err("In function '" + node.name() + "'", eval_errc::bad_func_call, &node);
     std::throw_with_nested(std::move(err));
   }
 }
