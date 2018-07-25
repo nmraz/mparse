@@ -124,9 +124,9 @@ int main(int argc, const char* const* argv) {
     std::cout << ast_ops::pretty_print(ast.get()) << "\n";
   } else if (cmd == "eval") {
     ast_ops::var_scope vscope = {
-      { "e", 2.71828183 },
-      { "pi", 3.14159265 },
-      { "tau", 6.28318531 }
+      { "e", 2.718281828459045 },
+      { "pi", 3.141592653589793 },
+      { "tau", 6.283185307179586 }
     };
 
     parse_vardefs(vscope, argc - 3, argv + 3);
