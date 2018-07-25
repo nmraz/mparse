@@ -1,11 +1,13 @@
 #pragma once
 
+#include "ast_ops/eval/exceptions.h"
 #include <functional>
 #include <initializer_list>
 #include <map>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <vector>
 
 namespace ast_ops {
@@ -29,6 +31,46 @@ private:
 };
 
 
+namespace impl {
+
+template<typename F>
+struct get_memfun_arity;
+
+template<typename C, typename R, typename... Args>
+struct get_memfun_arity<R(C::*)(Args...)>
+  : std::integral_constant<std::size_t, sizeof...(Args)> {
+};
+
+template<typename C, typename R, typename... Args>
+struct get_memfun_arity<R(C::*)(Args...) const>
+  : std::integral_constant<std::size_t, sizeof...(Args)> {
+};
+
+
+template<typename F>
+struct get_arity
+  : get_memfun_arity<decltype(&F::operator())> {
+};
+
+template<typename R, typename... Args>
+struct get_arity<R(*)(Args...)>
+  : std::integral_constant<std::size_t, sizeof...(Args)> {
+};
+
+template<typename F>
+constexpr std::size_t get_arity_v = get_arity<std::decay_t<F>>::value;
+
+
+template<typename F, std::size_t... I>
+double invoke_helper(F& func, const std::vector<double>& args, std::index_sequence<I...>) {
+  return func(args[I]...);
+}
+
+[[noreturn]] void throw_arity_error(int expected, int provided);
+
+}  // namespace impl
+
+
 class func_scope {
 public:
   using func_type = std::function<double(std::vector<double>)>;
@@ -39,10 +81,12 @@ private:
 public:
   func_scope() = default;
   func_scope(std::initializer_list<impl_type::value_type> ilist);
-
+  
   void set_binding(std::string name, func_type func);
+  template<typename F, typename = std::enable_if_t<!std::is_convertible_v<F&&, func_type>>>
+  void set_binding(std::string name, F&& func);
+  
   void remove_binding(std::string_view name);
-
   void clear() { map_.clear(); }
 
   const func_type* lookup(std::string_view name) const;
@@ -50,5 +94,21 @@ public:
 private:
   impl_type map_;
 };
+
+
+template<typename F, typename>
+void func_scope::set_binding(std::string name, F&& func) {
+  using namespace std::literals;
+
+  constexpr std::size_t arity = impl::get_arity_v<F>;
+
+  set_binding(std::move(name), [f = std::forward<F>(func)](std::vector<double> args) {
+    if (args.size() != arity) {
+      impl::throw_arity_error(arity, args.size());
+    }
+ 
+    return impl::invoke_helper(f, args, std::make_index_sequence<arity>{});
+  });
+}
 
 }  // namespace ast_ops

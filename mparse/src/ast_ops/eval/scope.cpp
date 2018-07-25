@@ -1,5 +1,7 @@
 #include "scope.h"
 
+#include <sstream>
+
 namespace ast_ops {
 
 var_scope::var_scope(std::initializer_list<impl_type::value_type> ilist)
@@ -24,6 +26,17 @@ std::optional<double> var_scope::lookup(std::string_view name) const {
   }
   return std::nullopt;
 }
+
+
+namespace impl {
+
+[[noreturn]] void throw_arity_error(int expected, int provided) {
+  std::ostringstream msg;
+  msg << "wrong number of arguments; " << expected << " expected, " << provided << " provided";
+  throw arity_error(msg.str(), expected, provided);
+}
+
+}  // namespace impl
 
 
 func_scope::func_scope(std::initializer_list<impl_type::value_type> ilist) 
