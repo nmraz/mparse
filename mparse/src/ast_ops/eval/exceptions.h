@@ -2,6 +2,7 @@
 
 #include "mparse/ast/ast_node.h"
 #include <stdexcept>
+#include <string_view>
 
 namespace ast_ops {
 
@@ -22,6 +23,19 @@ public:
 private:
   eval_errc code_;
   const mparse::ast_node* node_;
+};
+
+
+class arity_error : public std::runtime_error {
+public:
+  arity_error(std::string_view what, int expected, int provided);
+
+  int expected() const { return expected_; }
+  int provided() const { return provided_; }
+
+private:
+  int expected_;
+  int provided_;
 };
 
 }  // namespace ast_ops
