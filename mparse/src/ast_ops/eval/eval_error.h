@@ -1,8 +1,10 @@
 #pragma once
 
 #include "mparse/ast/ast_node.h"
+#include "util/span.h"
 #include <stdexcept>
 #include <string_view>
+#include <vector>
 
 namespace ast_ops {
 
@@ -37,6 +39,17 @@ public:
 private:
   int expected_;
   int provided_;
+};
+
+class func_arg_error : public std::runtime_error {
+public:
+  func_arg_error(std::string_view what, std::vector<int> indices);
+
+  util::span<const int> indices() const { return indices_; }
+
+private:
+  std::vector<int> indices_;
+
 };
 
 }  // namespace ast_ops

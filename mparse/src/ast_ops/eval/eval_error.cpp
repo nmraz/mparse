@@ -14,4 +14,9 @@ arity_error::arity_error(std::string_view what, int expected, int provided)
   , provided_(provided) {
 }
 
+func_arg_error::func_arg_error(std::string_view what, std::vector<int> indices) 
+  : std::runtime_error(what.data())
+  , indices_(std::move(indices)) {
+}
+
 }  // namespace ast_ops
