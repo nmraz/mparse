@@ -1,10 +1,8 @@
 #include "scope_helpers.h"
 
+#include "builtins.h"
 #include "mparse/lex.h"
-#include <cmath>
 #include <cstdlib>
-#include <numeric>
-#include <stdexcept>
 #include <string>
 #include <system_error>
 
@@ -37,29 +35,24 @@ constexpr auto wrap_errno(F func) {
 
 ast_ops::var_scope default_var_scope() {
   return {
-    { "e", 2.718281828459045 },
-    { "pi", 3.141592653589793 },
-    { "tau", 6.283185307179586 }
+    { "e", builtins::e },
+    { "pi", builtins::pi },
+    { "tau", builtins::tau }
   };
 }
 
 ast_ops::func_scope default_func_scope() {
   ast_ops::func_scope scope;
 
-  scope.set_binding("mod", [] (double a, double b) {
-    if (b == 0) {
-      throw ast_ops::func_arg_error("mod by zero", { 1 });
-    }
-    return std::fmod(a, b);
-  });
+  scope.set_binding("mod", builtins::mod);
 
-  scope.set_binding("sin", wrap_errno([] (double x) { return std::sin(x); }));
-  scope.set_binding("cos", wrap_errno([] (double x) { return std::cos(x); }));
-  scope.set_binding("tan", wrap_errno([] (double x) { return std::tan(x); }));
+  scope.set_binding("sin", wrap_errno(builtins::sin));
+  scope.set_binding("cos", wrap_errno(builtins::cos));
+  scope.set_binding("tan", wrap_errno(builtins::tan));
   
-  constexpr auto arcsin = wrap_errno([] (double x) { return std::asin(x); });
-  constexpr auto arccos = wrap_errno([] (double x) { return std::acos(x); });
-  constexpr auto arctan = wrap_errno([] (double x) { return std::atan(x); });
+  auto arcsin = wrap_errno(builtins::asin);
+  auto arccos = wrap_errno(builtins::acos);
+  auto arctan = wrap_errno(builtins::atan);
 
   scope.set_binding("arcsin", arcsin);
   scope.set_binding("asin", arcsin);
@@ -69,13 +62,13 @@ ast_ops::func_scope default_func_scope() {
   scope.set_binding("atan", arctan);
 
 
-  scope.set_binding("sinh", wrap_errno([] (double x) { return std::sinh(x); }));
-  scope.set_binding("cosh", wrap_errno([] (double x) { return std::cosh(x); }));
-  scope.set_binding("tanh", wrap_errno([] (double x) { return std::tanh(x); }));
+  scope.set_binding("sinh", wrap_errno(builtins::sinh));
+  scope.set_binding("cosh", wrap_errno(builtins::cosh));
+  scope.set_binding("tanh", wrap_errno(builtins::tanh));
 
-  constexpr auto arcsinh = wrap_errno([] (double x) { return std::asinh(x); });
-  constexpr auto arccosh = wrap_errno([] (double x) { return std::acosh(x); });
-  constexpr auto arctanh = wrap_errno([] (double x) { return std::atanh(x); });
+  auto arcsinh = wrap_errno(builtins::asinh);
+  auto arccosh = wrap_errno(builtins::acosh);
+  auto arctanh = wrap_errno(builtins::atanh);
 
   scope.set_binding("arcsinh", arcsinh);
   scope.set_binding("asinh", arcsinh);
@@ -85,56 +78,18 @@ ast_ops::func_scope default_func_scope() {
   scope.set_binding("atanh", arctanh);
 
 
-  scope.set_binding("exp", wrap_errno([] (double x) { return std::exp(x); }));
-  scope.set_binding("ln", wrap_errno([] (double x) { return std::log(x); }));
-  scope.set_binding("log", [] (double base, double val) {
-    if (val <= 0) {
-      throw ast_ops::func_arg_error("argument out of domain", { 1 });
-    }
-    if (base <= 0 || base == 1) {
-      throw ast_ops::func_arg_error("base out of domain", { 0 });
-    }
-    return std::log(val) / std::log(base);
-  });
+  scope.set_binding("exp", wrap_errno(builtins::exp));
+  scope.set_binding("ln", wrap_errno(builtins::ln));
+  scope.set_binding("log", builtins::log);
 
-  scope.set_binding("sqrt", wrap_errno([] (double x) { return std::sqrt(x); }));
-  scope.set_binding("cbrt", wrap_errno([] (double x) { return std::cbrt(x); }));
-  scope.set_binding("nroot", [] (double n, double val) {
-    if (val < 0 && std::fmod(n, 2) != 1) {
-      throw ast_ops::func_arg_error("taking non-odd nth-root of negative number", { 0, 1 });
-    }
-    if (n == 0) {
-      throw ast_ops::func_arg_error("taking zero-th root of number", { 0 });
-    }
-    if (val == 0 && n < 0) {
-      throw ast_ops::func_arg_error("taking negative root of zero", { 0, 1 });
-    }
-
-    if (val < 0) {
-      return -std::pow(-val, 1 / n);
-    }
-    return std::pow(val, 1 / n);
-  });
+  scope.set_binding("sqrt", wrap_errno(builtins::sqrt));
+  scope.set_binding("cbrt", wrap_errno(builtins::cbrt));
+  scope.set_binding("nroot", builtins::nroot);
 
   
-  scope.set_binding("min", [] (std::vector<double> vals) {
-    if (vals.empty()) {
-      throw ast_ops::arity_error("at least one argument is required", 1, 0);
-    }
-    return *std::min_element(vals.begin(), vals.end());
-  });
-  scope.set_binding("max", [] (std::vector<double> vals) {
-    if (vals.empty()) {
-      throw ast_ops::arity_error("at least one argument is required", 1, 0);
-    }
-    return *std::max_element(vals.begin(), vals.end());
-  });
-  scope.set_binding("avg", [] (std::vector<double> vals) {
-    if (vals.empty()) {
-      throw ast_ops::arity_error("at least one argument is required", 1, 0);
-    }
-    return std::accumulate(vals.begin(), vals.end(), 0.0) / vals.size();
-  });
+  scope.set_binding("min", builtins::min);
+  scope.set_binding("max", builtins::max);
+  scope.set_binding("avg", builtins::avg);
 
   return scope;
 }

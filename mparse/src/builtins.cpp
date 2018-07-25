@@ -5,6 +5,13 @@
 
 namespace builtins {
 
+double mod(double a, double b) {
+  if (b == 0) {
+    throw ast_ops::func_arg_error("mod by zero", { 1 });
+  }
+  return std::fmod(a, b);
+}
+
 double log(double base, double val) {
   if (val <= 0) {
     throw ast_ops::func_arg_error("argument out of domain", { 1 });

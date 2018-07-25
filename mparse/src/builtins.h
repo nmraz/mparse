@@ -9,6 +9,9 @@ constexpr auto e = 2.718281828459045;
 constexpr auto pi = 3.141592653589793;
 constexpr auto tau = 6.283185307179586;
 
+
+double mod(double a, double b);
+
 inline double sin(double x) { return std::sin(x); }
 inline double cos(double x) { return std::cos(x); }
 inline double tan(double x) { return std::tan(x); }
