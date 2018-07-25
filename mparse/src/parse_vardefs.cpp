@@ -18,7 +18,7 @@ std::string accumulate_argv(int argc, const char* const* argv) {
 
 }  // namespace
 
-void parse_vardefs(ast_ops::var_scope& scope, int argc, const char* const* argv) {
+void parse_vardefs(ast_ops::var_scope& vscope, int argc, const char* const* argv) {
   std::string input = accumulate_argv(argc, argv);
   mparse::source_stream stream(input);
 
@@ -45,6 +45,6 @@ void parse_vardefs(ast_ops::var_scope& scope, int argc, const char* const* argv)
     }
     val = std::strtod(last_tok.val.data(), nullptr);
 
-    scope.set_binding(std::move(name), val);
+    vscope.set_binding(std::move(name), val);
   } while (last_tok.type != mparse::token_type::eof);
 }

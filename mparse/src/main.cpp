@@ -81,16 +81,16 @@ int main(int argc, const char* const* argv) {
     ast_ops::strip_parens(ast);
     std::cout << ast_ops::pretty_print(ast.get()) << "\n";
   } else if (cmd == "eval") {
-    ast_ops::var_scope scope = {
+    ast_ops::var_scope vscope = {
       { "e", 2.71828183 },
       { "pi", 3.14159265 },
       { "tau", 6.28318531 }
     };
 
-    parse_vardefs(scope, argc - 3, argv + 3);
+    parse_vardefs(vscope, argc - 3, argv + 3);
 
     try {
-      std::cout << ast_ops::eval(ast.get(), scope) << '\n';
+      std::cout << ast_ops::eval(ast.get(), vscope) << '\n';
     } catch (const ast_ops::eval_error& err) {
       print_math_error(err, smap, input);
       return 1;
