@@ -60,21 +60,11 @@ int main(int argc, const char* const* argv) {
     ast_ops::strip_parens(ast);
     std::cout << ast_ops::pretty_print(ast.get()) << "\n";
   } else if (cmd == "eval") {
-    ast_ops::var_scope vscope = {
-      { "e", 2.718281828459045 },
-      { "pi", 3.141592653589793 },
-      { "tau", 6.283185307179586 }
-    };
-
-    ast_ops::func_scope fscope;
-    fscope.set_binding("sin", [] (double x) {
-      return std::sin(x);
-    });
-
+    ast_ops::var_scope vscope = default_var_scope();
     parse_vardefs(vscope, argc - 3, argv + 3);
 
     try {
-      std::cout << ast_ops::eval(ast.get(), vscope, fscope) << '\n';
+      std::cout << ast_ops::eval(ast.get(), vscope, default_func_scope()) << '\n';
     } catch (const ast_ops::eval_error& err) {
       handle_math_error(err, smap, input);
       return 1;
