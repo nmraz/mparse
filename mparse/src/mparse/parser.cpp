@@ -367,9 +367,11 @@ void parser::parser_impl::check_balanced(source_range open_loc,
  std::string_view term_tok, std::string_view friendly_name) const {
   if (!has_delim(term_tok)) {
     if (has_term_tok()) {
+      source_range cur_loc = get_loc(cur_token_);
       throw syntax_error(
         "Unbalanced "s + friendly_name.data() + ": expected a '" + term_tok.data() + "'",
-        { open_loc, get_loc(cur_token_) }
+        { open_loc, cur_loc },
+        term_tok.data(), static_cast<int>(cur_loc.from())
       );
     }
     error();
