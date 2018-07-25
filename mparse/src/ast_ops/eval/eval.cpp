@@ -20,16 +20,6 @@ namespace {
   throw arity_error(msg.str(), expected, provided);
 }
 
-template<typename F>
-void call_with_err_wrap(F&& func, const mparse::func_node& node) {
-  try {
-    std::forward<F>(func)();
-  } catch (...) {
-    eval_error err("Error in function '" + node.name() + "'", eval_errc::bad_func_call, &node);
-    std::throw_with_nested(std::move(err));
-  }
-}
-
 
 struct eval_visitor : mparse::const_ast_visitor {
   eval_visitor(const var_scope& vscope, const func_scope& fscope);
@@ -117,21 +107,21 @@ void eval_visitor::visit(const mparse::func_node& node) {
     throw eval_error("Function '" + node.name() + "' not found.", eval_errc::bad_func_call, &node);
   }
 
-  call_with_err_wrap([&] {
-    if (ent->arity && ent->arity != node.args().size()) {
-      throw_arity_error(*ent->arity, static_cast<int>(node.args().size()));
-    }
-  }, node);
-
   std::vector<double> args;
   for (const auto& arg : node.args()) {
     arg->apply_visitor(*this);
     args.push_back(result);
   }
 
-  call_with_err_wrap([&] {
+  try {
+    if (ent->arity && ent->arity != node.args().size()) {
+      throw_arity_error(*ent->arity, static_cast<int>(node.args().size()));
+    }
     ent->func(std::move(args));
-  }, node);
+  } catch (...) {
+    eval_error err("Error in function '" + node.name() + "'", eval_errc::bad_func_call, &node);
+    std::throw_with_nested(std::move(err));
+  }
 }
 
 void eval_visitor::visit(const mparse::literal_node& node) {
