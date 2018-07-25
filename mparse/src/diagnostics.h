@@ -16,3 +16,5 @@ inline void print_locs(std::string_view source, std::initializer_list<mparse::so
 inline void print_loc(std::string_view source, mparse::source_range loc) {
   print_locs(source, { loc });
 }
+
+void print_fixit(std::string_view hint, int col);

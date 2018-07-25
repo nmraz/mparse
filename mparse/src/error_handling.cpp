@@ -61,6 +61,9 @@ void handle_bad_func_call(const ast_ops::eval_error& err, const mparse::source_m
 void handle_syntax_error(const mparse::syntax_error& err, std::string_view input) {
   print_syntax_error(err.what());
   print_locs(input, err.where());
+  if (!err.fixit_hint().empty()) {
+    print_fixit(err.fixit_hint(), err.fixit_col());
+  }
 }
 
 void handle_math_error(const ast_ops::eval_error& err, const mparse::source_map& smap, std::string_view input) {
