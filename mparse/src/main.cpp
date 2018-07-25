@@ -90,7 +90,7 @@ int main(int argc, const char* const* argv) {
     parse_vardefs(vscope, argc - 3, argv + 3);
 
     try {
-      std::cout << ast_ops::eval(ast.get(), vscope) << '\n';
+      std::cout << ast_ops::eval(ast.get(), vscope, {}) << '\n';
     } catch (const ast_ops::eval_error& err) {
       print_math_error(err, smap, input);
       return 1;

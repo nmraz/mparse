@@ -3,30 +3,35 @@
 #include "ast_ops/eval/exceptions.h"
 #include "mparse/ast/abs_node.h"
 #include "mparse/ast/ast_visitor.h"
+#include "mparse/ast/func_node.h"
 #include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
 #include <cmath>
+#include <vector>
 
 namespace ast_ops {
 namespace {
 
 struct eval_visitor : mparse::const_ast_visitor {
-  eval_visitor(const var_scope& scope);
+  eval_visitor(const var_scope& vscope, const func_scope& fscope);
 
   void visit(const mparse::unary_node& node) override;
   void visit(const mparse::abs_node& node) override;
   void visit(const mparse::unary_op_node& node) override;
   void visit(const mparse::binary_op_node& node) override;
+  void visit(const mparse::func_node& node) override;
   void visit(const mparse::literal_node& node) override;
   void visit(const mparse::id_node& node) override;
 
-  const var_scope& scope;
+  const var_scope& vscope;
+  const func_scope& fscope;
   double result = 0;
 };
 
-eval_visitor::eval_visitor(const var_scope& scope)
-  : scope(scope) {
+eval_visitor::eval_visitor(const var_scope& vscope, const func_scope& fscope)
+  : vscope(vscope)
+  , fscope(fscope) {
 }
 
 void eval_visitor::visit(const mparse::unary_node& node) {
@@ -88,12 +93,32 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
   }
 }
 
+void eval_visitor::visit(const mparse::func_node& node) {
+  auto* func = fscope.lookup(node.name());
+  if (!func) {
+    throw eval_error("Function '" + node.name() + "' not found.", eval_errc::bad_func_call, &node);
+  }
+
+  std::vector<double> args;
+  for (const auto& arg : node.args()) {
+    arg->apply_visitor(*this);
+    args.push_back(result);
+  }
+  
+  try {
+    result = (*func)(std::move(args));
+  } catch (...) {
+    eval_error err("Error in function '" + node.name() + "'", eval_errc::bad_func_call, &node);
+    std::throw_with_nested(std::move(err));
+  }
+}
+
 void eval_visitor::visit(const mparse::literal_node& node) {
   result = node.val();
 }
 
 void eval_visitor::visit(const mparse::id_node& node) {
-  if (auto val = scope.lookup(node.name())) {
+  if (auto val = vscope.lookup(node.name())) {
     result = *val;
   } else {
     throw eval_error("Unbound variable '" + node.name() + "'", eval_errc::unbound_var, &node);
@@ -103,8 +128,8 @@ void eval_visitor::visit(const mparse::id_node& node) {
 }  // namespace
 
 
-double eval(const mparse::ast_node* node, const var_scope& scope) {
-  eval_visitor vis(scope);
+double eval(const mparse::ast_node* node, const var_scope& vscope, const func_scope& fscope) {
+  eval_visitor vis(vscope, fscope);
   node->apply_visitor(vis);
   return vis.result;
 }

@@ -8,6 +8,6 @@
 
 namespace ast_ops {
 
-double eval(const mparse::ast_node* node, const var_scope& scope);
+double eval(const mparse::ast_node* node, const var_scope& vscope, const func_scope& fscope);
 
 }  // namespace ast_ops
