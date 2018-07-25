@@ -16,7 +16,7 @@ std::string make_marker(std::size_t size) {
 
 
 void print_locs(std::string_view source, util::span<const mparse::source_range> locs) {
-  std::cout << source << '\n';
+  std::cout << source << "\n\x1b[32m";
 
   mparse::source_range prev_loc;
   for (const auto& loc : locs) {
@@ -25,5 +25,5 @@ void print_locs(std::string_view source, util::span<const mparse::source_range> 
       << make_marker(loc.to() - loc.from());
     prev_loc = loc;
   }
-  std::cout << '\n';
+  std::cout << "\n\x1b[0m";
 }
