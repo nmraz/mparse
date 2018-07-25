@@ -39,9 +39,6 @@
     <ClCompile Include="src\mparse\ast\unary_node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\loc_printing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\mparse\source_map.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -81,6 +78,9 @@
     <ClCompile Include="src\ast_ops\eval\eval_error.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\diagnostics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\mparse\source_range.h">
@@ -111,9 +111,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\mparse\ast\unary_node.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\loc_printing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\util\span.h">
@@ -174,6 +171,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ast_ops\eval\eval_error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\diagnostics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -153,7 +153,7 @@
     <ClCompile Include="src\ast_ops\eval\eval_error.cpp" />
     <ClCompile Include="src\ast_ops\eval\scope.cpp" />
     <ClCompile Include="src\ast_ops\strip_parens.cpp" />
-    <ClCompile Include="src\loc_printing.cpp" />
+    <ClCompile Include="src\diagnostics.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\error_handling.cpp" />
     <ClCompile Include="src\mparse\ast\abs_node.cpp" />
@@ -177,7 +177,7 @@
     <ClInclude Include="src\ast_ops\eval\eval_error.h" />
     <ClInclude Include="src\ast_ops\eval\scope.h" />
     <ClInclude Include="src\ast_ops\strip_parens.h" />
-    <ClInclude Include="src\loc_printing.h" />
+    <ClInclude Include="src\diagnostics.h" />
     <ClInclude Include="src\error_handling.h" />
     <ClInclude Include="src\mparse\ast\abs_node.h" />
     <ClInclude Include="src\mparse\ast\ast_node.h" />

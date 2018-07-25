@@ -1,6 +1,6 @@
 #include "error_handling.h"
 
-#include "loc_printing.h"
+#include "diagnostics.h"
 #include "mparse/ast/func_node.h"
 #include "mparse/ast/operator_nodes.h"
 #include <iostream>
@@ -9,10 +9,6 @@
 using namespace std::literals;
 
 namespace {
-
-void print_error(std::string_view type, std::string_view msg) {
-  std::cout << "\x1b[1m\x1b[31m" << type << " error:\x1b[37m " << msg << "\x1b[0m\n\n";
-}
 
 void print_math_error(std::string_view msg) {
   print_error("Math", msg);
