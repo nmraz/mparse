@@ -57,9 +57,6 @@ struct get_arity<R(*)(Args...)>
   : std::integral_constant<std::size_t, sizeof...(Args)> {
 };
 
-template<typename F>
-constexpr std::size_t get_arity_v = get_arity<std::decay_t<F>>::value;
-
 
 template<typename F, std::size_t... I>
 double invoke_helper(F& func, const std::vector<double>& args, std::index_sequence<I...>) {
@@ -100,11 +97,13 @@ template<typename F, typename>
 void func_scope::set_binding(std::string name, F&& func) {
   using namespace std::literals;
 
-  constexpr std::size_t arity = impl::get_arity_v<F>;
+  // MSVC constexpr capture bug workaround - replace with variable templates when fixed.
+  constexpr impl::get_arity<std::decay_t<F>> arity_obj;
 
-  set_binding(std::move(name), [f = std::forward<F>(func)](std::vector<double> args) {
+  set_binding(std::move(name), [f = std::forward<F>(func), arity_obj](std::vector<double> args) {
+    constexpr int arity = arity_obj.value;
     if (args.size() != arity) {
-      impl::throw_arity_error(arity, args.size());
+      impl::throw_arity_error(arity, static_cast<int>(args.size()));
     }
  
     return impl::invoke_helper(f, args, std::make_index_sequence<arity>{});
