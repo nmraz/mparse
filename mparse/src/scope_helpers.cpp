@@ -3,6 +3,7 @@
 #include "mparse/lex.h"
 #include <cmath>
 #include <cstdlib>
+#include <numeric>
 #include <stdexcept>
 #include <string>
 #include <system_error>
@@ -108,6 +109,26 @@ ast_ops::func_scope default_func_scope() {
       return -std::pow(-val, 1 / n);
     }
     return std::pow(val, 1 / n);
+  });
+
+  
+  scope.set_binding("min", [] (std::vector<double> vals) {
+    if (vals.empty()) {
+      throw ast_ops::arity_error("at least one argument is required", 1, 0);
+    }
+    return *std::min_element(vals.begin(), vals.end());
+  });
+  scope.set_binding("max", [] (std::vector<double> vals) {
+    if (vals.empty()) {
+      throw ast_ops::arity_error("at least one argument is required", 1, 0);
+    }
+    return *std::max_element(vals.begin(), vals.end());
+  });
+  scope.set_binding("avg", [] (std::vector<double> vals) {
+    if (vals.empty()) {
+      throw ast_ops::arity_error("at least one argument is required", 1, 0);
+    }
+    return std::accumulate(vals.begin(), vals.end(), 0.0) / vals.size();
   });
 
   return scope;
