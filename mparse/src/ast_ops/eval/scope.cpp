@@ -37,7 +37,7 @@ void func_scope::remove_binding(std::string_view name) {
   }
 }
 
-const func_type* func_scope::lookup(std::string_view name) const {
+const function* func_scope::lookup(std::string_view name) const {
   auto it = map_.find(name);
   if (it != map_.end()) {
     return &it->second;

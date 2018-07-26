@@ -44,11 +44,11 @@ double invoke_helper(F& func, const std::vector<double>& args, std::index_sequen
 }  // namespace impl  
 
 
-using func_type = std::function<double(std::vector<double>)>;
+using function = std::function<double(std::vector<double>)>;
 
 template<typename F>
-func_type wrap_function(F&& func) {
-  if constexpr (std::is_convertible_v<F&&, func_type>) {
+function wrap_function(F&& func) {
+  if constexpr (std::is_convertible_v<F&&, function>) {
     return std::forward<F>(func);
   } else {
     return [func = std::forward<F>(func)] (std::vector<double> args) {

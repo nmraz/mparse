@@ -31,7 +31,7 @@ private:
 
 
 class func_scope {
-  using impl_type = std::map<std::string, func_type, std::less<>>;
+  using impl_type = std::map<std::string, function, std::less<>>;
 
 public:
   func_scope() = default;
@@ -43,7 +43,7 @@ public:
   void remove_binding(std::string_view name);
   void clear() { map_.clear(); }
 
-  const func_type* lookup(std::string_view name) const;
+  const function* lookup(std::string_view name) const;
 
 private:
   impl_type map_;
