@@ -85,7 +85,12 @@ void handle_math_error(const ast_ops::eval_error& err, const mparse::source_map&
   case ast_ops::eval_errc::bad_func_call:
     handle_bad_func_call(err, smap, input);
     break;
+  case ast_ops::eval_errc::out_of_range:
+    print_math_error(err.what());
+    print_locs(input, { smap.find_primary_loc(err.node()) });
+    break;
   default:
+    print_math_error(err.what());
     break;
   }
 }
