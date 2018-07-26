@@ -39,6 +39,9 @@ auto parse_diag(std::string_view input) {
 }
 
 double to_precision(double num, double round_prec = 1000000000000000) {
+  if (num > 1) {
+    return num;
+  }
   return std::round(num * round_prec) / round_prec;
 }
 
