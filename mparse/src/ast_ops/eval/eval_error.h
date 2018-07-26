@@ -14,6 +14,7 @@ enum class eval_errc {
   bad_pow,
   unbound_var,
   bad_func_call,
+  out_of_range,
 };
 
 class eval_error : public std::runtime_error {
