@@ -12,13 +12,15 @@
 #include <system_error>
 #include <vector>
 
+using namespace std::literals;
+
 namespace ast_ops {
 namespace {
 
 template<typename F>
-double check_range(F func, const mparse::ast_node& node) {
+number check_range(F func, const mparse::ast_node& node) {
   errno = 0;
-  double res = func();
+  number res = func();
   if (errno || !std::isfinite(res)) {
     throw eval_error("Result too large", eval_errc::out_of_range, &node);
   }
@@ -26,9 +28,9 @@ double check_range(F func, const mparse::ast_node& node) {
 }
 
 template<typename F>
-double check_errno(F func) {
+number check_errno(F func) {
   errno = 0;
-  double res = func();
+  number res = func();
   if (!errno && !std::isfinite(res)) {
     errno = ERANGE;
   }
@@ -52,7 +54,7 @@ struct eval_visitor : mparse::const_ast_visitor {
 
   const var_scope& vscope;
   const func_scope& fscope;
-  double result = 0;
+  number result = 0;
 };
 
 eval_visitor::eval_visitor(const var_scope& vscope, const func_scope& fscope)
@@ -76,10 +78,10 @@ void eval_visitor::visit(const mparse::unary_op_node& node) {
 
 void eval_visitor::visit(const mparse::binary_op_node& node) {
   node.lhs()->apply_visitor(*this);
-  double lhs_val = result;
+  number lhs_val = result;
 
   node.rhs()->apply_visitor(*this);
-  double rhs_val = result;
+  number rhs_val = result;
 
   result = check_range([&] {
     switch (node.type()) {
@@ -90,7 +92,7 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
     case mparse::binary_op_type::mult:
       return lhs_val * rhs_val;
     case mparse::binary_op_type::div:
-      if (rhs_val == 0) {
+      if (rhs_val == 0.0) {
         throw eval_error("Division by zero", eval_errc::div_by_zero, &node);
       }
       return lhs_val / rhs_val;
@@ -102,7 +104,7 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
           &node
         );
       }
-      if (lhs_val == 0 && rhs_val <= 0) {
+      if (lhs_val == 0.0 && rhs_val <= 0) {
         throw eval_error(
           "Raising zero to negative or zero power",
           eval_errc::bad_pow,
@@ -111,7 +113,7 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
       }
       return std::pow(lhs_val, rhs_val);
     default:
-      return 0.0;
+      return 0i;  // deduce as complex
     }
   }, node);
 }
@@ -122,7 +124,7 @@ void eval_visitor::visit(const mparse::func_node& node) {
     throw eval_error("Function '" + node.name() + "' not found.", eval_errc::bad_func_call, &node);
   }
 
-  std::vector<double> args;
+  std::vector<number> args;
   for (const auto& arg : node.args()) {
     arg->apply_visitor(*this);
     args.push_back(result);
@@ -151,7 +153,7 @@ void eval_visitor::visit(const mparse::id_node& node) {
 }  // namespace
 
 
-double eval(const mparse::ast_node* node, const var_scope& vscope, const func_scope& fscope) {
+number eval(const mparse::ast_node* node, const var_scope& vscope, const func_scope& fscope) {
   eval_visitor vis(vscope, fscope);
   node->apply_visitor(vis);
   return vis.result;
