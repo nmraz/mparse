@@ -179,6 +179,7 @@
     <ClInclude Include="src\ast_ops\eval\eval_error.h" />
     <ClInclude Include="src\ast_ops\eval\func_util.h" />
     <ClInclude Include="src\ast_ops\eval\scope.h" />
+    <ClInclude Include="src\ast_ops\eval\types.h" />
     <ClInclude Include="src\ast_ops\strip_parens.h" />
     <ClInclude Include="src\builtins.h" />
     <ClInclude Include="src\diagnostics.h" />
