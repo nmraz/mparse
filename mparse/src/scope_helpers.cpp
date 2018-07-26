@@ -2,9 +2,7 @@
 
 #include "builtins.h"
 #include "mparse/lex.h"
-#include <cstdlib>
 #include <string>
-#include <system_error>
 
 using namespace std::literals;
 
@@ -16,18 +14,6 @@ std::string accumulate_argv(int argc, const char* const* argv) {
     ret += " "s + argv[i];
   }
   return ret;
-}
-
-template<typename F>
-constexpr auto wrap_errno(F func) {
-  return [func](double x) {
-    errno = 0;
-    double ret = func(x);
-    if (errno) {
-      throw ast_ops::func_arg_error(std::error_code(errno, std::generic_category()).message(), { 0 });
-    }
-    return ret;
-  };
 }
 
 }  // namespace
