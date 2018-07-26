@@ -7,13 +7,15 @@
 #include <string>
 #include <system_error>
 
+using namespace std::literals;
+
 namespace builtins {
 namespace {
 
 template<typename F>
-double check_errno(F func) {
+ast_ops::number check_errno(F func) {
   errno = 0;
-  double ret = func();
+  ast_ops::number ret = func();
   if (errno) {
     std::string msg = std::error_code(errno, std::generic_category()).message();
     if (errno == EDOM) {
@@ -35,89 +37,89 @@ double mod(double a, double b) {
 }
 
 
-double sin(double x) {
+ast_ops::number sin(ast_ops::number x) {
   return check_errno([&] {
     return std::sin(x);
   });
 }
 
-double cos(double x) {
+ast_ops::number cos(ast_ops::number x) {
   return check_errno([&] {
     return std::cos(x);
   });
 }
 
-double tan(double x) {
+ast_ops::number tan(ast_ops::number x) {
   return check_errno([&] {
     return std::tan(x);
   });
 }
 
 
-double asin(double x) {
+ast_ops::number asin(ast_ops::number x) {
   return check_errno([&] {
     return std::asin(x);
   });
 }
 
-double acos(double x) {
+ast_ops::number acos(ast_ops::number x) {
   return check_errno([&] {
     return std::acos(x);
   });
 }
 
-double atan(double x) {
+ast_ops::number atan(ast_ops::number x) {
   return check_errno([&] {
     return std::atan(x);
   });
 }
 
 
-double sinh(double x) {
+ast_ops::number sinh(ast_ops::number x) {
   return check_errno([&] {
     return std::sinh(x);
   });
 }
 
-double cosh(double x) {
+ast_ops::number cosh(ast_ops::number x) {
   return check_errno([&] {
     return std::cosh(x);
   });
 }
 
-double tanh(double x) {
+ast_ops::number tanh(ast_ops::number x) {
   return check_errno([&] {
     return std::tanh(x);
   });
 }
 
 
-double asinh(double x) {
+ast_ops::number asinh(ast_ops::number x) {
   return check_errno([&] {
     return std::asinh(x);
   });
 }
 
-double acosh(double x) {
+ast_ops::number acosh(ast_ops::number x) {
   return check_errno([&] {
     return std::acosh(x);
   });
 }
 
-double atanh(double x) {
+ast_ops::number atanh(ast_ops::number x) {
   return check_errno([&] {
     return std::atanh(x);
   });
 }
 
 
-double exp(double x) {
+ast_ops::number exp(ast_ops::number x) {
   return check_errno([&] {
     return std::exp(x);
   });
 }
 
-double ln(double x) {
+ast_ops::number ln(ast_ops::number x) {
   return check_errno([&] {
     return std::log(x);
   });
@@ -134,15 +136,15 @@ double log(double base, double val) {
 }
 
 
-double sqrt(double x) {
+ast_ops::number sqrt(ast_ops::number x) {
   return check_errno([&] {
     return std::sqrt(x);
   });
 }
 
-double cbrt(double x) {
+ast_ops::number cbrt(ast_ops::number x) {
   return check_errno([&] {
-    return std::cbrt(x);
+    return std::pow(x, 1 / 3);
   });
 }
 
@@ -177,11 +179,11 @@ double max(std::vector<double> vals) {
   return *std::max_element(vals.begin(), vals.end());
 }
 
-double avg(std::vector<double> vals) {
+ast_ops::number avg(std::vector<ast_ops::number> vals) {
   if (vals.empty()) {
     throw ast_ops::arity_error("at least one argument is required", 1, 0);
   }
-  return std::accumulate(vals.begin(), vals.end(), 0.0) / vals.size();
+  return std::accumulate(vals.begin(), vals.end(), 0i) / static_cast<double>(vals.size());
 }
 
 }  // namespace builtins

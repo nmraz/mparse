@@ -23,7 +23,8 @@ ast_ops::var_scope default_var_scope() {
   return {
     { "e", builtins::e },
     { "pi", builtins::pi },
-    { "tau", builtins::tau }
+    { "tau", builtins::tau },
+    { "i", builtins::i }
   };
 }
 
