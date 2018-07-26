@@ -151,6 +151,7 @@
     <ClCompile Include="src\ast_ops\ast_dump.cpp" />
     <ClCompile Include="src\ast_ops\eval\eval.cpp" />
     <ClCompile Include="src\ast_ops\eval\eval_error.cpp" />
+    <ClCompile Include="src\ast_ops\eval\func_util.cpp" />
     <ClCompile Include="src\ast_ops\eval\scope.cpp" />
     <ClCompile Include="src\ast_ops\strip_parens.cpp" />
     <ClCompile Include="src\builtins.cpp" />
@@ -176,6 +177,7 @@
     <ClInclude Include="src\ast_ops\ast_dump.h" />
     <ClInclude Include="src\ast_ops\eval\eval.h" />
     <ClInclude Include="src\ast_ops\eval\eval_error.h" />
+    <ClInclude Include="src\ast_ops\eval\func_util.h" />
     <ClInclude Include="src\ast_ops\eval\scope.h" />
     <ClInclude Include="src\ast_ops\strip_parens.h" />
     <ClInclude Include="src\builtins.h" />

@@ -15,12 +15,6 @@
 namespace ast_ops {
 namespace {
 
-[[noreturn]] void throw_arity_error(int expected, int provided) {
-  std::ostringstream msg;
-  msg << "wrong number of arguments (" << expected << " expected, " << provided << " provided)";
-  throw arity_error(msg.str(), expected, provided);
-}
-
 template<typename F>
 double check_range(F func, const mparse::ast_node& node) {
   errno = 0;
@@ -123,8 +117,8 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
 }
 
 void eval_visitor::visit(const mparse::func_node& node) {
-  auto* ent = fscope.lookup(node.name());
-  if (!ent) {
+  auto* func = fscope.lookup(node.name());
+  if (!func) {
     throw eval_error("Function '" + node.name() + "' not found.", eval_errc::bad_func_call, &node);
   }
 
@@ -135,10 +129,7 @@ void eval_visitor::visit(const mparse::func_node& node) {
   }
 
   try {
-    if (ent->arity && ent->arity != node.args().size()) {
-      throw_arity_error(*ent->arity, static_cast<int>(node.args().size()));
-    }
-    result = check_errno([&] { return ent->func(std::move(args)); });
+    result = check_errno([&] { return (*func)(std::move(args)); });
   } catch (...) {
     eval_error err("In function '" + node.name() + "'", eval_errc::bad_func_call, &node);
     std::throw_with_nested(std::move(err));
