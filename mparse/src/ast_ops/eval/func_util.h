@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ast_ops/eval/types.h"
 #include <functional>
 #include <type_traits>
 #include <vector>
@@ -37,21 +38,19 @@ template<typename F>
 constexpr std::size_t get_arity_v = get_arity<std::decay_t<F>>::value;
 
 template<typename F, std::size_t... I>
-double invoke_helper(F& func, const std::vector<double>& args, std::index_sequence<I...>) {
+double invoke_helper(F& func, const std::vector<number>& args, std::index_sequence<I...>) {
   return func(args[I]...);
 }
 
 }  // namespace impl  
 
 
-using function = std::function<double(std::vector<double>)>;
-
 template<typename F>
 function wrap_function(F&& func) {
   if constexpr (std::is_convertible_v<F&&, function>) {
     return std::forward<F>(func);
   } else {
-    return [func = std::forward<F>(func)] (std::vector<double> args) {
+    return [func = std::forward<F>(func)] (std::vector<number> args) {
       constexpr auto arity = static_cast<int>(impl::get_arity_v<F>);
       if (args.size() != arity) {
         impl::throw_arity_error(arity, static_cast<int>(args.size()));
