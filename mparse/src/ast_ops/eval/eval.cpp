@@ -9,6 +9,7 @@
 #include "mparse/ast/operator_nodes.h"
 #include <cmath>
 #include <sstream>
+#include <system_error>
 #include <vector>
 
 namespace ast_ops {
@@ -18,6 +19,29 @@ namespace {
   std::ostringstream msg;
   msg << "wrong number of arguments (" << expected << " expected, " << provided << " provided)";
   throw arity_error(msg.str(), expected, provided);
+}
+
+template<typename F>
+double check_range(F func, const mparse::ast_node& node) {
+  errno = 0;
+  double res = func();
+  if (errno || !std::isfinite(res)) {
+    throw eval_error("Result out of range", eval_errc::out_of_range, &node);
+  }
+  return res;
+}
+
+template<typename F>
+double check_errno(F func) {
+  errno = 0;
+  double res = func();
+  if (!errno && !std::isfinite(res)) {
+    errno = ERANGE;
+  }
+  if (errno) {
+    throw std::system_error(errno, std::generic_category());
+  }
+  return res;
 }
 
 
@@ -46,13 +70,13 @@ void eval_visitor::visit(const mparse::unary_node& node) {
   node.child()->apply_visitor(*this);
 }
 
-void eval_visitor::visit(const mparse::abs_node&) {
-  result = std::abs(result);
+void eval_visitor::visit(const mparse::abs_node& node) {
+  result = check_range([&] { return std::abs(result); }, node);
 }
 
 void eval_visitor::visit(const mparse::unary_op_node& node) {
   if (node.type() == mparse::unary_op_type::neg) {
-    result = -result;
+    result = check_range([&] { return -result; }, node);
   }
 }
 
@@ -63,42 +87,39 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
   node.rhs()->apply_visitor(*this);
   double rhs_val = result;
 
-  switch (node.type()) {
-  case mparse::binary_op_type::add:
-    result = lhs_val + rhs_val;
-    break;
-  case mparse::binary_op_type::sub:
-    result = lhs_val - rhs_val;
-    break;
-  case mparse::binary_op_type::mult:
-    result = lhs_val * rhs_val;
-    break;
-  case mparse::binary_op_type::div:
-    if (rhs_val == 0) {
-      throw eval_error("Division by zero", eval_errc::div_by_zero, &node);
+  result = check_range([&] {
+    switch (node.type()) {
+    case mparse::binary_op_type::add:
+      return lhs_val + rhs_val;
+    case mparse::binary_op_type::sub:
+      return lhs_val - rhs_val;
+    case mparse::binary_op_type::mult:
+      return lhs_val * rhs_val;
+    case mparse::binary_op_type::div:
+      if (rhs_val == 0) {
+        throw eval_error("Division by zero", eval_errc::div_by_zero, &node);
+      }
+      return lhs_val / rhs_val;
+    case mparse::binary_op_type::pow:
+      if (lhs_val < 0 && rhs_val != std::round(rhs_val)) {
+        throw eval_error(
+          "Raising negative number to non-integer power",
+          eval_errc::bad_pow,
+          &node
+        );
+      }
+      if (lhs_val == 0 && rhs_val <= 0) {
+        throw eval_error(
+          "Raising zero to negative or zero power",
+          eval_errc::bad_pow,
+          &node
+        );
+      }
+      return std::pow(lhs_val, rhs_val);
+    default:
+      return 0.0;
     }
-    result = lhs_val / rhs_val;
-    break;
-  case mparse::binary_op_type::pow:
-    if (lhs_val < 0 && rhs_val != std::round(rhs_val)) {
-      throw eval_error(
-        "Raising negative number to non-integer power",
-        eval_errc::bad_pow,
-        &node
-      );
-    }
-    if (lhs_val == 0 && rhs_val <= 0) {
-      throw eval_error(
-        "Raising zero to negative or zero power",
-        eval_errc::bad_pow,
-        &node
-      );
-    }
-    result = std::pow(lhs_val, rhs_val);
-    break;
-  default:
-    break;
-  }
+  }, node);
 }
 
 void eval_visitor::visit(const mparse::func_node& node) {
@@ -117,7 +138,7 @@ void eval_visitor::visit(const mparse::func_node& node) {
     if (ent->arity && ent->arity != node.args().size()) {
       throw_arity_error(*ent->arity, static_cast<int>(node.args().size()));
     }
-    result = ent->func(std::move(args));
+    result = check_errno([&] { return ent->func(std::move(args)); });
   } catch (...) {
     eval_error err("In function '" + node.name() + "'", eval_errc::bad_func_call, &node);
     std::throw_with_nested(std::move(err));
@@ -125,12 +146,12 @@ void eval_visitor::visit(const mparse::func_node& node) {
 }
 
 void eval_visitor::visit(const mparse::literal_node& node) {
-  result = node.val();
+  result = check_range([&] { return node.val(); }, node);
 }
 
 void eval_visitor::visit(const mparse::id_node& node) {
   if (auto val = vscope.lookup(node.name())) {
-    result = *val;
+    result = check_range([&] { return *val; }, node);
   } else {
     throw eval_error("Unbound variable '" + node.name() + "'", eval_errc::unbound_var, &node);
   }
