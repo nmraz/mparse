@@ -17,11 +17,15 @@ using namespace std::literals;
 namespace ast_ops {
 namespace {
 
+bool is_finite(number x) {
+  return std::isfinite(x.real()) && std::isfinite(x.imag());
+}
+
 template<typename F>
 number check_range(F func, const mparse::ast_node& node) {
   errno = 0;
   number res = func();
-  if (errno || !std::isfinite(res)) {
+  if (errno || !is_finite(res)) {
     throw eval_error("Result too large", eval_errc::out_of_range, &node);
   }
   return res;
@@ -31,7 +35,7 @@ template<typename F>
 number check_errno(F func) {
   errno = 0;
   number res = func();
-  if (!errno && !std::isfinite(res)) {
+  if (!errno && !is_finite(res)) {
     errno = ERANGE;
   }
   if (errno) {
@@ -97,16 +101,9 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
       }
       return lhs_val / rhs_val;
     case mparse::binary_op_type::pow:
-      if (lhs_val < 0 && rhs_val != std::round(rhs_val)) {
+      if (lhs_val == 0.0 && rhs_val.real() <= 0) {
         throw eval_error(
-          "Raising negative number to non-integer power",
-          eval_errc::bad_pow,
-          &node
-        );
-      }
-      if (lhs_val == 0.0 && rhs_val <= 0) {
-        throw eval_error(
-          "Raising zero to negative or zero power",
+          "Real part of exponent for zero must be positive",
           eval_errc::bad_pow,
           &node
         );
