@@ -13,9 +13,9 @@ namespace builtins {
 namespace {
 
 template<typename F>
-ast_ops::number check_errno(F func) {
+auto check_errno(F func) {
   errno = 0;
-  ast_ops::number ret = func();
+  auto ret = func();
   if (errno) {
     std::string msg = std::error_code(errno, std::generic_category()).message();
     if (errno == EDOM) {
@@ -125,11 +125,11 @@ ast_ops::number ln(ast_ops::number x) {
   });
 }
 
-double log(double base, double val) {
-  if (val <= 0) {
+ast_ops::number log(ast_ops::number base, ast_ops::number val) {
+  if (val == 0.0) {
     throw ast_ops::func_arg_error("argument out of domain", { 1 });
   }
-  if (base <= 0 || base == 1) {
+  if (base == 0.0 || base == 1.0) {
     throw ast_ops::func_arg_error("base out of domain", { 0 });
   }
   return std::log(val) / std::log(base);
@@ -142,9 +142,9 @@ ast_ops::number sqrt(ast_ops::number x) {
   });
 }
 
-ast_ops::number cbrt(ast_ops::number x) {
+double cbrt(double x) {
   return check_errno([&] {
-    return std::pow(x, 1 / 3);
+    return std::cbrt(x);
   });
 }
 

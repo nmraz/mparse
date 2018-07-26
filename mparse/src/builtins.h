@@ -31,10 +31,10 @@ ast_ops::number atanh(ast_ops::number x);
 
 ast_ops::number exp(ast_ops::number x);
 ast_ops::number ln(ast_ops::number x);
-double log(double base, double val);
+ast_ops::number log(ast_ops::number base, ast_ops::number val);
 
 ast_ops::number sqrt(ast_ops::number x);
-ast_ops::number cbrt(ast_ops::number x);
+double cbrt(double x);
 double nroot(double n, double val);
 
 double min(std::vector<double> vals);
