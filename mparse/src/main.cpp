@@ -38,6 +38,22 @@ auto parse_diag(std::string_view input) {
   }
 }
 
+std::ostream& print_number(std::ostream& stream, ast_ops::number num) {
+  if (num == 0.0) {
+    return stream << 0.0;
+  }
+  if (num.imag() == 0.0) {
+    return stream << num.real();
+  }
+  if (num.real() != 0.0) {
+    stream << num.real() << " + ";
+  }
+  if (num.imag() != 1.0) {
+    stream << num.imag() << "*";
+  }
+  return stream << "i";
+}
+
 }  // namespace
 
 
@@ -69,7 +85,7 @@ int main(int argc, const char* const* argv) {
     parse_vardefs(vscope, argc - 3, argv + 3);
 
     try {
-      std::cout << ast_ops::eval(ast.get(), vscope, default_func_scope()) << '\n';
+      print_number(std::cout, ast_ops::eval(ast.get(), vscope, default_func_scope())) << '\n';
     } catch (const ast_ops::eval_error& err) {
       handle_math_error(err, smap, input);
       return 1;
