@@ -20,7 +20,7 @@ double check_range(F func, const mparse::ast_node& node) {
   errno = 0;
   double res = func();
   if (errno || !std::isfinite(res)) {
-    throw eval_error("Result out of range", eval_errc::out_of_range, &node);
+    throw eval_error("Result too large", eval_errc::out_of_range, &node);
   }
   return res;
 }
