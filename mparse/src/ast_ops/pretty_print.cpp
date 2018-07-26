@@ -9,6 +9,8 @@
 #include "mparse/ast/operator_nodes.h"
 #include "mparse/ast/paren_node.h"
 #include "util/auto_restore.h"
+#include <iomanip>
+#include <limits>
 #include <sstream>
 
 using namespace std::literals;
@@ -261,7 +263,7 @@ void print_visitor::visit(const mparse::func_node& node) {
 
 void print_visitor::visit(const mparse::literal_node& node) {
   std::ostringstream stream;
-  stream << node.val();
+  stream << std::setprecision(std::numeric_limits<double>::digits10 + 1) << node.val();
 
   mparse::source_range loc = record_loc([&] {
     result += stream.str();

@@ -8,7 +8,9 @@
 #include "mparse/parser.h"
 #include "mparse/source_map.h"
 #include "scope_helpers.h"
+#include <iomanip>
 #include <iostream>
+#include <limits>
 #include <utility>
 
 using namespace std::literals;
@@ -40,6 +42,9 @@ auto parse_diag(std::string_view input) {
 
 
 int main(int argc, const char* const* argv) {
+
+  std::cout << std::setprecision(std::numeric_limits<double>::digits10 + 1);
+
   if (argc < 3) {
     print_help(argv[0]);
   }
