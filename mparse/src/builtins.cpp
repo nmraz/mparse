@@ -3,6 +3,8 @@
 #include "ast_ops/eval/eval_error.h"
 #include <cmath>
 #include <numeric>
+#include <stdexcept>
+#include <string>
 #include <system_error>
 
 namespace builtins {
@@ -13,7 +15,11 @@ double check_errno(F func) {
   errno = 0;
   double ret = func();
   if (errno) {
-    throw ast_ops::func_arg_error(std::error_code(errno, std::generic_category()).message(), { 0 });
+    std::string msg = std::error_code(errno, std::generic_category()).message();
+    if (errno == EDOM) {
+      throw ast_ops::func_arg_error(msg, { 0 });
+    }
+    throw std::runtime_error(msg);
   }
   return ret;
 }
