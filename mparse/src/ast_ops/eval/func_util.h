@@ -9,40 +9,76 @@
 namespace ast_ops {
 namespace impl {
 
-[[noreturn]] void throw_arity_error(int expected, int provided);
-void check_real(const std::vector<number> args);
+void check_arity(int expected, int provided);
+
+void throw_if_nonreal(std::vector<int> nonreal_args);
+void check_real(const std::vector<number>& args);
 
 
-template<typename F>
-struct get_memfun_arity;
-
-template<typename C, typename R, typename... Args>
-struct get_memfun_arity<R(C::*)(Args...)>
-  : std::integral_constant<std::size_t, sizeof...(Args)> {
-};
-
-template<typename C, typename R, typename... Args>
-struct get_memfun_arity<R(C::*)(Args...) const>
-  : std::integral_constant<std::size_t, sizeof...(Args)> {
+template<typename... Ts>
+struct type_list {
+  using seq = std::index_sequence_for<Ts...>;
 };
 
 
 template<typename F>
-struct get_arity
-  : get_memfun_arity<decltype(&F::operator())> {
+struct get_memfun_args;
+
+template<typename C, typename R, typename... Args>
+struct get_memfun_args<R(C::*)(Args...)>
+  : type_list<Args...> {
+};
+
+template<typename C, typename R, typename... Args>
+struct get_memfun_args<R(C::*)(Args...) const>
+  : type_list<Args...> {
+};
+
+template<typename F>
+struct get_args
+  : get_memfun_args<decltype(&F::operator())> {
 };
 
 template<typename R, typename... Args>
-struct get_arity<R(*)(Args...)>
-  : std::integral_constant<std::size_t, sizeof...(Args)> {
+struct get_args<R(*)(Args...)>
+  : type_list<Args...> {
 };
 
-template<typename F>
-constexpr std::size_t get_arity_v = get_arity<std::decay_t<F>>::value;
 
-template<typename F, std::size_t... I>
-double invoke_helper(F& func, const std::vector<number>& args, std::index_sequence<I...>) {
-  return func(args[I]...);
+template<typename T>
+constexpr bool must_be_number = false;
+
+template<typename T>
+struct arg_checker {
+  static_assert(must_be_number<T>, "Functions must take only numbers or doubles");
+};
+
+template<>
+struct arg_checker<number> {
+  static bool check(const number&) { return true; }
+  static number convert(const number& x) { return x; }
+};
+
+template<>
+struct arg_checker<double> {
+  static bool check(const number& x) { return x.imag() == 0; }
+  static double convert(const number& x) { return x.real(); }
+};
+
+
+template<std::size_t... I, typename... Args>
+void check_types(const std::vector<number>& args, std::index_sequence<I...>, type_list<Args...>) {
+  std::vector<int> nonreal_args;
+  ((!arg_checker<Args>::check(args[I]) ? nonreal_args.push_back(I) : (void) 0), ...);
+  throw_if_nonreal(std::move(nonreal_args));
+}
+
+template<typename F, std::size_t... I, typename... Args>
+number invoke_helper(F& func, const std::vector<number>& args, std::index_sequence<I...> idx,
+  type_list<Args...> ts) {
+  check_arity(static_cast<int>(sizeof...(Args)), static_cast<int>(args.size()));
+  check_types(args, idx, ts);
+  return func(arg_checker<Args>::convert(args[I])...);
 }
 
 }  // namespace impl  
@@ -64,11 +100,8 @@ function wrap_function(F&& func) {
     };
   } else {
     return [func = std::forward<F>(func)] (std::vector<number> args) {
-      constexpr auto arity = static_cast<int>(impl::get_arity_v<F>);
-      if (args.size() != arity) {
-        impl::throw_arity_error(arity, static_cast<int>(args.size()));
-      }
-      return impl::invoke_helper(func, args, std::make_index_sequence<arity>());
+      using arg_types = impl::get_args<std::decay_t<F>>;
+      return impl::invoke_helper(func, args, typename arg_types::seq{}, arg_types{});
     };
   }
 }
