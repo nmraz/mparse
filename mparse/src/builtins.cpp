@@ -165,6 +165,20 @@ double nroot(double n, double val) {
   return std::pow(val, 1 / n);
 }
 
+
+double re(ast_ops::number x) {
+  return x.real();
+}
+
+double im(ast_ops::number x) {
+  return x.imag();
+}
+
+double arg(ast_ops::number x) {
+  return std::arg(x);
+}
+
+
 double min(std::vector<double> vals) {
   if (vals.empty()) {
     throw ast_ops::arity_error("at least one argument is required", 1, 0);

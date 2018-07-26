@@ -37,6 +37,10 @@ ast_ops::number sqrt(ast_ops::number x);
 double cbrt(double x);
 double nroot(double n, double val);
 
+double re(ast_ops::number x);
+double im(ast_ops::number x);
+double arg(ast_ops::number x);
+
 double min(std::vector<double> vals);
 double max(std::vector<double> vals);
 ast_ops::number avg(std::vector<ast_ops::number> vals);

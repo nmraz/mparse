@@ -65,6 +65,13 @@ ast_ops::func_scope default_func_scope() {
   scope.set_binding("cbrt", builtins::cbrt);
   scope.set_binding("nroot", builtins::nroot);
 
+
+  scope.set_binding("re", builtins::re);
+  scope.set_binding("real", builtins::re);
+  scope.set_binding("im", builtins::im);
+  scope.set_binding("imag", builtins::im);
+  scope.set_binding("arg", builtins::arg);
+
   
   scope.set_binding("min", builtins::min);
   scope.set_binding("max", builtins::max);
