@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ast_ops/eval/types.h"
+#include <algorithm>
 #include <functional>
 #include <type_traits>
 #include <vector>
@@ -9,6 +10,8 @@ namespace ast_ops {
 namespace impl {
 
 [[noreturn]] void throw_arity_error(int expected, int provided);
+void check_real(const std::vector<number> args);
+
 
 template<typename F>
 struct get_memfun_arity;
@@ -49,6 +52,16 @@ template<typename F>
 function wrap_function(F&& func) {
   if constexpr (std::is_convertible_v<F&&, function>) {
     return std::forward<F>(func);
+  } else if constexpr (std::is_convertible_v<F&&, real_function>) {
+    return [func = std::forward<F>(func)] (std::vector<number> args) {
+      impl::check_real(args);
+
+      std::vector<double> real_args;
+      std::transform(args.begin(), args.end(), std::back_inserter(real_args),
+        [] (const number& x) { return x.real(); });
+
+      return func(std::move(real_args));
+    };
   } else {
     return [func = std::forward<F>(func)] (std::vector<number> args) {
       constexpr auto arity = static_cast<int>(impl::get_arity_v<F>);
