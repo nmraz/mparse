@@ -46,44 +46,36 @@ ast_ops::func_scope default_func_scope() {
 
   scope.set_binding("mod", builtins::mod);
 
-  scope.set_binding("sin", wrap_errno(builtins::sin));
-  scope.set_binding("cos", wrap_errno(builtins::cos));
-  scope.set_binding("tan", wrap_errno(builtins::tan));
+  scope.set_binding("sin", builtins::sin);
+  scope.set_binding("cos", builtins::cos);
+  scope.set_binding("tan", builtins::tan);
   
-  auto arcsin = wrap_errno(builtins::asin);
-  auto arccos = wrap_errno(builtins::acos);
-  auto arctan = wrap_errno(builtins::atan);
-
-  scope.set_binding("arcsin", arcsin);
-  scope.set_binding("asin", arcsin);
-  scope.set_binding("arccos", arccos);
-  scope.set_binding("acos", arccos);
-  scope.set_binding("arctan", arctan);
-  scope.set_binding("atan", arctan);
+  scope.set_binding("arcsin", builtins::asin);
+  scope.set_binding("asin", builtins::asin);
+  scope.set_binding("arccos", builtins::acos);
+  scope.set_binding("acos", builtins::acos);
+  scope.set_binding("arctan", builtins::atan);
+  scope.set_binding("atan", builtins::atan);
 
 
-  scope.set_binding("sinh", wrap_errno(builtins::sinh));
-  scope.set_binding("cosh", wrap_errno(builtins::cosh));
-  scope.set_binding("tanh", wrap_errno(builtins::tanh));
+  scope.set_binding("sinh", builtins::sinh);
+  scope.set_binding("cosh", builtins::cosh);
+  scope.set_binding("tanh", builtins::tanh);
 
-  auto arcsinh = wrap_errno(builtins::asinh);
-  auto arccosh = wrap_errno(builtins::acosh);
-  auto arctanh = wrap_errno(builtins::atanh);
-
-  scope.set_binding("arcsinh", arcsinh);
-  scope.set_binding("asinh", arcsinh);
-  scope.set_binding("arccosh", arccosh);
-  scope.set_binding("acosh", arccosh);
-  scope.set_binding("arctanh", arctanh);
-  scope.set_binding("atanh", arctanh);
+  scope.set_binding("arcsinh", builtins::asinh);
+  scope.set_binding("asinh", builtins::asinh);
+  scope.set_binding("arccosh", builtins::acosh);
+  scope.set_binding("acosh", builtins::acosh);
+  scope.set_binding("arctanh", builtins::atanh);
+  scope.set_binding("atanh", builtins::atanh);
 
 
-  scope.set_binding("exp", wrap_errno(builtins::exp));
-  scope.set_binding("ln", wrap_errno(builtins::ln));
+  scope.set_binding("exp", builtins::exp);
+  scope.set_binding("ln", builtins::ln);
   scope.set_binding("log", builtins::log);
 
-  scope.set_binding("sqrt", wrap_errno(builtins::sqrt));
-  scope.set_binding("cbrt", wrap_errno(builtins::cbrt));
+  scope.set_binding("sqrt", builtins::sqrt);
+  scope.set_binding("cbrt", builtins::cbrt);
   scope.set_binding("nroot", builtins::nroot);
 
   

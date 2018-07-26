@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cmath>
 #include <vector>
 
 namespace builtins {
@@ -12,28 +11,28 @@ constexpr auto tau = 6.283185307179586;
 
 double mod(double a, double b);
 
-inline double sin(double x) { return std::sin(x); }
-inline double cos(double x) { return std::cos(x); }
-inline double tan(double x) { return std::tan(x); }
+double sin(double x);
+double cos(double x);
+double tan(double x);
 
-inline double asin(double x) { return std::asin(x); }
-inline double acos(double x) { return std::acos(x); }
-inline double atan(double x) { return std::atan(x); }
+double asin(double x);
+double acos(double x);
+double atan(double x);
 
-inline double sinh(double x) { return std::sinh(x); }
-inline double cosh(double x) { return std::cosh(x); }
-inline double tanh(double x) { return std::tanh(x); }
+double sinh(double x);
+double cosh(double x);
+double tanh(double x);
 
-inline double asinh(double x) { return std::asinh(x); }
-inline double acosh(double x) { return std::acosh(x); }
-inline double atanh(double x) { return std::atanh(x); }
+double asinh(double x);
+double acosh(double x);
+double atanh(double x);
 
-inline double exp(double x) { return std::exp(x); }
-inline double ln(double x) { return std::log(x); }
+double exp(double x);
+double ln(double x);
 double log(double base, double val);
 
-inline double sqrt(double x) { return std::sqrt(x); }
-inline double cbrt(double x) { return std::cbrt(x); }
+double sqrt(double x);
+double cbrt(double x);
 double nroot(double n, double val);
 
 double min(std::vector<double> vals);
