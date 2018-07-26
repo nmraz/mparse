@@ -2,6 +2,7 @@
 
 #include "ast_ops/eval/eval_error.h"
 #include "ast_ops/eval/func_util.h"
+#include "ast_ops/eval/types.h"
 #include <initializer_list>
 #include <map>
 #include <optional>
@@ -12,18 +13,18 @@
 namespace ast_ops {
 
 class var_scope {
-  using impl_type = std::map<std::string, double, std::less<>>;
+  using impl_type = std::map<std::string, number, std::less<>>;
 
 public:
   var_scope() = default;
   var_scope(std::initializer_list<impl_type::value_type> ilist);
 
-  void set_binding(std::string name, double val);
+  void set_binding(std::string name, number val);
   void remove_binding(std::string_view name);
 
   void clear() { map_.clear(); }
 
-  std::optional<double> lookup(std::string_view name) const;
+  std::optional<number> lookup(std::string_view name) const;
 
 private:
   impl_type map_;
