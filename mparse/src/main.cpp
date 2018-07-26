@@ -38,6 +38,10 @@ auto parse_diag(std::string_view input) {
   }
 }
 
+double to_precision(double num, double round_prec = 1000000000000000) {
+  return std::round(num * round_prec) / round_prec;
+}
+
 std::ostream& print_number(std::ostream& stream, ast_ops::number num) {
   if (num == 0.0) {
     return stream << 0.0;
@@ -94,7 +98,11 @@ int main(int argc, const char* const* argv) {
     parse_vardefs(vscope, argc - 3, argv + 3);
 
     try {
-      print_number(std::cout, ast_ops::eval(ast.get(), vscope, default_func_scope())) << '\n';
+      auto result = ast_ops::eval(ast.get(), vscope, default_func_scope());
+      result.real(to_precision(result.real()));
+      result.imag(to_precision(result.imag()));
+
+      print_number(std::cout, result) << '\n';
     } catch (const ast_ops::eval_error& err) {
       handle_math_error(err, smap, input);
       return 1;
