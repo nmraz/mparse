@@ -46,7 +46,14 @@ std::ostream& print_number(std::ostream& stream, ast_ops::number num) {
     return stream << num.real();
   }
   if (num.real() != 0.0) {
-    stream << num.real() << " + ";
+    stream << num.real() << " ";
+    if (num.imag() < 0.0) {
+      stream << "-";
+      num.imag(-num.imag());
+    } else {
+      stream << "+";
+    }
+    stream << " ";
   }
   if (num.imag() != 1.0) {
     stream << num.imag() << "*";
