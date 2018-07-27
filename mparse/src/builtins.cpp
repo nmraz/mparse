@@ -177,7 +177,32 @@ double im(ast_ops::number x) {
 }
 
 double arg(ast_ops::number x) {
-  return std::arg(x);
+  return check_domain([&] {
+    return std::arg(x);
+  });
+}
+
+ast_ops::number conj(ast_ops::number x) {
+  return std::conj(x);
+}
+
+
+double floor(double x) {
+  return check_domain([&] {
+    return std::floor(x);
+  });
+}
+
+double ceil(double x) {
+  return check_domain([&] {
+    return std::ceil(x);
+  });
+}
+
+double round(double x) {
+  return check_domain([&] {
+    return std::round(x);
+  });
 }
 
 

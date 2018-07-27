@@ -71,6 +71,12 @@ ast_ops::func_scope default_func_scope() {
   scope.set_binding("im", builtins::im);
   scope.set_binding("imag", builtins::im);
   scope.set_binding("arg", builtins::arg);
+  scope.set_binding("conj", builtins::conj);
+
+
+  scope.set_binding("floor", builtins::floor);
+  scope.set_binding("ceil", builtins::ceil);
+  scope.set_binding("round", builtins::round);
 
   
   scope.set_binding("min", builtins::min);

@@ -40,6 +40,11 @@ double nroot(double n, double val);
 double re(ast_ops::number x);
 double im(ast_ops::number x);
 double arg(ast_ops::number x);
+ast_ops::number conj(ast_ops::number x);
+
+double floor(double x);
+double ceil(double x);
+double round(double x);
 
 double min(std::vector<double> vals);
 double max(std::vector<double> vals);
