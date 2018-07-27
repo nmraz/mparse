@@ -49,9 +49,14 @@ std::ostream& print_number(std::ostream& stream, ast_ops::number num) {
   if (num == 0.0) {
     return stream << 0.0;
   }
+  if (num == -1i) {
+    return stream << "-i";
+  }
+
   if (num.imag() == 0.0) {
     return stream << num.real();
   }
+
   if (num.real() != 0.0) {
     stream << num.real() << " ";
     if (num.imag() < 0.0) {
@@ -61,8 +66,6 @@ std::ostream& print_number(std::ostream& stream, ast_ops::number num) {
       stream << "+";
     }
     stream << " ";
-  } else if (num.imag() == -1) {
-    return stream << "-i";
   }
   if (num.imag() != 1.0) {
     stream << num.imag() << "*";
