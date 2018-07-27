@@ -11,13 +11,15 @@ using namespace std::literals;
 namespace builtins {
 namespace {
 
+constexpr auto domain_err_msg = "argument out of domain"sv;
+
 template<typename F>
 auto check_domain(F func) {
   errno = 0;
   auto ret = func();
   if (errno) {
     if (errno == EDOM) {
-      throw ast_ops::func_arg_error("argument out of domain", { 0 });
+      throw ast_ops::func_arg_error(domain_err_msg, { 0 });
     }
   }
   return ret;
@@ -117,6 +119,9 @@ ast_ops::number exp(ast_ops::number x) {
 }
 
 ast_ops::number ln(ast_ops::number x) {
+  if (x == 0.0) {
+    throw ast_ops::func_arg_error(domain_err_msg, { 0 });
+  }
   return check_domain([&] {
     return std::log(x);
   });
@@ -124,7 +129,7 @@ ast_ops::number ln(ast_ops::number x) {
 
 ast_ops::number log(ast_ops::number base, ast_ops::number val) {
   if (val == 0.0) {
-    throw ast_ops::func_arg_error("argument out of domain", { 1 });
+    throw ast_ops::func_arg_error(domain_err_msg, { 1 });
   }
   if (base == 0.0 || base == 1.0) {
     throw ast_ops::func_arg_error("base out of domain", { 0 });
