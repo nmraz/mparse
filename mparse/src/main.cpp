@@ -38,8 +38,8 @@ auto parse_diag(std::string_view input) {
   }
 }
 
-double to_precision(double num, double round_prec = 1000000000000000) {
-  if (num > 1) {
+double to_precision(double num, double round_prec = 10000000000000) {
+  if (std::abs(num - std::nextafter(num, 0)) > 1 / round_prec) {
     return num;
   }
   return std::round(num * round_prec) / round_prec;
