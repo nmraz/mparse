@@ -5,7 +5,6 @@
 #include <numeric>
 #include <stdexcept>
 #include <string>
-#include <system_error>
 
 using namespace std::literals;
 
@@ -13,15 +12,13 @@ namespace builtins {
 namespace {
 
 template<typename F>
-auto check_errno(F func) {
+auto check_domain(F func) {
   errno = 0;
   auto ret = func();
   if (errno) {
-    std::string msg = std::error_code(errno, std::generic_category()).message();
     if (errno == EDOM) {
-      throw ast_ops::func_arg_error(msg, { 0 });
+      throw ast_ops::func_arg_error("argument out of domain", { 0 });
     }
-    throw std::runtime_error(msg);
   }
   return ret;
 }
@@ -38,89 +35,89 @@ double mod(double a, double b) {
 
 
 ast_ops::number sin(ast_ops::number x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::sin(x);
   });
 }
 
 ast_ops::number cos(ast_ops::number x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::cos(x);
   });
 }
 
 ast_ops::number tan(ast_ops::number x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::tan(x);
   });
 }
 
 
 ast_ops::number asin(ast_ops::number x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::asin(x);
   });
 }
 
 ast_ops::number acos(ast_ops::number x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::acos(x);
   });
 }
 
 ast_ops::number atan(ast_ops::number x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::atan(x);
   });
 }
 
 
 ast_ops::number sinh(ast_ops::number x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::sinh(x);
   });
 }
 
 ast_ops::number cosh(ast_ops::number x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::cosh(x);
   });
 }
 
 ast_ops::number tanh(ast_ops::number x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::tanh(x);
   });
 }
 
 
 ast_ops::number asinh(ast_ops::number x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::asinh(x);
   });
 }
 
 ast_ops::number acosh(ast_ops::number x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::acosh(x);
   });
 }
 
 ast_ops::number atanh(ast_ops::number x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::atanh(x);
   });
 }
 
 
 ast_ops::number exp(ast_ops::number x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::exp(x);
   });
 }
 
 ast_ops::number ln(ast_ops::number x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::log(x);
   });
 }
@@ -137,13 +134,13 @@ ast_ops::number log(ast_ops::number base, ast_ops::number val) {
 
 
 ast_ops::number sqrt(ast_ops::number x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::sqrt(x);
   });
 }
 
 double cbrt(double x) {
-  return check_errno([&] {
+  return check_domain([&] {
     return std::cbrt(x);
   });
 }
