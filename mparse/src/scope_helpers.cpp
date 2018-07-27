@@ -31,8 +31,6 @@ ast_ops::var_scope default_var_scope() {
 ast_ops::func_scope default_func_scope() {
   ast_ops::func_scope scope;
 
-  scope.set_binding("mod", builtins::mod);
-
   scope.set_binding("sin", builtins::sin);
   scope.set_binding("cos", builtins::cos);
   scope.set_binding("tan", builtins::tan);
@@ -78,7 +76,9 @@ ast_ops::func_scope default_func_scope() {
   scope.set_binding("ceil", builtins::ceil);
   scope.set_binding("round", builtins::round);
 
+  scope.set_binding("mod", builtins::mod);
   
+
   scope.set_binding("min", builtins::min);
   scope.set_binding("max", builtins::max);
   scope.set_binding("avg", builtins::avg);

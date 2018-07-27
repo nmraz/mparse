@@ -11,8 +11,6 @@ constexpr auto tau = 6.283185307179586;
 constexpr auto i = ast_ops::number(0, 1);
 
 
-double mod(double a, double b);
-
 ast_ops::number sin(ast_ops::number x);
 ast_ops::number cos(ast_ops::number x);
 ast_ops::number tan(ast_ops::number x);
@@ -45,6 +43,8 @@ ast_ops::number conj(ast_ops::number x);
 double floor(double x);
 double ceil(double x);
 double round(double x);
+
+double mod(double a, double b);
 
 double min(std::vector<double> vals);
 double max(std::vector<double> vals);

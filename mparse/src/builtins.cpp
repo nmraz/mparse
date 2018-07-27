@@ -28,14 +28,6 @@ auto check_domain(F func) {
 }  // namespace
 
 
-double mod(double a, double b) {
-  if (b == 0) {
-    throw ast_ops::func_arg_error("mod by zero", { 1 });
-  }
-  return std::fmod(a, b);
-}
-
-
 ast_ops::number sin(ast_ops::number x) {
   return check_domain([&] {
     return std::sin(x);
@@ -203,6 +195,14 @@ double round(double x) {
   return check_domain([&] {
     return std::round(x);
   });
+}
+
+
+double mod(double a, double b) {
+  if (b == 0) {
+    throw ast_ops::func_arg_error("mod by zero", { 1 });
+  }
+  return std::fmod(a, b);
 }
 
 
