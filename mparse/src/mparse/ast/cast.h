@@ -2,7 +2,6 @@
 
 #include "mparse/ast/ast_node.h"
 #include "mparse/ast/ast_visitor.h"
-#include "mparse/ast/util.h"
 #include <type_traits>
 
 namespace mparse {
