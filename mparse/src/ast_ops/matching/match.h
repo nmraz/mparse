@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ast_ops/matching/compare.h"
 #include "ast_ops/matching/match_expr.h"
 #include "ast_ops/matching/match_results.h"
 #include "mparse/ast/ast_node.h"
@@ -126,6 +127,33 @@ struct matcher_traits<disjunction_expr<First, Second>> {
   }
 };
 
+
+template<typename Tag, typename Expr>
+struct matcher_traits<capture_expr_impl<Tag, Expr>> {
+  template<typename Ctx>
+  static bool match(const capture_expr_impl<Tag, Expr>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
+    if (matcher_traits<Expr>::match(expr.expr, node, ctx)) {
+      get_result<Tag>(ctx) = node;  // change when match type retriever is working
+      return true;
+    }
+    return false;
+  }
+};
+
+template<char C, typename Comp>
+struct matcher_traits<subexpr_expr<C, Comp>> {
+  template<typename Ctx>
+  static bool match(const subexpr_expr<C, Comp>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
+    auto& saved = get_subexpr<C>(ctx);
+    
+    if (!saved) {
+      saved = node;
+      return true;
+    }
+    
+    return compare_exprs(saved.get(), node.get(), expr.comp);
+  }
+};
 
 
 template<typename Matcher, typename = std::enable_if_t<is_match_expr<Matcher>>>
