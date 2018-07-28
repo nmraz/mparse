@@ -155,9 +155,6 @@
     <ClInclude Include="src\mparse\ast\cast.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\mparse\ast\util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\ast_ops\strip_parens.h">
       <Filter>Header Files</Filter>
     </ClInclude>
