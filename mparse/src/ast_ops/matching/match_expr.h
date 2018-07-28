@@ -67,18 +67,20 @@ template<typename Pred, typename Inner>
 constexpr bool is_match_expr<unary_op_pred_expr<Pred, Inner>> = true;
 
 
-template<typename T, T Val>
+template<auto Val>
 struct type_eq_pred {
-  constexpr bool operator()(T val) {
+  constexpr bool operator()(decltype(Val) val) {
     return val == Val;
   }
 };
 
 template<mparse::binary_op_type Type, typename Lhs, typename Rhs, bool Commute = is_commutative(Type)>
-using binary_op_expr = binary_op_pred_expr<type_eq_pred<mparse::binary_op_type, Type>, Lhs, Rhs, Commute>;
+class binary_op_expr : binary_op_pred_expr<type_eq_pred<Type>, Lhs, Rhs, Commute> {
+};
 
 template<mparse::unary_op_type Type, typename Inner>
-using unary_op_expr = unary_op_pred_expr<type_eq_pred<mparse::unary_op_type, Type>, Inner>;
+class unary_op_expr : unary_op_pred_expr<type_eq_pred<Type>, Inner> {
+};
 
 
 template<
