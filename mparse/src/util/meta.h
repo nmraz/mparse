@@ -6,6 +6,9 @@
 namespace util {
 
 template<typename T>
+constexpr bool always_false = false;  // dependent false
+
+template<typename T>
 using identity = T;
 
 

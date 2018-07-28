@@ -40,11 +40,8 @@ struct get_args<R(*)(Args...)>
 
 
 template<typename T>
-constexpr bool must_be_number = false;
-
-template<typename T>
 struct arg_checker {
-  static_assert(must_be_number<T>, "Functions must take only numbers or doubles");
+  static_assert(util::always_false<T>, "Functions must take only numbers or doubles");
 };
 
 template<>
