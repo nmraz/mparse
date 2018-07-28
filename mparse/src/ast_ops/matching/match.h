@@ -43,6 +43,7 @@ struct matcher_traits<node_type_expr<Node>> {
 template<typename Pred, typename Lhs, typename Rhs, bool Commute>
 struct matcher_traits<binary_op_pred_expr<Pred, Lhs, Rhs, Commute>> {
   using match_type = mparse::binary_op_node;
+  using captures = caplist_cat<get_captures_t<Lhs>, get_captures_t<Rhs>>;
 
   template<typename Ctx>
   static bool match(const binary_op_expr<Pred, Lhs, Rhs, Commute>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
@@ -74,6 +75,7 @@ struct matcher_traits<binary_op_pred_expr<Pred, Lhs, Rhs, Commute>> {
 template<typename Node, typename Inner>
 struct matcher_traits<unary_expr<Node, Inner>> {
   using match_type = Node;
+  using captures = get_captures_t<Inner>;
 
   template<typename Ctx>
   static bool match(const unary_expr<Node, Inner>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
@@ -87,6 +89,7 @@ struct matcher_traits<unary_expr<Node, Inner>> {
 template<typename Pred, typename Inner>
 struct matcher_traits<unary_op_pred_expr<Pred, Inner>> {
   using match_type = mparse::unary_op_node;
+  using captures = get_captures_t<Inner>;
 
   template<typename Ctx>
   static bool match(const unary_op_pred_expr<Pred, Inner>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
@@ -103,6 +106,7 @@ struct matcher_traits<unary_op_pred_expr<Pred, Inner>> {
 
 template<typename Expr>
 struct matcher_traits<negation_expr<Expr>> {
+  // no captures as this is a negation match
   template<typename Ctx>
   static bool match(const negation_expr<Expr>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
     return !matcher_traits<Expr>::match(expr.expr, node, ctx);
@@ -111,6 +115,8 @@ struct matcher_traits<negation_expr<Expr>> {
 
 template<typename First, typename Second>
 struct matcher_traits<conjunction_expr<First, Second>> {
+  using captures = caplist_cat<get_captures_t<First>, get_captures_t<Second>>;
+
    template<typename Ctx>
    static bool match(const conjunction_expr<First, Second>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
      return matcher_traits<First>::match(expr.first, node, ctx)
@@ -120,6 +126,7 @@ struct matcher_traits<conjunction_expr<First, Second>> {
 
 template<typename First, typename Second>
 struct matcher_traits<disjunction_expr<First, Second>> {
+  // no captures as this is a disjunction match
   template<typename Ctx>
   static bool match(const disjunction_expr<First, Second>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
     return matcher_traits<First>::match(expr.first, node, ctx)
@@ -148,10 +155,13 @@ using get_match_type_t = typename get_match_type<E>::type;
 
 template<typename Tag, typename Expr>
 struct matcher_traits<capture_expr_impl<Tag, Expr>> {
+  using inner_match_type = impl::get_match_type_t<Expr>;
+  using captures = caplist_append<get_captures_t<Expr>, capture<Tag, mparse::node_ptr<inner_match_type>>>;
+
   template<typename Ctx>
   static bool match(const capture_expr_impl<Tag, Expr>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
     if (matcher_traits<Expr>::match(expr.expr, node, ctx)) {
-      get_result<Tag>(ctx) = mparse::static_ast_node_ptr_cast<impl::get_match_type_t<Expr>>(node);
+      get_result<Tag>(ctx) = mparse::static_ast_node_ptr_cast<inner_match_type>(node);
       return true;
     }
     return false;
@@ -160,6 +170,8 @@ struct matcher_traits<capture_expr_impl<Tag, Expr>> {
 
 template<char C, typename Comp>
 struct matcher_traits<subexpr_expr<C, Comp>> {
+  using captures = caplist<capture<subexpr_expr_tag<C>, mparse::ast_node_ptr>>;
+
   template<typename Ctx>
   static bool match(const subexpr_expr<C, Comp>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
     auto& saved = get_subexpr<C>(ctx);
