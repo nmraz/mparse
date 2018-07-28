@@ -120,14 +120,17 @@ template<typename List, typename... Caps>
 using caplist_append = util::type_list_append_t<List, Caps...>;
 
 
+template<typename E>
+struct matcher_traits;
+
 template<typename E, typename = void>
 struct get_captures {
   using type = caplist<>;
 };
 
 template<typename E>
-struct get_captures<E, std::void_t<typename E::captures>> {
-  using type = typename E::captures;
+struct get_captures<E, std::void_t<typename matcher_traits<E>::captures>> {
+  using type = typename matcher_traits<E>::captures;
 };
 
 template<typename E>
