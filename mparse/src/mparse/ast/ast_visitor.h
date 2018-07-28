@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mparse/ast/util.h"
+#include "util/meta.h"
 #include <type_traits>
 
 namespace mparse {
@@ -32,7 +32,7 @@ struct ast_visitor_cv {
 
 }  // namespace impl
 
-using ast_visitor = impl::ast_visitor_cv<impl::identity>;
+using ast_visitor = impl::ast_visitor_cv<util::identity>;
 using const_ast_visitor = impl::ast_visitor_cv<std::add_const_t>;
 
 }  // namespace mparse

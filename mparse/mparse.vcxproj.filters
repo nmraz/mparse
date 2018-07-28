@@ -206,5 +206,8 @@
     <ClInclude Include="src\ast_ops\matching\util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\util\meta.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

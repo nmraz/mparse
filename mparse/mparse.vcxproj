@@ -212,6 +212,7 @@
     <ClInclude Include="src\ast_ops\pretty_print.h" />
     <ClInclude Include="src\scope_helpers.h" />
     <ClInclude Include="src\util\auto_restore.h" />
+    <ClInclude Include="src\util\meta.h" />
     <ClInclude Include="src\util\span.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
