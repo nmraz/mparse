@@ -6,21 +6,6 @@
 #include <optional>
 
 namespace ast_ops::matching {
-inline namespace literals {
-
-constexpr literal_expr operator""_lit(long double val) {
-  return { static_cast<double>(val) };
-}
-
-constexpr constant_expr<1> c1{};
-constexpr constant_expr<2> c2{};
-constexpr constant_expr<3> c3{};
-
-constexpr subexpr_expr<'x'> x{};
-constexpr subexpr_expr<'y'> y{};
-constexpr subexpr_expr<'z'> z{};
-
-}  // namespace literals
 
 
 template<typename Matcher, typename = std::enable_if_t<is_match_expr<Matcher>>>

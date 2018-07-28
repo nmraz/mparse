@@ -274,4 +274,20 @@ struct subexpr_expr {
 template<char C, typename Comp>
 constexpr bool is_match_expr<subexpr_expr<C, Comp>> = true;
 
+
+inline namespace literals {
+
+constexpr literal_expr operator""_lit(long double val) {
+  return { static_cast<double>(val) };
+}
+
+constexpr constant_expr<1> c1{};
+constexpr constant_expr<2> c2{};
+constexpr constant_expr<3> c3{};
+
+constexpr subexpr_expr<'x'> x{};
+constexpr subexpr_expr<'y'> y{};
+constexpr subexpr_expr<'z'> z{};
+
+}  // namespace literals
 }  // namespace ast_ops::matching
