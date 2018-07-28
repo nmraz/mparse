@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ast_ops/eval/types.h"
+#include "util/meta.h"
 #include <algorithm>
 #include <functional>
 #include <type_traits>
@@ -14,24 +15,17 @@ void check_arity(int expected, int provided);
 void throw_if_nonreal(std::vector<int> nonreal_args);
 void check_real(const std::vector<number>& args);
 
-
-template<typename... Ts>
-struct type_list {
-  using seq = std::index_sequence_for<Ts...>;
-};
-
-
 template<typename F>
 struct get_memfun_args;
 
 template<typename C, typename R, typename... Args>
 struct get_memfun_args<R(C::*)(Args...)>
-  : type_list<Args...> {
+  : util::type_list<Args...> {
 };
 
 template<typename C, typename R, typename... Args>
 struct get_memfun_args<R(C::*)(Args...) const>
-  : type_list<Args...> {
+  : util::type_list<Args...> {
 };
 
 template<typename F>
@@ -41,7 +35,7 @@ struct get_args
 
 template<typename R, typename... Args>
 struct get_args<R(*)(Args...)>
-  : type_list<Args...> {
+  : util::type_list<Args...> {
 };
 
 
@@ -67,7 +61,7 @@ struct arg_checker<double> {
 
 
 template<std::size_t... I, typename... Args>
-void check_types(const std::vector<number>& args, std::index_sequence<I...>, type_list<Args...>) {
+void check_types(const std::vector<number>& args, std::index_sequence<I...>, util::type_list<Args...>) {
   std::vector<int> nonreal_args;
   ((!arg_checker<Args>::check(args[I]) ? nonreal_args.push_back(I) : (void) 0), ...);
   throw_if_nonreal(std::move(nonreal_args));
@@ -75,7 +69,7 @@ void check_types(const std::vector<number>& args, std::index_sequence<I...>, typ
 
 template<typename F, std::size_t... I, typename... Args>
 number invoke_helper(F& func, const std::vector<number>& args, std::index_sequence<I...> idx,
-  type_list<Args...> ts) {
+  util::type_list<Args...> ts) {
   check_arity(static_cast<int>(sizeof...(Args)), static_cast<int>(args.size()));
   check_types(args, idx, ts);
   return func(arg_checker<Args>::convert(args[I])...);
