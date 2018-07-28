@@ -75,12 +75,10 @@ struct type_eq_pred {
 };
 
 template<mparse::binary_op_type Type, typename Lhs, typename Rhs, bool Commute = is_commutative(Type)>
-class binary_op_expr : binary_op_pred_expr<type_eq_pred<Type>, Lhs, Rhs, Commute> {
-};
+using binary_op_expr = binary_op_pred_expr<type_eq_pred<Type>, Lhs, Rhs, Commute>;
 
 template<mparse::unary_op_type Type, typename Inner>
-class unary_op_expr : unary_op_pred_expr<type_eq_pred<Type>, Inner> {
-};
+using unary_op_expr = unary_op_pred_expr<type_eq_pred<Type>, Inner>;
 
 
 template<
