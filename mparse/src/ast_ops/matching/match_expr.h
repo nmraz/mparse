@@ -164,13 +164,13 @@ template<
 
 /* COMBINATORS */
 
-template<typename Matcher>
+template<typename Expr>
 struct negation_expr {
-  const Matcher matcher;
+  const Expr expr;
 };
 
-template<typename Matcher>
-constexpr bool is_match_expr<negation_expr<Matcher>> = true;
+template<typename Expr>
+constexpr bool is_match_expr<negation_expr<Expr>> = true;
 
 
 template<typename First, typename Second>
@@ -194,10 +194,10 @@ constexpr bool is_match_expr<disjunction_expr<First, Second>> = true;
 
 
 template<
-  typename Matcher,
-  typename = std::enable_if_t<is_match_expr<Matcher>>
-> constexpr negation_expr<Matcher> match_not(Matcher matcher) {
-  return { matcher };
+  typename Expr,
+  typename = std::enable_if_t<is_match_expr<Expr>>
+> constexpr negation_expr<Expr> match_not(Expr expr) {
+  return { expr };
 }
 
 template<
@@ -217,15 +217,15 @@ template<
 }
 
 
-/* CAPTURING MATCHERS */
+/* CAPTURING EXPRESSIONS */
 
-template<typename Tag, typename Matcher>
+template<typename Tag, typename Expr>
 struct capture_expr_impl {
-  const Matcher matcher;
+  const Expr expr;
 };
 
-template<typename Tag, typename Matcher>
-constexpr bool is_match_expr<capture_expr_impl<Tag, Matcher>> = true;
+template<typename Tag, typename Expr>
+constexpr bool is_match_expr<capture_expr_impl<Tag, Expr>> = true;
 
 
 template<int N>
@@ -236,8 +236,8 @@ decltype(auto) get_capture(Res&& results) {
   return get_result<capture_expr_tag<N>>(std::forward<Res>(results));
 }
 
-template<int N, typename Matcher>
-using capture_expr = capture_expr_impl<capture_expr_tag<N>, Matcher>;
+template<int N, typename Expr>
+using capture_expr = capture_expr_impl<capture_expr_tag<N>, Expr>;
 
 
 template<int N>
