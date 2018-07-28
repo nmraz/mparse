@@ -27,7 +27,7 @@ constexpr bool is_match_expr<literal_expr> = true;
 
 template<typename Node>
 struct node_type_expr {
-  static_assert(std::is_base_of_v<mparse::ast_node, Node>, "node_type_expr can only match descendants of ast_node")
+  static_assert(std::is_base_of_v<mparse::ast_node, Node>, "node_type_expr can only match descendants of ast_node");
 };
 
 template<typename Node>

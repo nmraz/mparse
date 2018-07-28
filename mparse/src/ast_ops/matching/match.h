@@ -46,7 +46,7 @@ struct matcher_traits<binary_op_pred_expr<Pred, Lhs, Rhs, Commute>> {
   using captures = caplist_cat<get_captures_t<Lhs>, get_captures_t<Rhs>>;
 
   template<typename Ctx>
-  static bool match(const binary_op_expr<Pred, Lhs, Rhs, Commute>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
+  static bool match(const binary_op_pred_expr<Pred, Lhs, Rhs, Commute>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
     if (auto* bin_node = mparse::ast_node_cast<match_type>(node.get())) {
 
       if (!Pred{}(bin_node->type())) {
@@ -80,7 +80,7 @@ struct matcher_traits<unary_expr<Node, Inner>> {
   template<typename Ctx>
   static bool match(const unary_expr<Node, Inner>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
     if (auto* un_node = mparse::ast_node_cast<match_type>(node.get())) {
-      return matcher_traits<Inner>::match(expr.inner, un_node->ref_child(), ctx)
+      return matcher_traits<Inner>::match(expr.inner, un_node->ref_child(), ctx);
     }
     return false;
   }
