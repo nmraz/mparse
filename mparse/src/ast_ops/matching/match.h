@@ -128,12 +128,30 @@ struct matcher_traits<disjunction_expr<First, Second>> {
 };
 
 
+namespace impl {
+
+template<typename E, typename = void>
+struct get_match_type {
+  using type = mparse::ast_node;
+};
+
+template<typename E>
+struct get_match_type<E, std::void_t<typename matcher_traits<E>::match_type>> {
+  using type = typename matcher_traits<E>::match_type;
+};
+
+template<typename E>
+using get_match_type_t = typename get_match_type<E>::type;
+
+}  // namespace impl
+
+
 template<typename Tag, typename Expr>
 struct matcher_traits<capture_expr_impl<Tag, Expr>> {
   template<typename Ctx>
   static bool match(const capture_expr_impl<Tag, Expr>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
     if (matcher_traits<Expr>::match(expr.expr, node, ctx)) {
-      get_result<Tag>(ctx) = node;  // change when match type retriever is working
+      get_result<Tag>(ctx) = mparse::static_ast_node_ptr_cast<impl::get_match_type_t<Expr>>(node);
       return true;
     }
     return false;
