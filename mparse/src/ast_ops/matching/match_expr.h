@@ -239,6 +239,25 @@ decltype(auto) get_capture(Res&& results) {
 template<int N, typename Expr>
 using capture_expr = capture_expr_impl<capture_expr_tag<N>, Expr>;
 
+template<int N, typename Expr>
+constexpr capture_expr<N, Expr> capture_as(Expr expr) {
+  return  { expr };
+}
+
+
+struct retrieve_capture_dummy_expr {};
+
+template<>
+constexpr bool is_match_expr<retrieve_capture_dummy_expr> = true;
+
+template<int N>
+using retrieve_capture_expr = capture_expr_impl<capture_expr_tag<N>, retrieve_capture_dummy_expr>;
+
+template<int N>
+constexpr retrieve_capture_expr<N> retrieve_capture() {
+  return {};
+}
+
 
 template<int N>
 struct constant_tag {};
