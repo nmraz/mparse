@@ -253,11 +253,6 @@ constexpr bool is_match_expr<retrieve_capture_dummy_expr> = true;
 template<int N>
 using retrieve_capture_expr = capture_expr_impl<capture_expr_tag<N>, retrieve_capture_dummy_expr>;
 
-template<int N>
-constexpr retrieve_capture_expr<N> retrieve_capture() {
-  return {};
-}
-
 
 template<int N>
 struct constant_tag {};
@@ -293,6 +288,9 @@ inline namespace literals {
 constexpr literal_expr operator""_lit(long double val) {
   return { static_cast<double>(val) };
 }
+
+template<int N>
+constexpr retrieve_capture_expr<N> cap{};
 
 constexpr constant_expr<1> c1{};
 constexpr constant_expr<2> c2{};
