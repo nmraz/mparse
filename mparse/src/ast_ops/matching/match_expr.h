@@ -255,15 +255,15 @@ using retrieve_capture_expr = capture_expr_impl<capture_expr_tag<N>, retrieve_ca
 
 
 template<int N>
-struct constant_tag {};
+struct constant_expr_tag {};
 
 template<int N, typename Res>
 decltype(auto) get_constant(Res&& results) {
-  return get_result<constant_tag<N>>(std::forward<Res>(results));
+  return get_result<constant_expr_tag<N>>(std::forward<Res>(results));
 }
 
 template<int N>
-using constant_expr = capture_expr_impl<constant_tag<N>, node_type_expr<mparse::literal_node>>;
+using constant_expr = capture_expr_impl<constant_expr_tag<N>, node_type_expr<mparse::literal_node>>;
 
 
 template<char C>
