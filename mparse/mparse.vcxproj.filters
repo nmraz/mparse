@@ -194,9 +194,6 @@
     <ClInclude Include="src\ast_ops\matching\match.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ast_ops\matching\match_expr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\ast_ops\matching\match_results.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -204,6 +201,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\util\meta.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ast_ops\matching\expr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

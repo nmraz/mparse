@@ -182,7 +182,7 @@
     <ClInclude Include="src\ast_ops\eval\types.h" />
     <ClInclude Include="src\ast_ops\matching\compare.h" />
     <ClInclude Include="src\ast_ops\matching\match.h" />
-    <ClInclude Include="src\ast_ops\matching\match_expr.h" />
+    <ClInclude Include="src\ast_ops\matching\expr.h" />
     <ClInclude Include="src\ast_ops\matching\match_results.h" />
     <ClInclude Include="src\ast_ops\matching\util.h" />
     <ClInclude Include="src\ast_ops\strip_parens.h" />
