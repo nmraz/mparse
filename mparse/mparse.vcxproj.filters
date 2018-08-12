@@ -206,5 +206,8 @@
     <ClInclude Include="src\ast_ops\matching\expr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ast_ops\matching\build.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

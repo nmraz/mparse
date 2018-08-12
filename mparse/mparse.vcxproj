@@ -180,6 +180,7 @@
     <ClInclude Include="src\ast_ops\eval\func_util.h" />
     <ClInclude Include="src\ast_ops\eval\scope.h" />
     <ClInclude Include="src\ast_ops\eval\types.h" />
+    <ClInclude Include="src\ast_ops\matching\build.h" />
     <ClInclude Include="src\ast_ops\matching\compare.h" />
     <ClInclude Include="src\ast_ops\matching\match.h" />
     <ClInclude Include="src\ast_ops\matching\expr.h" />
