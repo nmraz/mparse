@@ -104,6 +104,19 @@ struct matcher_traits<unary_op_pred_expr<Pred, Inner>> {
   }
 };
 
+template<typename Node, typename Pred>
+struct matcher_traits<pred_matcher_expr<Node, Pred>> {
+  using match_type = mparse::node_ptr<Node>;
+
+  template<typename Ctx>
+  static bool match(const pred_matcher_expr<Node, Pred>& expr, const mparse::ast_node_ptr& node, Ctx&) {
+    if (auto* typed_node = mparse::ast_node_cast<Node>(node.get())) {
+      return expr.pred(*typed_node);
+    }
+    return false;
+  }
+};
+
 template<typename Expr>
 struct matcher_traits<negation_expr<Expr>> {
   // no captures as this is a negation match

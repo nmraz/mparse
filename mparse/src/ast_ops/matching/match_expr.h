@@ -25,13 +25,32 @@ template<>
 constexpr bool is_match_expr<literal_expr> = true;
 
 
+template<typename Node, typename Pred>
+struct pred_matcher_expr {
+  static_assert(std::is_base_of_v<mparse::ast_node, Node>, "pred_matcher_expr can only match descendants of ast_node");
+
+  const Pred pred;
+};
+
+template<typename Node, typename Pred>
+constexpr bool is_match_expr<pred_matcher_expr<Node, Pred>> = true;
+
+
 template<typename Node>
-struct node_type_expr {
-  static_assert(std::is_base_of_v<mparse::ast_node, Node>, "node_type_expr can only match descendants of ast_node");
+struct always_true_pred {
+  constexpr bool operator()(const Node&) {
+    return true;
+  }
 };
 
 template<typename Node>
-constexpr bool is_match_expr<node_type_expr<Node>> = true;
+using node_type_expr = pred_matcher_expr<Node, always_true_pred<Node>>;
+
+
+template<typename Node, typename Pred>
+pred_matcher_expr<Node, std::decay_t<Pred>> match_if(Pred&& pred) {
+  return { std::forward<Pred>(pred) };
+}
 
 
 template<typename Pred, typename Lhs, typename Rhs, bool Commute>
