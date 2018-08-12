@@ -186,10 +186,10 @@ struct matcher_traits<subexpr_expr<C, Comp>> {
 };
 
 
-template<typename Matcher, typename = std::enable_if_t<is_match_expr<Matcher>>>
-std::optional<match_results_for<Matcher>> exec_match(Matcher&& matcher, const mparse::ast_node_ptr& node) {
-  match_results_for<Matcher> res;
-  if (matcher.matches(node, res)) {
+template<typename Expr, typename = std::enable_if_t<is_match_expr<Expr>>>
+std::optional<match_results_for<Expr>> exec_match(Expr expr, const mparse::ast_node_ptr& node) {
+  match_results_for<Expr> res;
+  if (matcher_traits<Expr>::match(expr, node, res)) {
     return res;
   }
   return std::nullopt;
