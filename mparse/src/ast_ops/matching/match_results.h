@@ -70,11 +70,11 @@ public:
   using match_results_base<Caps...>::get;
 
   cap_type& get(tag_type) & {
-    return cap;
+    return cap_;
   }
 
   const cap_type& get(tag_type) const & {
-    return cap;
+    return cap_;
   }
 
   cap_type&& get(tag_type) && {
