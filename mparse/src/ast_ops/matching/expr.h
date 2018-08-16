@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ast_ops/matching/match_results.h"
 #include "ast_ops/matching/compare.h"
 #include "ast_ops/matching/util.h"
 #include "mparse/ast/abs_node.h"
@@ -240,7 +239,7 @@ template<
 
 template<typename Tag, typename Expr>
 struct capture_expr_impl {
-  const Expr expr;
+  const Expr expr{};
 };
 
 template<typename Tag, typename Expr>
@@ -249,11 +248,6 @@ constexpr bool is_match_expr<capture_expr_impl<Tag, Expr>> = true;
 
 template<int N>
 struct capture_expr_tag {};
-
-template<int N, typename Res>
-decltype(auto) get_capture(Res&& results) {
-  return get_result<capture_expr_tag<N>>(std::forward<Res>(results));
-}
 
 template<int N, typename Expr>
 using capture_expr = capture_expr_impl<capture_expr_tag<N>, Expr>;
@@ -276,22 +270,12 @@ using retrieve_capture_expr = capture_expr_impl<capture_expr_tag<N>, retrieve_ca
 template<int N>
 struct constant_expr_tag {};
 
-template<int N, typename Res>
-decltype(auto) get_constant(Res&& results) {
-  return get_result<constant_expr_tag<N>>(std::forward<Res>(results));
-}
-
 template<int N>
 using constant_expr = capture_expr_impl<constant_expr_tag<N>, node_type_expr<mparse::literal_node>>;
 
 
 template<char C>
 struct subexpr_expr_tag {};
-
-template<char C, typename Res>
-decltype(auto) get_subexpr(Res&& results) {
-  return get_result<subexpr_expr_tag<C>>(std::forward<Res>(results));
-}
 
 template<char C, typename Comp = commutative_expr_comparer>
 struct subexpr_expr {

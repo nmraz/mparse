@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ast_ops/matching/expr.h"
 #include "mparse/ast/ast_node.h"
 #include "util/meta.h"
 #include <type_traits>
@@ -140,27 +141,56 @@ using get_captures_t = typename get_captures<E>::type;
 template<typename Caps>
 class match_results : private impl::get_match_results_base_t<Caps> {
   template<typename Tag, typename E>
-  friend decltype(auto) get_result(match_results<E>& match) {
-    return match.get(Tag{});
-  }
+  friend decltype(auto) get_result(match_results<E>& match);
 
   template<typename Tag, typename E>
-  friend decltype(auto) get_result(const match_results<E>& match) {
-    return match.get(Tag{});
-  }
+  friend decltype(auto) get_result(const match_results<E>& match);
 
   template<typename Tag, typename E>
-  friend decltype(auto) get_result(match_results<E>&& match) {
-    return std::move(match).get(Tag{});
-  }
+  friend decltype(auto) get_result(match_results<E>&& match);
 
   template<typename Tag, typename E>
-  friend decltype(auto) get_result(const match_results<E>&& match) {
-    return std::move(match).get(Tag{});
-  }
+  friend decltype(auto) get_result(const match_results<E>&& match);
 };
 
 template<typename E>
 using match_results_for = match_results<get_captures_t<E>>;
+
+
+template<typename Tag, typename E>
+decltype(auto) get_result(match_results<E>& match) {
+  return match.get(Tag{});
+}
+
+template<typename Tag, typename E>
+decltype(auto) get_result(const match_results<E>& match) {
+  return match.get(Tag{});
+}
+
+template<typename Tag, typename E>
+decltype(auto) get_result(match_results<E>&& match) {
+  return std::move(match).get(Tag{});
+}
+
+template<typename Tag, typename E>
+decltype(auto) get_result(const match_results<E>&& match) {
+  return std::move(match).get(Tag{});
+}
+
+
+template<int N, typename Res>
+decltype(auto) get_capture(Res&& results) {
+  return get_result<capture_expr_tag<N>>(std::forward<Res>(results));
+}
+
+template<int N, typename Res>
+decltype(auto) get_constant(Res&& results) {
+  return get_result<constant_expr_tag<N>>(std::forward<Res>(results));
+}
+
+template<char C, typename Res>
+decltype(auto) get_subexpr(Res&& results) {
+  return get_result<subexpr_expr_tag<C>>(std::forward<Res>(results));
+}
 
 }  // namespace ast_ops::matching
