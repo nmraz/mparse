@@ -120,30 +120,37 @@ struct matcher_traits<pred_matcher_expr<Node, Pred>> {
 template<typename Expr>
 struct matcher_traits<negation_expr<Expr>> {
   // no captures as this is a negation match
+
   template<typename Ctx>
   static bool match(const negation_expr<Expr>& expr, const mparse::ast_node_ptr& node, Ctx&) {
-    match_results_for<Expr> child_ctx;  // separate context as captures are not propagated
+    match_results_for<Expr> child_ctx;
     return !matcher_traits<Expr>::match(expr.expr, node, child_ctx);
   }
 };
 
 template<typename First, typename Second>
 struct matcher_traits<conjunction_expr<First, Second>> {
-  using captures = caplist_cat<get_captures_t<First>, get_captures_t<Second>>;
+  // no captures as this is a conjunction match
 
    template<typename Ctx>
-   static bool match(const conjunction_expr<First, Second>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
-     return matcher_traits<First>::match(expr.first, node, ctx)
-       && matcher_traits<Second>::match(expr.second, node, ctx);
+   static bool match(const conjunction_expr<First, Second>& expr, const mparse::ast_node_ptr& node, Ctx&) {
+     match_results_for<First> fist_ctx;
+     if (!matcher_traits<First>::match(expr.first, node, fist_ctx)) {
+       return false;
+     }
+
+     match_results_for<Second> second_ctx;
+     return matcher_traits<Second>::match(expr.second, node, second_ctx);
    }
 };
 
 template<typename First, typename Second>
 struct matcher_traits<disjunction_expr<First, Second>> {
   // no captures as this is a disjunction match
+
   template<typename Ctx>
   static bool match(const disjunction_expr<First, Second>& expr, const mparse::ast_node_ptr& node, Ctx&) {
-    match_results_for<First> first_ctx;  // separate context as captures are not propagated
+    match_results_for<First> first_ctx;
     if (matcher_traits<First>::match(expr.first, node, first_ctx)) {
       return true;
     }
