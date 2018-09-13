@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ast_ops/matching/expr.h"
+#include "ast_ops/matching/match_results.h"
 #include "mparse/ast/ast_node.h"
 #include "util/meta.h"
 
