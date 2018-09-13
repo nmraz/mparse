@@ -153,6 +153,7 @@
     <ClCompile Include="src\ast_ops\eval\eval_error.cpp" />
     <ClCompile Include="src\ast_ops\eval\func_util.cpp" />
     <ClCompile Include="src\ast_ops\eval\scope.cpp" />
+    <ClCompile Include="src\ast_ops\matching\rewrite.cpp" />
     <ClCompile Include="src\ast_ops\strip_parens.cpp" />
     <ClCompile Include="src\builtins.cpp" />
     <ClCompile Include="src\diagnostics.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="src\ast_ops\matching\match.h" />
     <ClInclude Include="src\ast_ops\matching\expr.h" />
     <ClInclude Include="src\ast_ops\matching\match_results.h" />
+    <ClInclude Include="src\ast_ops\matching\rewrite.h" />
     <ClInclude Include="src\ast_ops\matching\util.h" />
     <ClInclude Include="src\ast_ops\strip_parens.h" />
     <ClInclude Include="src\builtins.h" />
