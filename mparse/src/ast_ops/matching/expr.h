@@ -35,15 +35,15 @@ template<typename Node, typename Pred>
 constexpr bool is_match_expr<pred_matcher_expr<Node, Pred>> = true;
 
 
-template<typename Node>
 struct always_true_pred {
-  constexpr bool operator()(const Node&) {
+  template<typename T>
+  constexpr bool operator()(const T&) {
     return true;
   }
 };
 
 template<typename Node>
-using node_type_expr = pred_matcher_expr<Node, always_true_pred<Node>>;
+using node_type_expr = pred_matcher_expr<Node, always_true_pred>;
 
 
 template<typename Node, typename Pred>
