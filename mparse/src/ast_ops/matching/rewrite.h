@@ -9,10 +9,12 @@
 namespace ast_ops::matching {
 
 template<typename M, typename B>
-void rewrite(mparse::ast_node_ptr& node, const M& matcher, const B& builder) {
+bool rewrite(mparse::ast_node_ptr& node, const M& matcher, const B& builder) {
   if (auto res = exec_match(matcher, node)) {
     node = build_expr(builder, res);
+    return true;
   }
+  return false;
 }
 
 
