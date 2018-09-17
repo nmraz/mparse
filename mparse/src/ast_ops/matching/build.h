@@ -56,7 +56,7 @@ public:
   static auto build(const func_expr<Args...>& expr, const Ctx& ctx) {
     return mparse::make_ast_node<mparse::func_node>(
       expr.name,
-      build_args(expr.args, std::index_sequence_for<Args...>, ctx)
+      build_args(expr.args, std::index_sequence_for<Args...>{}, ctx)
     );
   }
 };

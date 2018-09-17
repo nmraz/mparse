@@ -82,7 +82,7 @@ public:
         return false;
       }
 
-      return match_helper(expr.args, arg_nodes, std::index_sequence_for<Args...>, ctx);
+      return match_helper(expr.args, arg_nodes, std::index_sequence_for<Args...>{}, ctx);
     }
     return false;
   }
