@@ -46,12 +46,6 @@ template<typename Node>
 using node_type_expr = custom_matcher_expr<Node, always_true_pred>;
 
 
-template<typename Node, typename Pred>
-custom_matcher_expr<Node, std::decay_t<Pred>> match_custom(Pred&& pred) {
-  return { std::forward<Pred>(pred) };
-}
-
-
 template<typename Pred, typename Lhs, typename Rhs, bool Commute>
 struct binary_op_pred_expr {
   const Lhs lhs;
@@ -287,6 +281,11 @@ constexpr bool is_match_expr<subexpr_expr<C, Comp>> = true;
 
 
 inline namespace literals {
+
+template<typename Node, typename Pred>
+custom_matcher_expr<Node, std::decay_t<Pred>> match_custom(Pred&& pred) {
+  return { std::forward<Pred>(pred) };
+}
 
 constexpr literal_expr operator""_lit(long double val) {
   return { static_cast<double>(val) };
