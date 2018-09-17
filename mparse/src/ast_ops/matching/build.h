@@ -20,6 +20,14 @@ struct builder_traits<literal_expr> {
   }
 };
 
+template<typename F>
+struct builder_traits<custom_builder_expr<F>> {
+  template<typename Ctx>
+  static auto build(const custom_builder_expr<F>& expr, const Ctx& ctx) {
+    return expr.func(ctx);
+  }
+};
+
 template<typename Node, typename Inner>
 struct builder_traits<unary_expr<Node, Inner>> {
   template<typename Ctx>
