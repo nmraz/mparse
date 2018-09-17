@@ -7,8 +7,8 @@
 namespace ast_ops::matching {
 namespace {
 
-struct apply_visitor : mparse::ast_visitor {
-  apply_visitor(const rewriter_func& func) : func(func) {}
+struct apply_rec_visitor : mparse::ast_visitor {
+  apply_rec_visitor(const rewriter_func& func) : func(func) {}
 
   void visit(mparse::unary_node& node) override;
   void visit(mparse::binary_op_node& node) override;
@@ -18,14 +18,14 @@ struct apply_visitor : mparse::ast_visitor {
   bool result = false;
 };
 
-void apply_visitor::visit(mparse::unary_node& node) {
+void apply_rec_visitor::visit(mparse::unary_node& node) {
   auto child = node.ref_child();  // ref here for strong exception guarantee
   child->apply_visitor(*this);
   result |= func(child);  // no short-circuiting
   node.set_child(std::move(child));
 }
 
-void apply_visitor::visit(mparse::binary_op_node& node) {
+void apply_rec_visitor::visit(mparse::binary_op_node& node) {
   {
     auto lhs = node.ref_lhs();  // ref here for strong exception guarantee
     lhs->apply_visitor(*this);
@@ -41,7 +41,7 @@ void apply_visitor::visit(mparse::binary_op_node& node) {
   }
 }
 
-void apply_visitor::visit(mparse::func_node& node) {
+void apply_rec_visitor::visit(mparse::func_node& node) {
   for (auto& arg : node.args()) {
     arg->apply_visitor(*this);
     result |= func(arg);
@@ -52,7 +52,7 @@ void apply_visitor::visit(mparse::func_node& node) {
 }  // namespace
 
 bool apply_recursively(mparse::ast_node_ptr& node, rewriter_func func) {
-  apply_visitor vis(func);
+  apply_rec_visitor vis(func);
   node->apply_visitor(vis);
   return func(node) | vis.result;
 }
