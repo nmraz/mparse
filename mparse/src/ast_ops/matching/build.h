@@ -36,7 +36,7 @@ template<>
 struct builder_traits<id_expr> {
   template<typename Ctx>
   static auto build(const id_expr& expr, const Ctx&) {
-    return mparse::make_ast_node<mparse::id_node>(expr.name);
+    return mparse::make_ast_node<mparse::id_node>(std::string(expr.name));
   }
 };
 
@@ -55,7 +55,7 @@ public:
   template<typename Ctx>
   static auto build(const func_expr<Args...>& expr, const Ctx& ctx) {
     return mparse::make_ast_node<mparse::func_node>(
-      expr.name,
+      std::string(expr.name),
       build_args(expr.args, std::index_sequence_for<Args...>{}, ctx)
     );
   }
