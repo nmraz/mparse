@@ -52,6 +52,13 @@ constexpr auto get_rewriters_after_expr(const M& matcher, const B& builder, cons
   return std::tuple_cat(std::tuple{ get_expr_rewriter(matcher, builder) }, get_rewriters(rest...));
 }
 
+
+template<typename... Ts>
+bool do_apply_rewriters(mparse::ast_node_ptr& node, const Ts&... rewriters) {
+  // note: not || as we don't want short-circuiting
+  return (... | rewriters(node));
+}
+
 }  // namespace impl
 
 
@@ -60,8 +67,18 @@ class rewriter_list {
 public:
   constexpr rewriter_list(const Ts&... args) : rewriters_(impl::get_rewriters(args...)) {}
 
+  template<typename... Us>
+  friend bool apply_rewriters(mparse::ast_node_ptr& node, const rewriter_list<Us...>& list);
+
 private:
   decltype(impl::get_rewriters(std::declval<const Ts&>()...)) rewriters_;
 };
+
+template<typename... Ts>
+bool apply_rewriters(mparse::ast_node_ptr& node, const rewriter_list<Ts...>& list) {
+  return std::apply([&] (auto&&... rewriters) {
+    return impl::do_apply_rewriters(node, rewriters...);
+  }, list.rewriters_);
+}
 
 }  // namespace ast_ops::matching
