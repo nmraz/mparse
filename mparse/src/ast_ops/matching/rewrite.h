@@ -4,8 +4,9 @@
 #include "ast_ops/matching/match.h"
 #include "ast_ops/matching/match_results.h"
 #include "mparse/ast/ast_node.h"
-#include <type_traits>
+#include <functional>
 #include <tuple>
+#include <type_traits>
 
 namespace ast_ops::matching {
 
@@ -79,6 +80,18 @@ bool apply_rewriters(mparse::ast_node_ptr& node, const rewriter_list<Ts...>& lis
   return std::apply([&] (auto&&... rewriters) {
     return impl::do_apply_rewriters(node, rewriters...);
   }, list.rewriters_);
+}
+
+
+using rewriter_func = std::function<bool(mparse::ast_node_ptr&)>;
+
+bool apply_recursively(mparse::ast_node_ptr& node, rewriter_func func);
+
+template<typename... Ts>
+bool apply_rewriters_recursively(mparse::ast_node_ptr& node, const rewriter_list<Ts...>& list) {
+  return apply_recursively(node, [&] (mparse::ast_node_ptr& cur_node) {
+    return apply_rewriters(cur_node, list);
+  });
 }
 
 }  // namespace ast_ops::matching
