@@ -7,6 +7,7 @@
 #include "mparse/ast/paren_node.h"
 #include "mparse/ast/unary_node.h"
 #include <string_view>
+#include <tuple>
 #include <type_traits>
 
 namespace ast_ops::matching {
@@ -64,6 +65,16 @@ struct id_expr {
 
 template<>
 constexpr bool is_match_expr<id_expr> = true;
+
+
+template<typename... Args>
+struct func_expr {
+  const std::string_view name;
+  const std::tuple<Args...> args;
+};
+
+template<typename... Args>
+constexpr bool is_match_expr<func_expr<Args...>> = true;
 
 
 template<typename Pred, typename Lhs, typename Rhs, bool Commute>
@@ -325,6 +336,11 @@ constexpr custom_builder_expr<std::decay_t<F>> build_custom(F&& func) {
 
 constexpr id_expr id(std::string_view name) {
   return { name };
+}
+
+template<typename... Args, typename = std::enable_if_t<(... && is_match_expr<Args>)>>
+constexpr func_expr<Args...> func(std::string_view name, Args... args) {
+  return { name, { args... } };
 }
 
 
