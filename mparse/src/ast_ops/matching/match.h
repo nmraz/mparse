@@ -5,6 +5,7 @@
 #include "ast_ops/matching/match_results.h"
 #include "mparse/ast/ast_node.h"
 #include "mparse/ast/cast.h"
+#include "mparse/ast/func_node.h"
 #include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
@@ -52,6 +53,36 @@ struct matcher_traits<id_expr> {
   static bool match(const id_expr& expr, const mparse::ast_node_ptr& node, Ctx&) {
     if (auto* id_node = mparse::ast_node_cast<match_type>(node.get())) {
       return id_node->name() == expr.name;
+    }
+    return false;
+  }
+};
+
+template<typename... Args>
+struct matcher_traits<func_expr<Args...>> {
+  using match_type = mparse::func_node;
+
+private:
+  template<typename... Args, size_t... I, typename Ctx>
+  static bool match_helper(const std::tuple<Args...>& args,
+    match_type::arg_list& arg_nodes, std::index_sequence<I...>, Ctx& ctx) {
+    return (... && matcher_traits<Args>::match(std::get<I>(args), arg_nodes[I], ctx));
+  }
+
+public:
+  template<typename Ctx>
+  static bool match(const func_expr<Args...>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
+    if (auto* fn_node = mparse::ast_node_cast<match_type>(node.get())) {
+      if (fn_node->name() != expr.name) {
+        return false;
+      }
+
+      auto& arg_nodes = fn_node->args();
+      if (arg_nodes.size() != sizeof...(Args)) {
+        return false;
+      }
+
+      return match_helper(expr.args, arg_nodes, std::index_sequence_for<Args...>, ctx);
     }
     return false;
   }
