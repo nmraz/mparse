@@ -150,7 +150,7 @@ struct commutative_expr_comparer : commutative_expr_comparer_base<commutative_ex
 
 template<typename Comp>
 bool compare_exprs(const mparse::ast_node* first, const mparse::ast_node* second, Comp&& comp) {
-  impl::compare_visitor<std::decay_t<Comp>> vis(second, comp);
+  impl::compare_visitor<std::remove_reference_t<Comp>> vis(second, comp);
   first->apply_visitor(vis);
   return vis.result;
 }
