@@ -61,6 +61,7 @@ struct matcher_traits<id_expr> {
 template<typename... Args>
 struct matcher_traits<func_expr<Args...>> {
   using match_type = mparse::func_node;
+  using captures = caplist_cat<get_captures_t<Args>...>;
 
 private:
   template<typename... Args, size_t... I, typename Ctx>
