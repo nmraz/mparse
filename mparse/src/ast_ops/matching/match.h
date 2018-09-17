@@ -5,6 +5,7 @@
 #include "ast_ops/matching/match_results.h"
 #include "mparse/ast/ast_node.h"
 #include "mparse/ast/cast.h"
+#include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
 #include "util/meta.h"
@@ -38,6 +39,19 @@ struct matcher_traits<literal_expr> {
   static bool match(const literal_expr& expr, const mparse::ast_node_ptr& node, Ctx&) {
     if (auto* lit_node = mparse::ast_node_cast<match_type>(node.get())) {
       return lit_node->val() == expr.val;
+    }
+    return false;
+  }
+};
+
+template<>
+struct matcher_traits<id_expr> {
+  using match_type = mparse::id_node;
+
+  template<typename Ctx>
+  static bool match(const id_expr& expr, const mparse::ast_node_ptr& node, Ctx&) {
+    if (auto* id_node = mparse::ast_node_cast<match_type>(node.get())) {
+      return id_node->name() == expr.name;
     }
     return false;
   }
