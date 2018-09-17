@@ -6,6 +6,7 @@
 #include "mparse/ast/ast_node.h"
 #include "mparse/ast/paren_node.h"
 #include "mparse/ast/unary_node.h"
+#include <string_view>
 #include <type_traits>
 
 namespace ast_ops::matching {
@@ -55,6 +56,14 @@ struct literal_expr {
 
 template<>
 constexpr bool is_match_expr<literal_expr> = true;
+
+
+struct id_expr {
+  const std::string_view name;
+};
+
+template<>
+constexpr bool is_match_expr<id_expr> = true;
 
 
 template<typename Pred, typename Lhs, typename Rhs, bool Commute>
@@ -311,6 +320,11 @@ constexpr custom_matcher_expr<Node, std::decay_t<Pred>> match_custom(Pred&& pred
 template<typename F>
 constexpr custom_builder_expr<std::decay_t<F>> build_custom(F&& func) {
   return { std::forward<F>(func) };
+}
+
+
+constexpr id_expr id(std::string_view name) {
+  return { name };
 }
 
 
