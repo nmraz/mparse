@@ -3,6 +3,7 @@
 #include "ast_ops/matching/expr.h"
 #include "ast_ops/matching/match_results.h"
 #include "mparse/ast/ast_node.h"
+#include "mparse/ast/func_node.h"
 #include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
@@ -36,6 +37,27 @@ struct builder_traits<id_expr> {
   template<typename Ctx>
   static auto build(const id_expr& expr, const Ctx&) {
     return mparse::make_ast_node<mparse::id_node>(expr.name);
+  }
+};
+
+template<typename... Args>
+struct builder_traits<func_expr<Args...>> {
+private:
+  template<typename... Args, size_t... I, typename Ctx>
+  static mparse::func_node::arg_list build_args(const std::tuple<Args...>& args,
+    std::index_sequence<I...>, Ctx& ctx) {
+    mparse::func_node::arg_list arg_nodes;
+    (..., arg_nodes.push_back(builder_traits<Args>::build(std::get<I>(args), ctx)));
+    return arg_nodes;
+  }
+
+public:
+  template<typename Ctx>
+  static auto build(const func_expr<Args...>& expr, const Ctx& ctx) {
+    return mparse::make_ast_node<mparse::func_node>(
+      expr.name,
+      build_args(expr.args, std::index_sequence_for<Args...>, ctx)
+    );
   }
 };
 
