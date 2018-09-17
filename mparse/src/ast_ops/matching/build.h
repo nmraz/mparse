@@ -61,7 +61,7 @@ struct builder_traits<capture_expr_impl<Tag, Expr>> {
 template<char C, typename Comp>
 struct builder_traits<subexpr_expr<C, Comp>> {
   template<typename Ctx>
-  static auto build(const subexpr_expr<C, Comp>& expr, const Ctx& ctx) {
+  static auto build(const subexpr_expr<C, Comp>&, const Ctx& ctx) {
     return get_subexpr<C>(ctx);
   }
 };
