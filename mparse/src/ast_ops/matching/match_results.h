@@ -114,8 +114,8 @@ struct capture {
 template<typename... Caps>
 using caplist = util::type_list<Caps...>;
 
-template<typename First, typename Second>
-using caplist_cat = util::type_list_cat_t<First, Second>;
+template<typename... Ls>
+using caplist_cat = util::type_list_cat_t<Ls...>;
 
 template<typename List, typename... Caps>
 using caplist_append = util::type_list_append_t<List, Caps...>;
