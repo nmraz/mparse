@@ -293,7 +293,7 @@ constexpr bool is_match_expr<subexpr_expr<C, Comp>> = true;
 inline namespace literals {
 
 template<typename Node, typename Pred>
-custom_matcher_expr<Node, std::decay_t<Pred>> match_custom(Pred&& pred) {
+constexpr custom_matcher_expr<Node, std::decay_t<Pred>> match_custom(Pred&& pred) {
   return { std::forward<Pred>(pred) };
 }
 
