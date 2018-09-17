@@ -3,6 +3,9 @@
 #include "ast_ops/matching/expr.h"
 #include "ast_ops/matching/match_results.h"
 #include "mparse/ast/ast_node.h"
+#include "mparse/ast/id_node.h"
+#include "mparse/ast/literal_node.h"
+#include "mparse/ast/operator_nodes.h"
 #include "util/meta.h"
 
 namespace ast_ops::matching {
@@ -25,6 +28,14 @@ struct builder_traits<literal_expr> {
   template<typename Ctx>
   static auto build(const literal_expr& expr, const Ctx&) {
     return mparse::make_ast_node<mparse::literal_node>(expr.val);
+  }
+};
+
+template<>
+struct builder_traits<id_expr> {
+  template<typename Ctx>
+  static auto build(const id_expr& expr, const Ctx&) {
+    return mparse::make_ast_node<mparse::id_node>(expr.name);
   }
 };
 
