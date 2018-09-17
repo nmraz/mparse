@@ -12,19 +12,19 @@ struct builder_traits {
   static_assert(util::always_false<E>, "Unknown expression type");
 };
 
-template<>
-struct builder_traits<literal_expr> {
-  template<typename Ctx>
-  static auto build(const literal_expr& expr, const Ctx&) {
-    return mparse::make_ast_node<mparse::literal_node>(expr.val);
-  }
-};
-
 template<typename F>
 struct builder_traits<custom_builder_expr<F>> {
   template<typename Ctx>
   static auto build(const custom_builder_expr<F>& expr, const Ctx& ctx) {
     return expr.func(ctx);
+  }
+};
+
+template<>
+struct builder_traits<literal_expr> {
+  template<typename Ctx>
+  static auto build(const literal_expr& expr, const Ctx&) {
+    return mparse::make_ast_node<mparse::literal_node>(expr.val);
   }
 };
 

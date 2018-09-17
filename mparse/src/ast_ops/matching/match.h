@@ -17,6 +17,19 @@ struct matcher_traits {
   static_assert(util::always_false<E>, "Unknown expression type");
 };
 
+template<typename Node, typename Pred>
+struct matcher_traits<custom_matcher_expr<Node, Pred>> {
+  using match_type = mparse::node_ptr<Node>;
+
+  template<typename Ctx>
+  static bool match(const custom_matcher_expr<Node, Pred>& expr, const mparse::ast_node_ptr& node, Ctx&) {
+    if (auto* typed_node = mparse::ast_node_cast<Node>(node.get())) {
+      return expr.pred(*typed_node);
+    }
+    return false;
+  }
+};
+
 template<>
 struct matcher_traits<literal_expr> {
   using match_type = mparse::literal_node;
@@ -27,16 +40,6 @@ struct matcher_traits<literal_expr> {
       return lit_node->val() == expr.val;
     }
     return false;
-  }
-};
-
-template<typename Node>
-struct matcher_traits<node_type_expr<Node>> {
-  using match_type = Node;
-
-  template<typename Ctx>
-  static bool match(const node_type_expr<Node>&, const mparse::ast_node_ptr& node, Ctx&) {
-    return mparse::ast_node_cast<match_type>(node.get()) != nullptr;
   }
 };
 
@@ -99,19 +102,6 @@ struct matcher_traits<unary_op_pred_expr<Pred, Inner>> {
       }
 
       return matcher_traits<Inner>::match(expr.inner, un_node->ref_child(), ctx);
-    }
-    return false;
-  }
-};
-
-template<typename Node, typename Pred>
-struct matcher_traits<custom_matcher_expr<Node, Pred>> {
-  using match_type = mparse::node_ptr<Node>;
-
-  template<typename Ctx>
-  static bool match(const custom_matcher_expr<Node, Pred>& expr, const mparse::ast_node_ptr& node, Ctx&) {
-    if (auto* typed_node = mparse::ast_node_cast<Node>(node.get())) {
-      return expr.pred(*typed_node);
     }
     return false;
   }

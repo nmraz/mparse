@@ -14,15 +14,7 @@ template<typename T>
 constexpr bool is_match_expr = false;
 
 
-/* ARITHMETIC MATCHERS */
-
-struct literal_expr {
-  const double val;
-};
-
-template<>
-constexpr bool is_match_expr<literal_expr> = true;
-
+/* CUSTOM EXPRESSIONS */
 
 template<typename Node, typename Pred>
 struct custom_matcher_expr {
@@ -53,6 +45,16 @@ struct custom_builder_expr {
 
 template<typename F>
 constexpr bool is_match_expr<custom_builder_expr<F>> = true;
+
+
+/* ARITHMETIC EXPRESSIONS */
+
+struct literal_expr {
+  const double val;
+};
+
+template<>
+constexpr bool is_match_expr<literal_expr> = true;
 
 
 template<typename Pred, typename Lhs, typename Rhs, bool Commute>
