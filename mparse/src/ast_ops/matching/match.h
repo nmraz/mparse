@@ -238,12 +238,21 @@ struct matcher_traits<subexpr_expr<C, Comp>> {
   static bool match(const subexpr_expr<C, Comp>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
     auto& saved = get_subexpr<C>(ctx);
     
-    if (!saved) {
+    if constexpr (Ctx::template count_caps_with<subexpr_expr_tag<C>>() > 1) {
+      // subexpression appears multiple times - compare with stored result
+
+      if (!saved) {
+        saved = node;
+        return true;
+      }
+
+      return compare_exprs(saved.get(), node.get(), expr.comp);
+    } else {
+      // expression appears only once - don't even try to compare
+
       saved = node;
       return true;
     }
-    
-    return compare_exprs(saved.get(), node.get(), expr.comp);
   }
 };
 
