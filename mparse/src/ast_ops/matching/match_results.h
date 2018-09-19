@@ -56,19 +56,13 @@ template<typename... Ts>
 struct unique_caplist<util::type_list<Ts...>> : caplist_append_multi_unique<util::type_list<>, Ts...> {};
 
 
-template<typename Tag, typename List>
-struct count_caps;
-
-template<typename Tag, typename... Caps>
-struct count_caps<Tag, util::type_list<Caps...>>
-  : std::integral_constant<
-      size_t,
-      (... + std::is_same_v<Tag, typename Caps::tag_type>)
-  > {
+template<typename Tag, typename Cap>
+struct has_tag
+  : std::is_same<Tag, typename Cap::tag_type> {
 };
 
 template<typename Tag, typename List>
-constexpr size_t count_caps_v = count_caps<Tag, List>::value;
+constexpr size_t count_caps_v = util::type_list_count<Tag, List, has_tag>::value;
 
 
 template<typename... Caps>

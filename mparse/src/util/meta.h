@@ -44,4 +44,18 @@ using type_list_cat_t = typename type_list_cat<Ls...>::type;
 template<typename List, typename... Ts>
 using type_list_append_t = type_list_cat_t<List, type_list<Ts...>>;
 
+template<typename T, typename List, template<typename, typename> typename Cmp>
+struct type_list_count;
+
+template<typename T, typename... Ts, template<typename, typename> typename Cmp>
+struct type_list_count<T, type_list<Ts...>, Cmp>
+  : std::integral_constant<
+      std::size_t,
+      (0 + ... + Cmp<T, Ts>::value)
+  > {
+};
+
+template<typename T, typename List>
+constexpr std::size_t type_list_count_v = type_list_count<T, List, std::is_same>::value;
+
 }  // namespace util
