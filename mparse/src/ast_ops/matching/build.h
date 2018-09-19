@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ast_ops/clone.h"
 #include "ast_ops/matching/expr.h"
 #include "ast_ops/matching/match_results.h"
 #include "mparse/ast/ast_node.h"
@@ -15,6 +16,25 @@ template<typename E>
 struct builder_traits {
   static_assert(util::always_false<E>, "Unknown expression type");
 };
+
+
+namespace impl {
+
+template<typename E, typename = void>
+struct get_build_tags {
+  using type = util::type_list<>;
+};
+
+template<typename E>
+struct get_build_tags<E, std::void_t<typename builder_traits<E>::tags>> {
+  using type = typename builder_traits<E>::tags;
+};
+
+template<typename E>
+using get_build_tags_t = typename get_build_tags<E>::type;
+
+}  // namespace impl
+
 
 template<typename F>
 struct builder_traits<custom_builder_expr<F>> {
@@ -52,6 +72,8 @@ private:
   }
 
 public:
+  using tags = util::type_list_cat_t<impl::get_build_tags_t<Args>...>;
+
   template<typename BuildTags, typename Ctx>
   static auto build(const func_expr<Args...>& expr, const Ctx& ctx) {
     return mparse::make_ast_node<mparse::func_node>(
@@ -63,6 +85,8 @@ public:
 
 template<typename Node, typename Inner>
 struct builder_traits<unary_expr<Node, Inner>> {
+  using tags = impl::get_build_tags_t<Inner>;
+
   template<typename BuildTags, typename Ctx>
   static auto build(const unary_expr<Node, Inner>& expr, const Ctx& ctx) {
     auto inner_node = builder_traits<Inner>::template build<BuildTags>(expr.inner, ctx);
@@ -72,6 +96,8 @@ struct builder_traits<unary_expr<Node, Inner>> {
 
 template<mparse::unary_op_type Type, typename Inner>
 struct builder_traits<unary_op_expr<Type, Inner>> {
+  using tags = impl::get_build_tags_t<Inner>;
+
   template<typename BuildTags, typename Ctx>
   static auto build(const unary_op_expr<Type, Inner>& expr, const Ctx& ctx) {
     auto inner_node = builder_traits<Inner>::template build<BuildTags>(expr.inner, ctx);
@@ -81,6 +107,8 @@ struct builder_traits<unary_op_expr<Type, Inner>> {
 
 template<mparse::binary_op_type Type, typename Lhs, typename Rhs, bool Commute>
 struct builder_traits<binary_op_expr<Type, Lhs, Rhs, Commute>> {
+  using tags = util::type_list_cat_t<impl::get_build_tags_t<Lhs>, impl::get_build_tags_t<Rhs>>;
+
   template<typename BuildTags, typename Ctx>
   static auto build(const binary_op_expr<Type, Lhs, Rhs, Commute>& expr, const Ctx& ctx) {
     auto lhs_node = builder_traits<Lhs>::template build<BuildTags>(expr.lhs, ctx);
@@ -91,39 +119,43 @@ struct builder_traits<binary_op_expr<Type, Lhs, Rhs, Commute>> {
   }
 };
 
+
+namespace impl {
+
+template<typename BuildTags, typename Tag, typename Ctx>
+auto get_build_result(const Ctx& ctx) {
+  const auto& stored = get_result<Tag>(ctx);
+
+  if constexpr (util::type_list_count_v<Tag, BuildTags> > 1) {
+    // used several times - clone for safety
+    return ast_ops::clone(stored);
+  } else {
+    // only required once - no need to copy
+    return stored;
+  }
+}
+
+}  // namespace impl
+
 template<typename Tag, typename Expr>
 struct builder_traits<capture_expr_impl<Tag, Expr>> {
+  using tags = util::type_list_append_t<impl::get_build_tags_t<Expr>, Tag>;
+
   template<typename BuildTags, typename Ctx>
   static auto build(const capture_expr_impl<Tag, Expr>& expr, const Ctx& ctx) {
-    return get_result<Tag>(ctx);
+    return impl::get_build_result<BuildTags, Tag>(ctx);
   }
 };
 
 template<char C, typename Comp>
 struct builder_traits<subexpr_expr<C, Comp>> {
+  using tags = util::type_list<subexpr_expr_tag<C>>;
+
   template<typename BuildTags, typename Ctx>
   static auto build(const subexpr_expr<C, Comp>&, const Ctx& ctx) {
-    return get_subexpr<C>(ctx);
+    return impl::get_build_result<BuildTags, subexpr_expr_tag<C>>(ctx);
   }
 };
-
-
-namespace impl {
-
-template<typename E, typename = void>
-struct get_build_tags {
-  using type = caplist<>;
-};
-
-template<typename E>
-struct get_build_tags<E, std::void_t<typename builder_traits<E>::tags>> {
-  using type = typename builder_traits<E>::tags;
-};
-
-template<typename E>
-using get_build_tags_t = typename get_build_tags<E>::type;
-
-}  // namespace impl
 
 
 template<typename Expr, typename Ctx>
