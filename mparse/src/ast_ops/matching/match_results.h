@@ -56,6 +56,21 @@ template<typename... Ts>
 struct unique_caplist<util::type_list<Ts...>> : caplist_append_multi_unique<util::type_list<>, Ts...> {};
 
 
+template<typename Tag, typename List>
+struct count_caps;
+
+template<typename Tag, typename... Caps>
+struct count_caps<Tag, util::type_list<Caps...>>
+  : std::integral_constant<
+      size_t,
+      (... + std::is_same_v<Tag, typename Caps::tag_type>)
+  > {
+};
+
+template<typename Tag, typename List>
+constexpr size_t count_caps_v = count_caps<Tag, List>::value;
+
+
 template<typename... Caps>
 class match_results_base {
 public:
@@ -140,6 +155,12 @@ using get_captures_t = typename get_captures<E>::type;
 
 template<typename Caps>
 class match_results : private impl::get_match_results_base_t<Caps> {
+public:
+  template<typename Tag>
+  static constexpr size_t count_caps_with() {
+    return impl::count_caps_v<Tag, Caps>;
+  }
+
   template<typename Tag, typename E>
   friend decltype(auto) get_result(match_results<E>& match);
 
