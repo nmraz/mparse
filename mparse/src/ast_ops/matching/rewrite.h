@@ -13,7 +13,7 @@ namespace ast_ops::matching {
 template<typename M, typename B>
 bool rewrite(mparse::ast_node_ptr& node, const M& matcher, const B& builder) {
   if (auto res = exec_match(matcher, node)) {
-    node = build_expr(builder, *res);
+    node = build_expr(builder, std::move(*res));
     return true;
   }
   return false;
