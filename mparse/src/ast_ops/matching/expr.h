@@ -287,7 +287,7 @@ struct capture_expr_tag {};
 template<int N, typename Expr>
 using capture_expr = capture_expr_impl<capture_expr_tag<N>, Expr>;
 
-template<int N, typename Expr>
+template<int N, typename Expr, typename = std::enable_if_t<is_match_expr<Expr>>>
 constexpr capture_expr<N, Expr> capture_as(Expr expr) {
   return  { expr };
 }
