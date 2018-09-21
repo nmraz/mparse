@@ -40,13 +40,13 @@ template<typename Node>
 using node_type_expr = custom_matcher_expr<Node, always_true_pred>;
 
 
-template<typename F>
+template<typename F, typename... Tags>
 struct custom_builder_expr {
   const F func;
 };
 
-template<typename F>
-constexpr bool is_match_expr<custom_builder_expr<F>> = true;
+template<typename F, typename... Tags>
+constexpr bool is_match_expr<custom_builder_expr<F, Tags...>> = true;
 
 
 /* ARITHMETIC EXPRESSIONS */
@@ -328,8 +328,8 @@ constexpr custom_matcher_expr<Node, std::decay_t<Pred>, Caps...> match_custom(Pr
   return { std::forward<Pred>(pred) };
 }
 
-template<typename F>
-constexpr custom_builder_expr<std::decay_t<F>> build_custom(F&& func) {
+template<typename F, typename... Tags>
+constexpr custom_builder_expr<std::decay_t<F>, Tags...> build_custom(F&& func) {
   return { std::forward<F>(func) };
 }
 

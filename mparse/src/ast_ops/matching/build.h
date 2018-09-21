@@ -37,8 +37,10 @@ using get_build_tags_t = typename get_build_tags<E>::type;
 }  // namespace impl
 
 
-template<typename F>
-struct builder_traits<custom_builder_expr<F>> {
+template<typename F, typename... Tags>
+struct builder_traits<custom_builder_expr<F, Tags...>> {
+  using tags = util::type_list<Tags...>;
+
   template<typename BuildTags, typename Ctx>
   static auto build(const custom_builder_expr<F>& expr, Ctx&& ctx) {
     return expr.func(std::forward<Ctx>(ctx));
