@@ -82,9 +82,8 @@ void handle_math_error(const ast_ops::eval_error& err,
     break;
   case ast_ops::eval_errc::bad_pow:
     print_math_error(err.what());
-    print_locs(input,
-               {smap.find_primary_loc(node->lhs()),
-                smap.find_primary_loc(node->rhs())});
+    print_locs(input, {smap.find_primary_loc(node->lhs()),
+                       smap.find_primary_loc(node->rhs())});
     break;
   case ast_ops::eval_errc::unbound_var:
     print_math_error(err.what());

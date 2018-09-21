@@ -102,8 +102,7 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
         case mparse::binary_op_type::pow:
           if (lhs_val == 0.0 && rhs_val.real() <= 0) {
             throw eval_error("Real part of exponent for zero must be positive",
-                             eval_errc::bad_pow,
-                             &node);
+                             eval_errc::bad_pow, &node);
           }
           return std::pow(lhs_val, rhs_val);
         default:
@@ -117,8 +116,7 @@ void eval_visitor::visit(const mparse::func_node& node) {
   auto* func = fscope.lookup(node.name());
   if (!func) {
     throw eval_error("Function '" + node.name() + "' not found.",
-                     eval_errc::bad_func_call,
-                     &node);
+                     eval_errc::bad_func_call, &node);
   }
 
   std::vector<number> args;
@@ -130,8 +128,8 @@ void eval_visitor::visit(const mparse::func_node& node) {
   try {
     result = check_errno([&] { return (*func)(std::move(args)); });
   } catch (...) {
-    eval_error err(
-        "In function '" + node.name() + "'", eval_errc::bad_func_call, &node);
+    eval_error err("In function '" + node.name() + "'",
+                   eval_errc::bad_func_call, &node);
     std::throw_with_nested(std::move(err));
   }
 }
@@ -145,8 +143,7 @@ void eval_visitor::visit(const mparse::id_node& node) {
     result = check_range([&] { return *val; }, node);
   } else {
     throw eval_error("Unbound variable '" + node.name() + "'",
-                     eval_errc::unbound_var,
-                     &node);
+                     eval_errc::unbound_var, &node);
   }
 }
 

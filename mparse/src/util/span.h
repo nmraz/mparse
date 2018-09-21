@@ -168,8 +168,8 @@ constexpr bool operator!=(const span<T>& lhs, const span<T>& rhs) {
 
 template <typename T>
 constexpr bool operator<(const span<T>& lhs, const span<T>& rhs) {
-  return std::lexicographical_compare(
-      lhs.cbegin(), lhs.cend(), rhs.cbegin(), rhs.cend());
+  return std::lexicographical_compare(lhs.cbegin(), lhs.cend(), rhs.cbegin(),
+                                      rhs.cend());
 }
 
 template <typename T>

@@ -55,7 +55,7 @@ void check_types(const std::vector<number>& args,
                  std::index_sequence<I...>,
                  util::type_list<Args...>) {
   std::vector<int> nonreal_args;
-  ((!arg_checker<Args>::check(args[I]) ? nonreal_args.push_back(I) : (void)0),
+  ((!arg_checker<Args>::check(args[I]) ? nonreal_args.push_back(I) : (void) 0),
    ...);
   throw_if_nonreal(std::move(nonreal_args));
 }
@@ -82,9 +82,7 @@ function wrap_function(F&& func) {
       impl::check_real(args);
 
       std::vector<double> real_args;
-      std::transform(args.begin(),
-                     args.end(),
-                     std::back_inserter(real_args),
+      std::transform(args.begin(), args.end(), std::back_inserter(real_args),
                      [](const number& x) { return x.real(); });
 
       return func(std::move(real_args));
@@ -92,8 +90,8 @@ function wrap_function(F&& func) {
   } else {
     return [func = std::forward<F>(func)](std::vector<number> args) {
       using arg_types = impl::get_args<std::decay_t<F>>;
-      return impl::invoke_helper(
-          func, args, typename arg_types::seq{}, arg_types{});
+      return impl::invoke_helper(func, args, typename arg_types::seq{},
+                                 arg_types{});
     };
   }
 }

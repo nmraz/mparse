@@ -95,8 +95,8 @@ public:
         return false;
       }
 
-      return match_helper(
-          expr.args, arg_nodes, std::index_sequence_for<Args...>{}, ctx);
+      return match_helper(expr.args, arg_nodes,
+                          std::index_sequence_for<Args...>{}, ctx);
     }
     return false;
   }
@@ -145,8 +145,8 @@ struct matcher_traits<unary_expr<Node, Inner>> {
                     const mparse::ast_node_ptr& node,
                     Ctx& ctx) {
     if (auto* un_node = mparse::ast_node_cast<match_type>(node.get())) {
-      return matcher_traits<Inner>::match(
-          expr.inner, un_node->ref_child(), ctx);
+      return matcher_traits<Inner>::match(expr.inner, un_node->ref_child(),
+                                          ctx);
     }
     return false;
   }
@@ -166,8 +166,8 @@ struct matcher_traits<unary_op_pred_expr<Pred, Inner>> {
         return false;
       }
 
-      return matcher_traits<Inner>::match(
-          expr.inner, un_node->ref_child(), ctx);
+      return matcher_traits<Inner>::match(expr.inner, un_node->ref_child(),
+                                          ctx);
     }
     return false;
   }

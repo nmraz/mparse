@@ -178,10 +178,8 @@ void print_visitor::visit(const mparse::paren_node& node) {
   mparse::source_range loc = record_loc([&] {
     result += "(";
     {
-      child_visitor_scope scope(*this,
-                                op_precedence::unknown,
-                                associativity::none,
-                                branch_side::none);
+      child_visitor_scope scope(*this, op_precedence::unknown,
+                                associativity::none, branch_side::none);
       node.child()->apply_visitor(*this);
     }
     result += ")";
@@ -194,10 +192,8 @@ void print_visitor::visit(const mparse::abs_node& node) {
   mparse::source_range loc = record_loc([&] {
     result += "|";
     {
-      child_visitor_scope scope(*this,
-                                op_precedence::unknown,
-                                associativity::none,
-                                branch_side::none);
+      child_visitor_scope scope(*this, op_precedence::unknown,
+                                associativity::none, branch_side::none);
       node.child()->apply_visitor(*this);
     }
     result += "|";
@@ -213,8 +209,8 @@ void print_visitor::visit(const mparse::unary_op_node& node) {
 
     op_loc = record_loc([&] { result += stringify_unary_op(node.type()); });
 
-    child_visitor_scope scope(
-        *this, op_precedence::unary, associativity::none, branch_side::none);
+    child_visitor_scope scope(*this, op_precedence::unary, associativity::none,
+                              branch_side::none);
     node.child()->apply_visitor(*this);
   });
 
@@ -254,10 +250,8 @@ void print_visitor::visit(const mparse::func_node& node) {
     open_loc = record_loc([&] { result += "("; });
 
     {
-      child_visitor_scope scope(*this,
-                                op_precedence::unknown,
-                                associativity::none,
-                                branch_side::none);
+      child_visitor_scope scope(*this, op_precedence::unknown,
+                                associativity::none, branch_side::none);
       for (const auto& arg : node.args()) {
         if (arg != node.args().front()) {
           result += ", ";

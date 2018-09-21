@@ -100,30 +100,30 @@ template <typename Der>
 struct basic_expr_comparer_base {
   bool compare_paren(const mparse::paren_node& first,
                      const mparse::paren_node& second) const {
-    return compare_exprs(
-        first.child(), second.child(), static_cast<const Der&>(*this));
+    return compare_exprs(first.child(), second.child(),
+                         static_cast<const Der&>(*this));
   }
 
   bool compare_abs(const mparse::abs_node& first,
                    const mparse::abs_node& second) const {
-    return compare_exprs(
-        first.child(), second.child(), static_cast<const Der&>(*this));
+    return compare_exprs(first.child(), second.child(),
+                         static_cast<const Der&>(*this));
   }
 
   bool compare_unary(const mparse::unary_op_node& first,
                      const mparse::unary_op_node& second) const {
     return first.type() == second.type() &&
-           compare_exprs(
-               first.child(), second.child(), static_cast<const Der&>(*this));
+           compare_exprs(first.child(), second.child(),
+                         static_cast<const Der&>(*this));
   }
 
   bool compare_binary(const mparse::binary_op_node& first,
                       const mparse::binary_op_node& second) const {
     return first.type() == second.type() &&
-           compare_exprs(
-               first.lhs(), second.lhs(), static_cast<const Der&>(*this)) &&
-           compare_exprs(
-               first.rhs(), second.rhs(), static_cast<const Der&>(*this));
+           compare_exprs(first.lhs(), second.lhs(),
+                         static_cast<const Der&>(*this)) &&
+           compare_exprs(first.rhs(), second.rhs(),
+                         static_cast<const Der&>(*this));
   }
 
   bool compare_id(const mparse::id_node& first,
@@ -148,16 +148,16 @@ struct commutative_expr_comparer_base : public basic_expr_comparer_base<Der> {
       return false;
     }
 
-    if (compare_exprs(
-            first.lhs(), second.lhs(), static_cast<const Der&>(*this)) &&
-        compare_exprs(
-            first.rhs(), second.rhs(), static_cast<const Der&>(*this))) {
+    if (compare_exprs(first.lhs(), second.lhs(),
+                      static_cast<const Der&>(*this)) &&
+        compare_exprs(first.rhs(), second.rhs(),
+                      static_cast<const Der&>(*this))) {
       return true;
     } else if (is_commutative(first.type()) &&
-               compare_exprs(
-                   first.lhs(), second.rhs(), static_cast<const Der&>(*this)) &&
-               compare_exprs(
-                   first.rhs(), second.lhs(), static_cast<const Der&>(*this))) {
+               compare_exprs(first.lhs(), second.rhs(),
+                             static_cast<const Der&>(*this)) &&
+               compare_exprs(first.rhs(), second.lhs(),
+                             static_cast<const Der&>(*this))) {
       return true;
     }
 

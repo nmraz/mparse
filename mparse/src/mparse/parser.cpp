@@ -32,8 +32,7 @@ const T* find_delim_val(const delim_val_mapping<T> (&mapping)[N],
     return nullptr;
   }
 
-  auto it = std::find_if(std::begin(mapping),
-                         std::end(mapping),
+  auto it = std::find_if(std::begin(mapping), std::end(mapping),
                          [&tok](const delim_val_mapping<T>& entry) {
                            return entry.tok == tok.val;
                          });
@@ -311,9 +310,8 @@ ast_node_ptr parser::parser_impl::consume_func(token name) {
   auto node = make_ast_node<func_node>(std::string(name.val), std::move(args));
 
   if (smap_) {
-    smap_->set_locs(
-        node.get(),
-        {source_range::merge(name_loc, close_loc), name_loc, open_loc});
+    smap_->set_locs(node.get(), {source_range::merge(name_loc, close_loc),
+                                 name_loc, open_loc});
   }
 
   return node;
@@ -386,8 +384,7 @@ void parser::parser_impl::check_balanced(source_range open_loc,
       source_range cur_loc = get_loc(cur_token_);
       throw syntax_error("Unbalanced "s + friendly_name.data() +
                              ": expected a '" + term_tok.data() + "'",
-                         {open_loc, cur_loc},
-                         term_tok.data(),
+                         {open_loc, cur_loc}, term_tok.data(),
                          static_cast<int>(cur_loc.from()));
     }
     error();

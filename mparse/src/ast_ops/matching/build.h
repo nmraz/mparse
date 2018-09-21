@@ -71,9 +71,8 @@ private:
                                                 std::index_sequence<I...>,
                                                 Ctx&& ctx) {
     mparse::func_node::arg_list arg_nodes;
-    (...,
-     arg_nodes.push_back(builder_traits<Args>::template build<BuildTags>(
-         std::get<I>(args), std::forward<Ctx>(ctx))));
+    (..., arg_nodes.push_back(builder_traits<Args>::template build<BuildTags>(
+              std::get<I>(args), std::forward<Ctx>(ctx))));
     return arg_nodes;
   }
 
@@ -84,8 +83,7 @@ public:
   static auto build(const func_expr<Args...>& expr, Ctx&& ctx) {
     return mparse::make_ast_node<mparse::func_node>(
         std::string(expr.name),
-        build_args<BuildTags>(expr.args,
-                              std::index_sequence_for<Args...>{},
+        build_args<BuildTags>(expr.args, std::index_sequence_for<Args...>{},
                               std::forward<Ctx>(ctx)));
   }
 };
