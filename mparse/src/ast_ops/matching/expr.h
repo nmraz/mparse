@@ -25,8 +25,8 @@ struct custom_matcher_expr {
   const Pred pred;
 };
 
-template<typename Node, typename Pred>
-constexpr bool is_match_expr<custom_matcher_expr<Node, Pred>> = true;
+template<typename Node, typename Pred, typename... Caps>
+constexpr bool is_match_expr<custom_matcher_expr<Node, Pred, Caps...>> = true;
 
 
 struct always_true_pred {
