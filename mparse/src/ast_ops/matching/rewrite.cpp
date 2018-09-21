@@ -48,8 +48,8 @@ void apply_rec_visitor::visit(mparse::func_node& node) {
   }
 }
 
-
 } // namespace
+
 
 bool apply_recursively(mparse::ast_node_ptr& node, rewriter_func func) {
   apply_rec_visitor vis(func);
