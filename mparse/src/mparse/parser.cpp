@@ -9,6 +9,7 @@
 #include "mparse/parse_error.h"
 #include <algorithm>
 #include <array>
+#include <charconv>
 #include <string>
 #include <utility>
 #include <vector>
@@ -250,7 +251,15 @@ ast_node_ptr parser::parser_impl::parse_atom() {
 }
 
 ast_node_ptr parser::parser_impl::consume_literal() {
-  auto node = make_ast_node<literal_node>(std::strtod(cur_token_.val.data(), nullptr));
+  std::string_view tok_val = cur_token_.val;
+  double val;
+
+  auto res = std::from_chars(tok_val.data(), tok_val.data() + tok_val.size(), val);
+  if (res.ec == std::errc::result_out_of_range) {
+    throw syntax_error("Literal too large", { get_loc(cur_token_) });
+  }
+
+  auto node = make_ast_node<literal_node>(val);
   if (smap_) {
     smap_->set_locs(node.get(), { get_loc(cur_token_) });
   }
