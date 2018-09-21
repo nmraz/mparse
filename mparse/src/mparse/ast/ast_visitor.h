@@ -17,7 +17,7 @@ class id_node;
 
 namespace impl {
 
-template<template<typename> typename AddCv>
+template <template <typename> typename AddCv>
 struct ast_visitor_cv {
   virtual void visit(AddCv<ast_node>&) {}
   virtual void visit(AddCv<unary_node>&) {}
@@ -30,9 +30,9 @@ struct ast_visitor_cv {
   virtual void visit(AddCv<abs_node>&) {}
 };
 
-}  // namespace impl
+} // namespace impl
 
 using ast_visitor = impl::ast_visitor_cv<util::identity>;
 using const_ast_visitor = impl::ast_visitor_cv<std::add_const_t>;
 
-}  // namespace mparse
+} // namespace mparse

@@ -11,8 +11,10 @@ namespace mparse {
 
 class syntax_error : public std::runtime_error {
 public:
-  syntax_error(std::string_view what, std::vector<source_range> where, 
-    std::string fixit_hint = "", int fixit_col = 0);
+  syntax_error(std::string_view what,
+               std::vector<source_range> where,
+               std::string fixit_hint = "",
+               int fixit_col = 0);
 
   util::span<const source_range> where() const { return where_; }
   std::string_view fixit_hint() const { return fixit_hint_; }
@@ -24,4 +26,4 @@ private:
   int fixit_col_;
 };
 
-}  // namespace mparse
+} // namespace mparse

@@ -19,25 +19,24 @@ using namespace std::literals;
 namespace mparse {
 namespace {
 
-template<typename T>
+template <typename T>
 struct delim_val_mapping {
   std::string_view tok;
   T val;
 };
 
-template<typename T, std::size_t N>
-const T* find_delim_val(const delim_val_mapping<T>(&mapping)[N], const token& tok) {
+template <typename T, std::size_t N>
+const T* find_delim_val(const delim_val_mapping<T> (&mapping)[N],
+                        const token& tok) {
   if (tok.type != token_type::delim) {
     return nullptr;
   }
 
-  auto it = std::find_if(
-    std::begin(mapping),
-    std::end(mapping),
-    [&tok] (const delim_val_mapping<T>& entry) {
-      return entry.tok == tok.val;
-    }
-  );
+  auto it = std::find_if(std::begin(mapping),
+                         std::end(mapping),
+                         [&tok](const delim_val_mapping<T>& entry) {
+                           return entry.tok == tok.val;
+                         });
   return it == std::end(mapping) ? nullptr : &it->val;
 }
 
@@ -60,23 +59,21 @@ std::string token_str(token tok) {
 
 
 source_range get_loc(const token& tok) {
-  return { tok.loc, tok.loc + std::max(tok.val.size(), std::size_t{1}) };
+  return {tok.loc, tok.loc + std::max(tok.val.size(), std::size_t{1})};
 }
 
-}  // namespace
+} // namespace
 
 
 struct parser::parser_impl {
   class term_tok_pusher {
   public:
     term_tok_pusher(parser_impl& parser, std::string_view tok)
-      : parser_(parser) {
+        : parser_(parser) {
       parser_.push_term_tok(tok);
     }
 
-    ~term_tok_pusher() {
-      parser_.pop_term_tok();
-    }
+    ~term_tok_pusher() { parser_.pop_term_tok(); }
 
   private:
     parser_impl& parser_;
@@ -98,8 +95,9 @@ struct parser::parser_impl {
   ast_node_ptr consume_ident();
   ast_node_ptr consume_func(token name);
 
-  template<typename T>
-  ast_node_ptr consume_paren_like(std::string_view term_tok, std::string_view friendly_name);
+  template <typename T>
+  ast_node_ptr consume_paren_like(std::string_view term_tok,
+                                  std::string_view friendly_name);
 
   void get_next_token();
   token cur_token() const { return cur_token_; }
@@ -110,7 +108,9 @@ struct parser::parser_impl {
   bool has_term_tok() const;
   bool has_delim(std::string_view val) const;
 
-  void check_balanced(source_range open_loc, std::string_view term_tok, std::string_view friendly_name) const;
+  void check_balanced(source_range open_loc,
+                      std::string_view term_tok,
+                      std::string_view friendly_name) const;
   void error() const;
 
   void set_bin_locs(const binary_op_node* node, source_range op_loc);
@@ -118,7 +118,7 @@ struct parser::parser_impl {
   source_stream& stream_;
   source_map* smap_;
 
-  token cur_token_{ token_type::unknown, 0 };
+  token cur_token_{token_type::unknown, 0};
 
   // used for informative error messages
   std::string_view expected_type_;
@@ -127,9 +127,7 @@ struct parser::parser_impl {
 
 
 parser::parser_impl::parser_impl(source_stream& stream, source_map* smap)
-  : stream_(stream)
-  , smap_(smap) {
-}
+    : stream_(stream), smap_(smap) {}
 
 
 void parser::parser_impl::begin_parse() {
@@ -145,18 +143,17 @@ void parser::parser_impl::end_parse() {
 
 ast_node_ptr parser::parser_impl::parse_add() {
   static constexpr delim_val_mapping<binary_op_type> ops[] = {
-    { "+"sv, binary_op_type::add },
-    { "-"sv, binary_op_type::sub }
-  };
+      {"+"sv, binary_op_type::add}, {"-"sv, binary_op_type::sub}};
 
   const binary_op_type* op = nullptr;
   ast_node_ptr node = parse_mult();
 
   while ((op = find_delim_val(ops, cur_token_)) != nullptr) {
     source_range op_loc = get_loc(cur_token_);
-  
+
     get_next_token();
-    auto add_node = make_ast_node<binary_op_node>(*op, std::move(node), parse_mult());
+    auto add_node =
+        make_ast_node<binary_op_node>(*op, std::move(node), parse_mult());
 
     set_bin_locs(add_node.get(), op_loc);
     node = std::move(add_node);
@@ -167,9 +164,7 @@ ast_node_ptr parser::parser_impl::parse_add() {
 
 ast_node_ptr parser::parser_impl::parse_mult() {
   static constexpr delim_val_mapping<binary_op_type> ops[] = {
-    { "*"sv, binary_op_type::mult },
-    { "/"sv, binary_op_type::div }
-  };
+      {"*"sv, binary_op_type::mult}, {"/"sv, binary_op_type::div}};
 
   const binary_op_type* op = nullptr;
   ast_node_ptr node = parse_unary();
@@ -178,7 +173,8 @@ ast_node_ptr parser::parser_impl::parse_mult() {
     source_range op_loc = get_loc(cur_token_);
 
     get_next_token();
-    auto mul_node = make_ast_node<binary_op_node>(*op, std::move(node), parse_unary());
+    auto mul_node =
+        make_ast_node<binary_op_node>(*op, std::move(node), parse_unary());
 
     set_bin_locs(mul_node.get(), op_loc);
     node = std::move(mul_node);
@@ -189,9 +185,7 @@ ast_node_ptr parser::parser_impl::parse_mult() {
 
 ast_node_ptr parser::parser_impl::parse_unary() {
   static constexpr delim_val_mapping<unary_op_type> ops[] = {
-    { "+"sv, unary_op_type::plus },
-    { "-"sv, unary_op_type::neg }
-  };
+      {"+"sv, unary_op_type::plus}, {"-"sv, unary_op_type::neg}};
 
   const unary_op_type* op = find_delim_val(ops, cur_token_);
   if (op) {
@@ -199,12 +193,15 @@ ast_node_ptr parser::parser_impl::parse_unary() {
 
     get_next_token();
     auto node = make_ast_node<unary_op_node>(*op, parse_unary());
-    
+
     if (smap_) {
-      smap_->set_locs(node.get(), {
-        source_range::merge(op_loc, smap_->find_primary_loc(node->child())),  // full range
-        op_loc  // operator
-      });
+      smap_->set_locs(
+          node.get(),
+          {
+              source_range::merge(
+                  op_loc, smap_->find_primary_loc(node->child())), // full range
+              op_loc                                               // operator
+          });
     }
 
     return node;
@@ -220,7 +217,8 @@ ast_node_ptr parser::parser_impl::parse_pow() {
     source_range op_loc = get_loc(cur_token_);
 
     get_next_token();
-    auto pow_node = make_ast_node<binary_op_node>(binary_op_type::pow, std::move(node), parse_unary());
+    auto pow_node = make_ast_node<binary_op_node>(
+        binary_op_type::pow, std::move(node), parse_unary());
 
     set_bin_locs(pow_node.get(), op_loc);
     return pow_node;
@@ -231,7 +229,7 @@ ast_node_ptr parser::parser_impl::parse_pow() {
 
 
 ast_node_ptr parser::parser_impl::parse_atom() {
-  expected_type_ = "an expression";  // at this point, we want an expression
+  expected_type_ = "an expression"; // at this point, we want an expression
 
   ast_node_ptr ret = nullptr;
 
@@ -247,7 +245,8 @@ ast_node_ptr parser::parser_impl::parse_atom() {
     error();
   }
 
-  expected_type_ = "an operator";  // we need an operator to follow the expression
+  expected_type_ =
+      "an operator"; // we need an operator to follow the expression
   return ret;
 }
 
@@ -255,14 +254,15 @@ ast_node_ptr parser::parser_impl::consume_literal() {
   std::string_view tok_val = cur_token_.val;
   double val;
 
-  auto res = std::from_chars(tok_val.data(), tok_val.data() + tok_val.size(), val);
+  auto res =
+      std::from_chars(tok_val.data(), tok_val.data() + tok_val.size(), val);
   if (res.ec == std::errc::result_out_of_range) {
-    throw syntax_error("Literal too large", { get_loc(cur_token_) });
+    throw syntax_error("Literal too large", {get_loc(cur_token_)});
   }
 
   auto node = make_ast_node<literal_node>(val);
   if (smap_) {
-    smap_->set_locs(node.get(), { get_loc(cur_token_) });
+    smap_->set_locs(node.get(), {get_loc(cur_token_)});
   }
 
   get_next_token();
@@ -278,7 +278,7 @@ ast_node_ptr parser::parser_impl::consume_ident() {
 
   auto node = make_ast_node<id_node>(std::string(name.val));
   if (smap_) {
-    smap_->set_locs(node.get(), { get_loc(name) });
+    smap_->set_locs(node.get(), {get_loc(name)});
   }
 
   return node;
@@ -311,17 +311,21 @@ ast_node_ptr parser::parser_impl::consume_func(token name) {
   auto node = make_ast_node<func_node>(std::string(name.val), std::move(args));
 
   if (smap_) {
-    smap_->set_locs(node.get(), { source_range::merge(name_loc, close_loc), name_loc, open_loc });
+    smap_->set_locs(
+        node.get(),
+        {source_range::merge(name_loc, close_loc), name_loc, open_loc});
   }
 
   return node;
 }
 
-template<typename T>
-ast_node_ptr parser::parser_impl::consume_paren_like(std::string_view term_tok, std::string_view friendly_name) {
+template <typename T>
+ast_node_ptr parser::parser_impl::consume_paren_like(
+    std::string_view term_tok,
+    std::string_view friendly_name) {
   source_range open_loc = get_loc(cur_token_);
   ast_node_ptr inner_expr;
-  
+
   {
     term_tok_pusher push(*this, term_tok);
 
@@ -329,14 +333,14 @@ ast_node_ptr parser::parser_impl::consume_paren_like(std::string_view term_tok, 
     inner_expr = parse_add();
     check_balanced(open_loc, term_tok, friendly_name);
   }
-  
+
   source_range close_loc = get_loc(cur_token_);
 
   get_next_token();
   auto node = make_ast_node<T>(std::move(inner_expr));
 
   if (smap_) {
-    smap_->set_locs(node.get(), { source_range::merge(open_loc, close_loc) });
+    smap_->set_locs(node.get(), {source_range::merge(open_loc, close_loc)});
   }
   return node;
 }
@@ -365,7 +369,8 @@ bool parser::parser_impl::has_term_tok() const {
     return false;
   }
 
-  return std::find(term_toks_.begin(), term_toks_.end(), cur_token_.val) != term_toks_.end();
+  return std::find(term_toks_.begin(), term_toks_.end(), cur_token_.val) !=
+         term_toks_.end();
 }
 
 bool parser::parser_impl::has_delim(std::string_view val) const {
@@ -374,47 +379,49 @@ bool parser::parser_impl::has_delim(std::string_view val) const {
 
 
 void parser::parser_impl::check_balanced(source_range open_loc,
- std::string_view term_tok, std::string_view friendly_name) const {
+                                         std::string_view term_tok,
+                                         std::string_view friendly_name) const {
   if (!has_delim(term_tok)) {
     if (has_term_tok()) {
       source_range cur_loc = get_loc(cur_token_);
-      throw syntax_error(
-        "Unbalanced "s + friendly_name.data() + ": expected a '" + term_tok.data() + "'",
-        { open_loc, cur_loc },
-        term_tok.data(), static_cast<int>(cur_loc.from())
-      );
+      throw syntax_error("Unbalanced "s + friendly_name.data() +
+                             ": expected a '" + term_tok.data() + "'",
+                         {open_loc, cur_loc},
+                         term_tok.data(),
+                         static_cast<int>(cur_loc.from()));
     }
     error();
   }
 }
 
 void parser::parser_impl::error() const {
-  std::string msg = "Unexpected "s + token_str(cur_token_) + ": expected " + std::string(expected_type_);
+  std::string msg = "Unexpected "s + token_str(cur_token_) + ": expected " +
+                    std::string(expected_type_);
 
-  throw syntax_error(
-    msg,
-    { get_loc(cur_token_) }
-  );
+  throw syntax_error(msg, {get_loc(cur_token_)});
 }
 
 
-void parser::parser_impl::set_bin_locs(const binary_op_node* node, source_range op_loc) {
+void parser::parser_impl::set_bin_locs(const binary_op_node* node,
+                                       source_range op_loc) {
   if (smap_) {
-    smap_->set_locs(node, {
-      source_range::merge(smap_->find_primary_loc(node->lhs()), smap_->find_primary_loc(node->rhs())),  // full range
-      op_loc  // operator
-    });
+    smap_->set_locs(node,
+                    {
+                        source_range::merge(
+                            smap_->find_primary_loc(node->lhs()),
+                            smap_->find_primary_loc(node->rhs())), // full range
+                        op_loc                                     // operator
+                    });
   }
 }
-
 
 
 // PUBLIC API
 
 parser::parser(source_stream& stream, source_map* smap)
-  : impl_(std::make_unique<parser_impl>(stream, smap)) {}
+    : impl_(std::make_unique<parser_impl>(stream, smap)) {}
 
-parser::~parser() = default;  // parser_impl is a complete type here
+parser::~parser() = default; // parser_impl is a complete type here
 
 
 void parser::begin_parse() {
@@ -470,4 +477,4 @@ ast_node_ptr parse(std::string_view source, source_map* smap) {
   return p.parse_root();
 }
 
-}  // namespace mparse
+} // namespace mparse

@@ -19,24 +19,24 @@ struct apply_rec_visitor : mparse::ast_visitor {
 };
 
 void apply_rec_visitor::visit(mparse::unary_node& node) {
-  auto child = node.ref_child();  // ref here for strong exception guarantee
+  auto child = node.ref_child(); // ref here for strong exception guarantee
   child->apply_visitor(*this);
-  result |= func(child);  // no short-circuiting
+  result |= func(child); // no short-circuiting
   node.set_child(std::move(child));
 }
 
 void apply_rec_visitor::visit(mparse::binary_op_node& node) {
   {
-    auto lhs = node.ref_lhs();  // ref here for strong exception guarantee
+    auto lhs = node.ref_lhs(); // ref here for strong exception guarantee
     lhs->apply_visitor(*this);
-    result |= func(lhs);  // no short-circuiting
+    result |= func(lhs); // no short-circuiting
     node.set_lhs(std::move(lhs));
   }
 
   {
-    auto rhs = node.ref_rhs();  // ref here for strong exception guarantee
+    auto rhs = node.ref_rhs(); // ref here for strong exception guarantee
     rhs->apply_visitor(*this);
-    result |= func(rhs);  // no short-circuiting
+    result |= func(rhs); // no short-circuiting
     node.set_rhs(std::move(rhs));
   }
 }
@@ -49,7 +49,7 @@ void apply_rec_visitor::visit(mparse::func_node& node) {
 }
 
 
-}  // namespace
+} // namespace
 
 bool apply_recursively(mparse::ast_node_ptr& node, rewriter_func func) {
   apply_rec_visitor vis(func);
@@ -57,4 +57,4 @@ bool apply_recursively(mparse::ast_node_ptr& node, rewriter_func func) {
   return func(node) | vis.result;
 }
 
-}  // namespace ast_ops::matching
+} // namespace ast_ops::matching

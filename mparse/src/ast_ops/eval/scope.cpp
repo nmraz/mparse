@@ -3,8 +3,7 @@
 namespace ast_ops {
 
 var_scope::var_scope(std::initializer_list<impl_type::value_type> ilist)
-  : map_(ilist) {
-}
+    : map_(ilist) {}
 
 void var_scope::set_binding(std::string name, number value) {
   map_[std::move(name)] = value;
@@ -26,9 +25,8 @@ std::optional<number> var_scope::lookup(std::string_view name) const {
 }
 
 
-func_scope::func_scope(std::initializer_list<impl_type::value_type> ilist) 
-  : map_(ilist) {
-}
+func_scope::func_scope(std::initializer_list<impl_type::value_type> ilist)
+    : map_(ilist) {}
 
 void func_scope::remove_binding(std::string_view name) {
   auto it = map_.find(name);
@@ -45,4 +43,4 @@ const function* func_scope::lookup(std::string_view name) const {
   return nullptr;
 }
 
-}  // namespace ast_ops
+} // namespace ast_ops

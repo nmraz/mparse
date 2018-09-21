@@ -11,4 +11,4 @@ public:
   paren_node(ast_node_ptr child);
 };
 
-}  // namespace mparse
+} // namespace mparse

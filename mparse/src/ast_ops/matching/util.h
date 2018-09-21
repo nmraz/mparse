@@ -14,4 +14,4 @@ constexpr bool is_commutative(mparse::binary_op_type op) {
   }
 }
 
-}  // namespace ast_ops::matching
+} // namespace ast_ops::matching

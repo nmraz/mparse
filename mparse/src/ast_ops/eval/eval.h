@@ -9,6 +9,8 @@
 
 namespace ast_ops {
 
-number eval(const mparse::ast_node* node, const var_scope& vscope, const func_scope& fscope);
+number eval(const mparse::ast_node* node,
+            const var_scope& vscope,
+            const func_scope& fscope);
 
-}  // namespace ast_ops
+} // namespace ast_ops

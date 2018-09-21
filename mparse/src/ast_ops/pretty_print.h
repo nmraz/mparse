@@ -6,6 +6,7 @@
 
 namespace ast_ops {
 
-std::string pretty_print(const mparse::ast_node* ast, mparse::source_map* smap = nullptr);
+std::string pretty_print(const mparse::ast_node* ast,
+                         mparse::source_map* smap = nullptr);
 
-}  // namespace ast_ops
+} // namespace ast_ops

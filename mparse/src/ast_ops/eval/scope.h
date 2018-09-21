@@ -37,10 +37,10 @@ class func_scope {
 public:
   func_scope() = default;
   func_scope(std::initializer_list<impl_type::value_type> ilist);
- 
-  template<typename F>
+
+  template <typename F>
   void set_binding(std::string name, F&& func);
-  
+
   void remove_binding(std::string_view name);
   void clear() { map_.clear(); }
 
@@ -51,9 +51,9 @@ private:
 };
 
 
-template<typename F>
+template <typename F>
 void func_scope::set_binding(std::string name, F&& func) {
   map_[std::move(name)] = wrap_function(std::forward<F>(func));
 }
 
-}  // namespace ast_ops
+} // namespace ast_ops

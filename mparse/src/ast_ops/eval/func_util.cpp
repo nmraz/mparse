@@ -8,7 +8,8 @@ namespace ast_ops::impl {
 void check_arity(int expected, int provided) {
   if (expected != provided) {
     std::ostringstream msg;
-    msg << "wrong number of arguments (" << expected << " expected, " << provided << " provided)";
+    msg << "wrong number of arguments (" << expected << " expected, "
+        << provided << " provided)";
     throw arity_error(msg.str(), expected, provided);
   }
 }
@@ -18,7 +19,7 @@ void throw_if_nonreal(std::vector<int> nonreal_args) {
   if (!nonreal_args.empty()) {
     std::ostringstream msg;
     msg << (nonreal_args.size() > 1 ? "arguments" : "argument")
-      << " must be real";
+        << " must be real";
     throw func_arg_error(msg.str(), std::move(nonreal_args));
   }
 }
@@ -33,4 +34,4 @@ void check_real(const std::vector<number>& args) {
   throw_if_nonreal(std::move(nonreal_args));
 }
 
-}  // namespace ast_ops::impl
+} // namespace ast_ops::impl

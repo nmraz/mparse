@@ -24,22 +24,24 @@ public:
 
 namespace impl {
 
-template<typename T>
+template <typename T>
 struct get_node_ptr {
-  static_assert(std::is_base_of_v<ast_node, T>, "node_ptr can only be used for AST nodes");
+  static_assert(std::is_base_of_v<ast_node, T>,
+                "node_ptr can only be used for AST nodes");
   using type = std::shared_ptr<T>;
 };
 
-}  // namespace impl
+} // namespace impl
 
-template<typename T>
+template <typename T>
 using node_ptr = typename impl::get_node_ptr<T>::type;
 using ast_node_ptr = node_ptr<ast_node>;
 
-template<typename Node, typename... Args>
+template <typename Node, typename... Args>
 node_ptr<Node> make_ast_node(Args&&... args) {
-  static_assert(std::is_base_of_v<ast_node, Node>, "make_ast_node can only be used for AST nodes");
+  static_assert(std::is_base_of_v<ast_node, Node>,
+                "make_ast_node can only be used for AST nodes");
   return std::make_shared<Node>(std::forward<Args>(args)...);
 }
 
-}  // namespace mparse
+} // namespace mparse

@@ -5,10 +5,7 @@
 
 namespace mparse {
 
-enum class unary_op_type {
-  plus,
-  neg
-};
+enum class unary_op_type { plus, neg };
 
 class unary_op_node : public ast_node_impl<unary_op_node, unary_node> {
 public:
@@ -23,13 +20,7 @@ private:
 };
 
 
-enum class binary_op_type {
-  add,
-  sub,
-  mult,
-  div,
-  pow
-};
+enum class binary_op_type { add, sub, mult, div, pow };
 
 class binary_op_node : public ast_node_impl<binary_op_node> {
 public:
@@ -59,4 +50,4 @@ private:
   ast_node_ptr rhs_;
 };
 
-}  // namespace mparse
+} // namespace mparse

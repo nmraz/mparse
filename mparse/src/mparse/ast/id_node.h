@@ -17,4 +17,4 @@ private:
   std::string name_;
 };
 
-}  // namespace mparse
+} // namespace mparse

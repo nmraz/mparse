@@ -16,15 +16,15 @@ std::string accumulate_argv(int argc, const char* const* argv) {
   return ret;
 }
 
-}  // namespace
+} // namespace
 
 
 ast_ops::var_scope default_var_scope() {
   return {
-    { "e", builtins::e },
-    { "pi", builtins::pi },
-    { "tau", builtins::tau },
-    { "i", builtins::i }
+      {"e", builtins::e},
+      {"pi", builtins::pi},
+      {"tau", builtins::tau},
+      {"i", builtins::i},
   };
 }
 
@@ -34,7 +34,7 @@ ast_ops::func_scope default_func_scope() {
   scope.set_binding("sin", builtins::sin);
   scope.set_binding("cos", builtins::cos);
   scope.set_binding("tan", builtins::tan);
-  
+
   scope.set_binding("arcsin", builtins::asin);
   scope.set_binding("asin", builtins::asin);
   scope.set_binding("arccos", builtins::acos);
@@ -77,7 +77,7 @@ ast_ops::func_scope default_func_scope() {
   scope.set_binding("round", builtins::round);
 
   scope.set_binding("mod", builtins::mod);
-  
+
 
   scope.set_binding("min", builtins::min);
   scope.set_binding("max", builtins::max);
@@ -87,7 +87,9 @@ ast_ops::func_scope default_func_scope() {
 }
 
 
-void parse_vardefs(ast_ops::var_scope& vscope, int argc, const char* const* argv) {
+void parse_vardefs(ast_ops::var_scope& vscope,
+                   int argc,
+                   const char* const* argv) {
   std::string input = accumulate_argv(argc, argv);
   mparse::source_stream stream(input);
 

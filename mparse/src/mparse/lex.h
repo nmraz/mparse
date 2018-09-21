@@ -5,10 +5,10 @@
 namespace mparse {
 
 enum class token_type {
-  literal,  // number literal
-  ident,  // identifier
-  delim,  // delimiter (operator)
-  eof,  // end of input
+  literal, // number literal
+  ident,   // identifier
+  delim,   // delimiter (operator)
+  eof,     // end of input
   unknown  // error
 };
 
@@ -20,4 +20,4 @@ struct token {
 
 token get_token(source_stream& stream);
 
-}  // namespace mparse
+} // namespace mparse

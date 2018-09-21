@@ -19,12 +19,14 @@ void print_syntax_error(std::string_view msg) {
 }
 
 
-void handle_bad_func_call(const ast_ops::eval_error& err, const mparse::source_map& smap,
-  std::string_view input) {
+void handle_bad_func_call(const ast_ops::eval_error& err,
+                          const mparse::source_map& smap,
+                          std::string_view input) {
   auto* node = static_cast<const mparse::func_node*>(err.node());
 
   std::ostringstream msg;
-  std::vector<mparse::source_range> locs{ smap.find_locs(node)[1] };  // function name
+  std::vector<mparse::source_range> locs{
+      smap.find_locs(node)[1]}; // function name
 
   msg << err.what();
 
@@ -43,22 +45,24 @@ void handle_bad_func_call(const ast_ops::eval_error& err, const mparse::source_m
     }
   } catch (const ast_ops::func_arg_error& arg_err) {
     msg << ": " << arg_err.what();
-    
+
     for (int index : arg_err.indices()) {
       locs.push_back(smap.find_primary_loc(node->args()[index].get()));
     }
   } catch (const std::exception& inner) {
     msg << ": " << inner.what();
-  } catch (...) {}
+  } catch (...) {
+  }
 
   print_math_error(msg.str());
   print_locs(input, locs);
 }
 
-}  // namespace
+} // namespace
 
 
-void handle_syntax_error(const mparse::syntax_error& err, std::string_view input) {
+void handle_syntax_error(const mparse::syntax_error& err,
+                         std::string_view input) {
   print_syntax_error(err.what());
   print_locs(input, err.where());
   if (!err.fixit_hint().empty()) {
@@ -66,7 +70,9 @@ void handle_syntax_error(const mparse::syntax_error& err, std::string_view input
   }
 }
 
-void handle_math_error(const ast_ops::eval_error& err, const mparse::source_map& smap, std::string_view input) {
+void handle_math_error(const ast_ops::eval_error& err,
+                       const mparse::source_map& smap,
+                       std::string_view input) {
   auto* node = static_cast<const mparse::binary_op_node*>(err.node());
 
   switch (err.code()) {
@@ -76,7 +82,9 @@ void handle_math_error(const ast_ops::eval_error& err, const mparse::source_map&
     break;
   case ast_ops::eval_errc::bad_pow:
     print_math_error(err.what());
-    print_locs(input, { smap.find_primary_loc(node->lhs()), smap.find_primary_loc(node->rhs()) });
+    print_locs(input,
+               {smap.find_primary_loc(node->lhs()),
+                smap.find_primary_loc(node->rhs())});
     break;
   case ast_ops::eval_errc::unbound_var:
     print_math_error(err.what());
@@ -87,7 +95,7 @@ void handle_math_error(const ast_ops::eval_error& err, const mparse::source_map&
     break;
   case ast_ops::eval_errc::out_of_range:
     print_math_error(err.what());
-    print_locs(input, { smap.find_primary_loc(err.node()) });
+    print_locs(input, {smap.find_primary_loc(err.node())});
     break;
   default:
     print_math_error(err.what());

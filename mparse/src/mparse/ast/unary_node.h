@@ -19,4 +19,4 @@ private:
   ast_node_ptr child_;
 };
 
-}  // namespace mparse
+} // namespace mparse

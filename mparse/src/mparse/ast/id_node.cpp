@@ -10,4 +10,4 @@ void id_node::set_name(std::string name) {
   name_ = std::move(name);
 }
 
-}  // namespace mparse
+} // namespace mparse

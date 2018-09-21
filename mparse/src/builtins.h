@@ -4,7 +4,7 @@
 #include <vector>
 
 namespace builtins {
-  
+
 constexpr auto e = 2.718281828459045;
 constexpr auto pi = 3.141592653589793;
 constexpr auto tau = 6.283185307179586;
@@ -50,4 +50,4 @@ double min(std::vector<double> vals);
 double max(std::vector<double> vals);
 ast_ops::number avg(std::vector<ast_ops::number> vals);
 
-}  // namespace builtins
+} // namespace builtins

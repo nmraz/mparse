@@ -33,4 +33,4 @@ constexpr std::string_view stringify_binary_op(mparse::binary_op_type op) {
   }
 }
 
-}  // namespace ast_ops
+} // namespace ast_ops

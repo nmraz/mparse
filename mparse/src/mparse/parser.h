@@ -34,4 +34,4 @@ private:
 
 ast_node_ptr parse(std::string_view source, source_map* smap = nullptr);
 
-}  // namespace mparse
+} // namespace mparse

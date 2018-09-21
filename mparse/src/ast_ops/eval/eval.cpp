@@ -21,7 +21,7 @@ bool is_finite(number x) {
   return std::isfinite(x.real()) && std::isfinite(x.imag());
 }
 
-template<typename F>
+template <typename F>
 number check_range(F func, const mparse::ast_node& node) {
   errno = 0;
   number res = func();
@@ -31,7 +31,7 @@ number check_range(F func, const mparse::ast_node& node) {
   return res;
 }
 
-template<typename F>
+template <typename F>
 number check_errno(F func) {
   errno = 0;
   number res = func();
@@ -62,9 +62,7 @@ struct eval_visitor : mparse::const_ast_visitor {
 };
 
 eval_visitor::eval_visitor(const var_scope& vscope, const func_scope& fscope)
-  : vscope(vscope)
-  , fscope(fscope) {
-}
+    : vscope(vscope), fscope(fscope) {}
 
 void eval_visitor::visit(const mparse::unary_node& node) {
   node.child()->apply_visitor(*this);
@@ -87,38 +85,40 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
   node.rhs()->apply_visitor(*this);
   number rhs_val = result;
 
-  result = check_range([&] {
-    switch (node.type()) {
-    case mparse::binary_op_type::add:
-      return lhs_val + rhs_val;
-    case mparse::binary_op_type::sub:
-      return lhs_val - rhs_val;
-    case mparse::binary_op_type::mult:
-      return lhs_val * rhs_val;
-    case mparse::binary_op_type::div:
-      if (rhs_val == 0.0) {
-        throw eval_error("Division by zero", eval_errc::div_by_zero, &node);
-      }
-      return lhs_val / rhs_val;
-    case mparse::binary_op_type::pow:
-      if (lhs_val == 0.0 && rhs_val.real() <= 0) {
-        throw eval_error(
-          "Real part of exponent for zero must be positive",
-          eval_errc::bad_pow,
-          &node
-        );
-      }
-      return std::pow(lhs_val, rhs_val);
-    default:
-      return 0i;  // deduce as complex
-    }
-  }, node);
+  result = check_range(
+      [&] {
+        switch (node.type()) {
+        case mparse::binary_op_type::add:
+          return lhs_val + rhs_val;
+        case mparse::binary_op_type::sub:
+          return lhs_val - rhs_val;
+        case mparse::binary_op_type::mult:
+          return lhs_val * rhs_val;
+        case mparse::binary_op_type::div:
+          if (rhs_val == 0.0) {
+            throw eval_error("Division by zero", eval_errc::div_by_zero, &node);
+          }
+          return lhs_val / rhs_val;
+        case mparse::binary_op_type::pow:
+          if (lhs_val == 0.0 && rhs_val.real() <= 0) {
+            throw eval_error("Real part of exponent for zero must be positive",
+                             eval_errc::bad_pow,
+                             &node);
+          }
+          return std::pow(lhs_val, rhs_val);
+        default:
+          return 0i; // deduce as complex
+        }
+      },
+      node);
 }
 
 void eval_visitor::visit(const mparse::func_node& node) {
   auto* func = fscope.lookup(node.name());
   if (!func) {
-    throw eval_error("Function '" + node.name() + "' not found.", eval_errc::bad_func_call, &node);
+    throw eval_error("Function '" + node.name() + "' not found.",
+                     eval_errc::bad_func_call,
+                     &node);
   }
 
   std::vector<number> args;
@@ -130,7 +130,8 @@ void eval_visitor::visit(const mparse::func_node& node) {
   try {
     result = check_errno([&] { return (*func)(std::move(args)); });
   } catch (...) {
-    eval_error err("In function '" + node.name() + "'", eval_errc::bad_func_call, &node);
+    eval_error err(
+        "In function '" + node.name() + "'", eval_errc::bad_func_call, &node);
     std::throw_with_nested(std::move(err));
   }
 }
@@ -143,17 +144,21 @@ void eval_visitor::visit(const mparse::id_node& node) {
   if (auto val = vscope.lookup(node.name())) {
     result = check_range([&] { return *val; }, node);
   } else {
-    throw eval_error("Unbound variable '" + node.name() + "'", eval_errc::unbound_var, &node);
+    throw eval_error("Unbound variable '" + node.name() + "'",
+                     eval_errc::unbound_var,
+                     &node);
   }
 }
 
-}  // namespace
+} // namespace
 
 
-number eval(const mparse::ast_node* node, const var_scope& vscope, const func_scope& fscope) {
+number eval(const mparse::ast_node* node,
+            const var_scope& vscope,
+            const func_scope& fscope) {
   eval_visitor vis(vscope, fscope);
   node->apply_visitor(vis);
   return vis.result;
 }
 
-}  // namespac ast_ops
+} // namespace ast_ops

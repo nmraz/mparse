@@ -24,4 +24,4 @@ private:
   arg_list args_;
 };
 
-}  // namespace mparse
+} // namespace mparse

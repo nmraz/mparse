@@ -16,4 +16,4 @@ ast_node_ptr unary_node::ref_child() {
   return child_;
 }
 
-}  // namespace mparse
+} // namespace mparse

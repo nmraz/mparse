@@ -16,4 +16,4 @@ private:
   double val_ = 0;
 };
 
-}  // namespace mparse
+} // namespace mparse

@@ -18,12 +18,16 @@ using namespace std::literals;
 namespace {
 
 void print_help(std::string_view prog_name) {
-  prog_name.remove_prefix(std::min(prog_name.rfind('\\') + 1, prog_name.size()));
-  std::cout << "Usage: " << prog_name << " dump|pretty|strip|eval <expr> [var1=val1 var2=val2 ...]\n\n";
+  prog_name.remove_prefix(
+      std::min(prog_name.rfind('\\') + 1, prog_name.size()));
+  std::cout << "Usage: " << prog_name
+            << " dump|pretty|strip|eval <expr> [var1=val1 var2=val2 ...]\n\n";
   std::cout << "dump - Print a visualization of the AST.\n";
   std::cout << "pretty - Pretty print the expression.\n";
-  std::cout << "strip - Pretty print the expression, with superfluous parentheses removed.\n";
-  std::cout << "eval - Evaluate the expression, using the passed variable definitions.\n";
+  std::cout << "strip - Pretty print the expression, with superfluous "
+               "parentheses removed.\n";
+  std::cout << "eval - Evaluate the expression, using the passed variable "
+               "definitions.\n";
   std::exit(1);
 }
 
@@ -73,11 +77,10 @@ std::ostream& print_number(std::ostream& stream, ast_ops::number num) {
   return stream << "i";
 }
 
-}  // namespace
+} // namespace
 
 
 int main(int argc, const char* const* argv) {
-
   std::cout << std::setprecision(std::numeric_limits<double>::digits10 + 1);
 
   if (argc < 3) {

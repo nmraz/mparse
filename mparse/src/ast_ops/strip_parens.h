@@ -6,4 +6,4 @@ namespace ast_ops {
 
 void strip_parens(mparse::ast_node_ptr& node);
 
-}  // namespace ast_ops
+} // namespace ast_ops

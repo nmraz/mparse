@@ -26,21 +26,17 @@ source_stream::int_type source_stream::peek(int lookahead) const {
 }
 
 bool source_stream::eat(char_type ch) {
-  return eat([=] (char peeked) {
-    return peeked == ch;
-  });
+  return eat([=](char peeked) { return peeked == ch; });
 }
 
 bool source_stream::eat_one_of(source_type chars) {
-  return eat([&] (char peeked) {
-    return chars.find(peeked) != source_type::npos;
-  });
+  return eat(
+      [&](char peeked) { return chars.find(peeked) != source_type::npos; });
 }
 
 source_stream::pos_type source_stream::eat_while(source_type chars) {
-  return eat_while([&] (char peeked) {
-    return chars.find(peeked) != source_type::npos;
-  });
+  return eat_while(
+      [&](char peeked) { return chars.find(peeked) != source_type::npos; });
 }
 
-}  // namespace mparse
+} // namespace mparse
