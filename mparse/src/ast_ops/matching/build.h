@@ -160,7 +160,7 @@ struct builder_traits<subexpr_expr<C, Comp>> {
 
 
 template<typename Expr, typename Ctx>
-mparse::ast_node_ptr build_expr(Expr expr, Ctx& ctx) {
+mparse::ast_node_ptr build_expr(Expr expr, Ctx&& ctx) {
   using build_tags = impl::get_build_tags_t<Expr>;
   return builder_traits<Expr>::template build<build_tags>(expr, std::forward<Ctx>(ctx));
 }
