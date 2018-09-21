@@ -18,7 +18,7 @@ constexpr bool is_match_expr = false;
 
 /* CUSTOM EXPRESSIONS */
 
-template<typename Node, typename Pred>
+template<typename Node, typename Pred, typename... Caps>
 struct custom_matcher_expr {
   static_assert(std::is_base_of_v<mparse::ast_node, Node>, "custom_matcher_expr can only match descendants of ast_node");
 
@@ -323,8 +323,8 @@ constexpr bool is_match_expr<subexpr_expr<C, Comp>> = true;
 
 inline namespace literals {
 
-template<typename Node, typename Pred>
-constexpr custom_matcher_expr<Node, std::decay_t<Pred>> match_custom(Pred&& pred) {
+template<typename Node, typename Pred, typename... Caps>
+constexpr custom_matcher_expr<Node, std::decay_t<Pred>, Caps...> match_custom(Pred&& pred, Caps...) {
   return { std::forward<Pred>(pred) };
 }
 

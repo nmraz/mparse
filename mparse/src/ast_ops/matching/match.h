@@ -19,14 +19,15 @@ struct matcher_traits {
   static_assert(util::always_false<E>, "Unknown expression type");
 };
 
-template<typename Node, typename Pred>
-struct matcher_traits<custom_matcher_expr<Node, Pred>> {
+template<typename Node, typename Pred, typename... Caps>
+struct matcher_traits<custom_matcher_expr<Node, Pred, Caps...>> {
   using match_type = mparse::node_ptr<Node>;
+  using captures = caplist<Caps...>;
 
   template<typename Ctx>
-  static bool match(const custom_matcher_expr<Node, Pred>& expr, const mparse::ast_node_ptr& node, Ctx&) {
+  static bool match(const custom_matcher_expr<Node, Pred>& expr, const mparse::ast_node_ptr& node, Ctx& ctx) {
     if (auto* typed_node = mparse::ast_node_cast<Node>(node.get())) {
-      return expr.pred(*typed_node);
+      return expr.pred(*typed_node, ctx);
     }
     return false;
   }
