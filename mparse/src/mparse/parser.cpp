@@ -42,14 +42,14 @@ const T* find_delim_val(const delim_val_mapping<T>(&mapping)[N], const token& to
 }
 
 
-constexpr std::string_view token_type_name(token_type type) {
-  switch (type) {
+std::string token_str(token tok) {
+  switch (tok.type) {
   case token_type::literal:
     return "number";
   case token_type::ident:
     return "identifier";
   case token_type::delim:
-    return "delimitor";
+    return "'" + std::string(tok.val) + "'";
   case token_type::eof:
     return "end of input";
   case token_type::unknown:
@@ -57,6 +57,7 @@ constexpr std::string_view token_type_name(token_type type) {
     return "token";
   }
 }
+
 
 source_range get_loc(const token& tok) {
   return { tok.loc, tok.loc + std::max(tok.val.size(), std::size_t{1}) };
@@ -388,7 +389,7 @@ void parser::parser_impl::check_balanced(source_range open_loc,
 }
 
 void parser::parser_impl::error() const {
-  std::string msg = "Unexpected "s + token_type_name(cur_token_.type).data() + ": expected " + expected_type_.data();
+  std::string msg = "Unexpected "s + token_str(cur_token_) + ": expected " + std::string(expected_type_);
 
   throw syntax_error(
     msg,
