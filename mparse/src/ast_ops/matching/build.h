@@ -138,7 +138,7 @@ template <typename BuildTags, typename Tag, typename Ctx>
 auto get_build_result(Ctx&& ctx) {
   auto&& stored = get_result<Tag>(std::forward<Ctx>(ctx));
 
-  if constexpr (util::type_list_count_v<Tag, BuildTags>> 1) {
+  if constexpr ((util::type_list_count_v<Tag, BuildTags>) > 1) {
     // used several times - clone for safety
     return ast_ops::clone(stored.get());
   } else {
