@@ -5,10 +5,10 @@
 #include "ast_ops/pretty_print.h"
 #include "ast_ops/strip_parens.h"
 #include "error_handling.h"
+#include "helpers.h"
 #include "mparse/parse_error.h"
 #include "mparse/parser.h"
 #include "mparse/source_map.h"
-#include "scope_helpers.h"
 #include <iomanip>
 #include <iostream>
 #include <limits>
@@ -108,7 +108,8 @@ int main(int argc, const char* const* argv) {
     parse_vardefs(vscope, argc - 3, argv + 3);
 
     try {
-      auto result = ast_ops::eval(ast.get(), vscope, ast_ops::builtin_func_scope());
+      auto result =
+          ast_ops::eval(ast.get(), vscope, ast_ops::builtin_func_scope());
       result.real(to_precision(result.real()));
       result.imag(to_precision(result.imag()));
 
