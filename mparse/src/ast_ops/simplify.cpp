@@ -15,4 +15,13 @@ void strip_parens(mparse::ast_node_ptr& node) {
   ast_ops::matching::apply_rewriters_recursively(node, rewriters);
 }
 
+
+void canonicalize(mparse::ast_node_ptr& node) {
+
+}
+
+void decanonicalize(mparse::ast_node_ptr& node) {
+
+}
+
 } // namespace ast_ops
