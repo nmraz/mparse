@@ -51,8 +51,7 @@ struct arg_checker<double> {
 
 
 template <std::size_t... I, typename... Args>
-void check_types(const std::vector<number>& args,
-                 std::index_sequence<I...>,
+void check_types(const std::vector<number>& args, std::index_sequence<I...>,
                  util::type_list<Args...>) {
   std::vector<int> nonreal_args;
   ((!arg_checker<Args>::check(args[I]) ? nonreal_args.push_back(I) : (void) 0),
@@ -61,8 +60,7 @@ void check_types(const std::vector<number>& args,
 }
 
 template <typename F, std::size_t... I, typename... Args>
-number invoke_helper(F& func,
-                     const std::vector<number>& args,
+number invoke_helper(F& func, const std::vector<number>& args,
                      std::index_sequence<I...> idx,
                      util::type_list<Args...> ts) {
   check_arity(static_cast<int>(sizeof...(Args)), static_cast<int>(args.size()));

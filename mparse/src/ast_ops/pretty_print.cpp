@@ -81,8 +81,7 @@ bool should_parenthesize_assoc(branch_side side, associativity parent_assoc) {
 }
 
 bool should_parenthesize(op_precedence parent_precedence,
-                         op_precedence precedence,
-                         bool assoc_paren) {
+                         op_precedence precedence, bool assoc_paren) {
   if (precedence ==
       parent_precedence) { // tie - determine based on associativity
     return assoc_paren;
@@ -136,8 +135,7 @@ private:
 auto_parenthesizer::auto_parenthesizer(print_visitor& vis,
                                        op_precedence precedence)
     : expr_(vis.result),
-      parenthesize_(should_parenthesize(vis.parent_precedence,
-                                        precedence,
+      parenthesize_(should_parenthesize(vis.parent_precedence, precedence,
                                         vis.assoc_paren)) {
   if (parenthesize_) {
     expr_ += "(";
@@ -153,10 +151,8 @@ auto_parenthesizer::~auto_parenthesizer() {
 
 class child_visitor_scope {
 public:
-  child_visitor_scope(print_visitor& vis,
-                      op_precedence parent_precedence,
-                      associativity parent_assoc,
-                      branch_side side);
+  child_visitor_scope(print_visitor& vis, op_precedence parent_precedence,
+                      associativity parent_assoc, branch_side side);
 
 private:
   print_visitor& vis_;

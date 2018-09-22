@@ -123,9 +123,7 @@ struct un_type_eq_pred {
   constexpr bool operator()(mparse::unary_op_type val) { return val == Val; }
 };
 
-template <mparse::binary_op_type Type,
-          typename Lhs,
-          typename Rhs,
+template <mparse::binary_op_type Type, typename Lhs, typename Rhs,
           bool Commute = is_commutative(Type)>
 using binary_op_expr =
     binary_op_pred_expr<bin_type_eq_pred<Type>, Lhs, Rhs, Commute>;
@@ -156,60 +154,49 @@ constexpr unary_op_expr<mparse::unary_op_type::neg, Inner> operator-(
   return {inner};
 }
 
-template <typename Lhs,
-          typename Rhs,
+template <typename Lhs, typename Rhs,
           typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>>
 constexpr binary_op_expr<mparse::binary_op_type::add, Lhs, Rhs> operator+(
-    Lhs lhs,
-    Rhs rhs) {
+    Lhs lhs, Rhs rhs) {
   return {lhs, rhs};
 }
 
-template <typename Lhs,
-          typename Rhs,
+template <typename Lhs, typename Rhs,
           typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>>
 constexpr binary_op_expr<mparse::binary_op_type::add, Lhs, Rhs, false>
 add_nocomm(Lhs lhs, Rhs rhs) {
   return {lhs, rhs};
 }
 
-template <typename Lhs,
-          typename Rhs,
+template <typename Lhs, typename Rhs,
           typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>>
 constexpr binary_op_expr<mparse::binary_op_type::sub, Lhs, Rhs> operator-(
-    Lhs lhs,
-    Rhs rhs) {
+    Lhs lhs, Rhs rhs) {
   return {lhs, rhs};
 }
 
-template <typename Lhs,
-          typename Rhs,
+template <typename Lhs, typename Rhs,
           typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>>
 constexpr binary_op_expr<mparse::binary_op_type::mult, Lhs, Rhs> operator*(
-    Lhs lhs,
-    Rhs rhs) {
+    Lhs lhs, Rhs rhs) {
   return {lhs, rhs};
 }
 
-template <typename Lhs,
-          typename Rhs,
+template <typename Lhs, typename Rhs,
           typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>>
 constexpr binary_op_expr<mparse::binary_op_type::mult, Lhs, Rhs, false>
 mul_nocomm(Lhs lhs, Rhs rhs) {
   return {lhs, rhs};
 }
 
-template <typename Lhs,
-          typename Rhs,
+template <typename Lhs, typename Rhs,
           typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>>
 constexpr binary_op_expr<mparse::binary_op_type::div, Lhs, Rhs> operator/(
-    Lhs lhs,
-    Rhs rhs) {
+    Lhs lhs, Rhs rhs) {
   return {lhs, rhs};
 }
 
-template <typename Lhs,
-          typename Rhs,
+template <typename Lhs, typename Rhs,
           typename = std::enable_if_t<is_match_expr<Lhs> && is_match_expr<Rhs>>>
 constexpr binary_op_expr<mparse::binary_op_type::pow, Lhs, Rhs> pow(Lhs lhs,
                                                                     Rhs rhs) {
@@ -254,8 +241,7 @@ constexpr negation_expr<Expr> match_not(Expr expr) {
 }
 
 template <
-    typename First,
-    typename Second,
+    typename First, typename Second,
     typename = std::enable_if_t<is_match_expr<First> && is_match_expr<Second>>>
 constexpr conjunction_expr<First, Second> match_and(First first,
                                                     Second second) {
@@ -263,8 +249,7 @@ constexpr conjunction_expr<First, Second> match_and(First first,
 }
 
 template <
-    typename First,
-    typename Second,
+    typename First, typename Second,
     typename = std::enable_if_t<is_match_expr<First> && is_match_expr<Second>>>
 constexpr disjunction_expr<First, Second> match_or(First first, Second second) {
   return {first, second};
@@ -288,8 +273,7 @@ struct capture_expr_tag {};
 template <int N, typename Expr>
 using capture_expr = capture_expr_impl<capture_expr_tag<N>, Expr>;
 
-template <int N,
-          typename Expr,
+template <int N, typename Expr,
           typename = std::enable_if_t<is_match_expr<Expr>>>
 constexpr capture_expr<N, Expr> capture_as(Expr expr) {
   return {expr};
@@ -329,8 +313,7 @@ constexpr bool is_match_expr<subexpr_expr<C, Comp>> = true;
 inline namespace literals {
 template <typename Node, typename Pred, typename... Caps>
 constexpr custom_matcher_expr<Node, std::decay_t<Pred>, Caps...> match_custom(
-    Pred&& pred,
-    Caps...) {
+    Pred&& pred, Caps...) {
   return {std::forward<Pred>(pred)};
 }
 

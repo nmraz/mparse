@@ -11,9 +11,8 @@ constexpr bool has_visit_overload = false;
 
 template <typename V, typename T>
 constexpr bool has_visit_overload<
-    V,
-    T,
-    std::void_t<decltype(static_cast<void (V::*)(T&)>(&V::visit))>> = true;
+    V, T, std::void_t<decltype(static_cast<void (V::*)(T&)>(&V::visit))>> =
+    true;
 
 } // namespace impl
 

@@ -16,8 +16,7 @@ void unary_op_node::set_type(unary_op_type type) {
 }
 
 
-binary_op_node::binary_op_node(binary_op_type type,
-                               ast_node_ptr lhs,
+binary_op_node::binary_op_node(binary_op_type type, ast_node_ptr lhs,
                                ast_node_ptr rhs) {
   set_type(type);
   set_lhs(std::move(lhs));

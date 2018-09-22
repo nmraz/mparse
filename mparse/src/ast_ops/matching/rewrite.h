@@ -23,8 +23,7 @@ bool rewrite(mparse::ast_node_ptr& node, const M& matcher, const B& builder) {
 namespace impl {
 
 template <typename M, typename B, typename... Rest>
-constexpr auto get_rewriters_after_expr(const M& matcher,
-                                        const B& builder,
+constexpr auto get_rewriters_after_expr(const M& matcher, const B& builder,
                                         const Rest&... rest);
 
 constexpr auto get_rewriters() { // base case
@@ -51,8 +50,7 @@ constexpr auto get_expr_rewriter(const M& matcher, const B& builder) {
 }
 
 template <typename M, typename B, typename... Rest>
-constexpr auto get_rewriters_after_expr(const M& matcher,
-                                        const B& builder,
+constexpr auto get_rewriters_after_expr(const M& matcher, const B& builder,
                                         const Rest&... rest) {
   static_assert(is_match_expr<B>, "Expected a builder after match expression");
   return std::tuple_cat(std::tuple{get_expr_rewriter(matcher, builder)},

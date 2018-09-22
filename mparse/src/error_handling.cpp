@@ -71,8 +71,7 @@ void handle_syntax_error(const mparse::syntax_error& err,
 }
 
 void handle_math_error(const ast_ops::eval_error& err,
-                       const mparse::source_map& smap,
-                       std::string_view input) {
+                       const mparse::source_map& smap, std::string_view input) {
   auto* node = static_cast<const mparse::binary_op_node*>(err.node());
 
   switch (err.code()) {

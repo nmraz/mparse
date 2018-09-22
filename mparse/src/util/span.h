@@ -26,10 +26,9 @@ template <typename Cont, typename = void>
 constexpr bool has_integral_size = false;
 
 template <typename Cont>
-constexpr bool
-    has_integral_size<Cont,
-                      std::void_t<decltype(std::declval<Cont&>().size())>> =
-        std::is_integral_v<decltype(std::declval<Cont&>().size())>;
+constexpr bool has_integral_size<
+    Cont, std::void_t<decltype(std::declval<Cont&>().size())>> =
+    std::is_integral_v<decltype(std::declval<Cont&>().size())>;
 
 
 template <typename Data, typename T>
@@ -41,11 +40,9 @@ template <typename Cont, typename T, typename = void>
 constexpr bool has_convertible_data = false;
 
 template <typename Cont, typename T>
-constexpr bool
-    has_convertible_data<Cont,
-                         T,
-                         std::void_t<decltype(std::declval<Cont&>().data())>> =
-        is_convertible_data<decltype(std::declval<Cont&>().data()), T>;
+constexpr bool has_convertible_data<
+    Cont, T, std::void_t<decltype(std::declval<Cont&>().data())>> =
+    is_convertible_data<decltype(std::declval<Cont&>().data()), T>;
 
 
 template <typename Cont, typename T>
@@ -79,8 +76,7 @@ public:
             typename = std::enable_if_t<impl::is_compatible_container<Cont, T>>>
   constexpr span(Cont& cont) : span(cont.data(), cont.size()) {}
 
-  template <typename U,
-            std::size_t N,
+  template <typename U, std::size_t N,
             typename = std::enable_if_t<impl::is_safe_array_conv<U, T>>>
   constexpr span(U (&array)[N]) : span(array, N) {}
 

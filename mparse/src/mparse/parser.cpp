@@ -107,8 +107,7 @@ struct parser::parser_impl {
   bool has_term_tok() const;
   bool has_delim(std::string_view val) const;
 
-  void check_balanced(source_range open_loc,
-                      std::string_view term_tok,
+  void check_balanced(source_range open_loc, std::string_view term_tok,
                       std::string_view friendly_name) const;
   void error() const;
 
@@ -142,7 +141,9 @@ void parser::parser_impl::end_parse() {
 
 ast_node_ptr parser::parser_impl::parse_add() {
   static constexpr delim_val_mapping<binary_op_type> ops[] = {
-      {"+"sv, binary_op_type::add}, {"-"sv, binary_op_type::sub}};
+      {"+"sv, binary_op_type::add},
+      {"-"sv, binary_op_type::sub},
+  };
 
   const binary_op_type* op = nullptr;
   ast_node_ptr node = parse_mult();
@@ -163,7 +164,9 @@ ast_node_ptr parser::parser_impl::parse_add() {
 
 ast_node_ptr parser::parser_impl::parse_mult() {
   static constexpr delim_val_mapping<binary_op_type> ops[] = {
-      {"*"sv, binary_op_type::mult}, {"/"sv, binary_op_type::div}};
+      {"*"sv, binary_op_type::mult},
+      {"/"sv, binary_op_type::div},
+  };
 
   const binary_op_type* op = nullptr;
   ast_node_ptr node = parse_unary();
@@ -184,7 +187,9 @@ ast_node_ptr parser::parser_impl::parse_mult() {
 
 ast_node_ptr parser::parser_impl::parse_unary() {
   static constexpr delim_val_mapping<unary_op_type> ops[] = {
-      {"+"sv, unary_op_type::plus}, {"-"sv, unary_op_type::neg}};
+      {"+"sv, unary_op_type::plus},
+      {"-"sv, unary_op_type::neg},
+  };
 
   const unary_op_type* op = find_delim_val(ops, cur_token_);
   if (op) {
@@ -319,8 +324,7 @@ ast_node_ptr parser::parser_impl::consume_func(token name) {
 
 template <typename T>
 ast_node_ptr parser::parser_impl::consume_paren_like(
-    std::string_view term_tok,
-    std::string_view friendly_name) {
+    std::string_view term_tok, std::string_view friendly_name) {
   source_range open_loc = get_loc(cur_token_);
   ast_node_ptr inner_expr;
 

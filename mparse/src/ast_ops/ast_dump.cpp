@@ -33,10 +33,8 @@ std::string stringify_source_locs(const mparse::ast_node& node,
 }
 
 struct ast_dump_visitor : mparse::const_ast_visitor {
-  ast_dump_visitor(std::string prefix,
-                   bool last_node,
-                   const mparse::source_map* smap,
-                   std::ostream& stream);
+  ast_dump_visitor(std::string prefix, bool last_node,
+                   const mparse::source_map* smap, std::ostream& stream);
 
   void visit(const mparse::ast_node& node) override;
   void visit(const mparse::paren_node& node) override;
@@ -58,8 +56,7 @@ struct ast_dump_visitor : mparse::const_ast_visitor {
 };
 
 
-ast_dump_visitor::ast_dump_visitor(std::string prefix,
-                                   bool last_node,
+ast_dump_visitor::ast_dump_visitor(std::string prefix, bool last_node,
                                    const mparse::source_map* smap,
                                    std::ostream& stream)
     : prefix(std::move(prefix)),
@@ -146,8 +143,7 @@ void ast_dump_visitor::dump_last_child(const mparse::ast_node& node) {
 } // namespace
 
 
-void dump_ast(const mparse::ast_node* node,
-              const mparse::source_map* smap,
+void dump_ast(const mparse::ast_node* node, const mparse::source_map* smap,
               std::ostream& stream) {
   ast_dump_visitor vis("", false, smap, stream);
   node->apply_visitor(vis);

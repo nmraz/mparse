@@ -26,8 +26,7 @@ struct matcher_traits<custom_matcher_expr<Node, Pred, Caps...>> {
 
   template <typename Ctx>
   static bool match(const custom_matcher_expr<Node, Pred>& expr,
-                    const mparse::ast_node_ptr& node,
-                    Ctx& ctx) {
+                    const mparse::ast_node_ptr& node, Ctx& ctx) {
     if (auto* typed_node = mparse::ast_node_cast<Node>(node.get())) {
       return expr.pred(*typed_node, ctx);
     }
@@ -40,8 +39,7 @@ struct matcher_traits<literal_expr> {
   using match_type = mparse::literal_node;
 
   template <typename Ctx>
-  static bool match(const literal_expr& expr,
-                    const mparse::ast_node_ptr& node,
+  static bool match(const literal_expr& expr, const mparse::ast_node_ptr& node,
                     Ctx&) {
     if (auto* lit_node = mparse::ast_node_cast<match_type>(node.get())) {
       return lit_node->val() == expr.val;
@@ -55,8 +53,7 @@ struct matcher_traits<id_expr> {
   using match_type = mparse::id_node;
 
   template <typename Ctx>
-  static bool match(const id_expr& expr,
-                    const mparse::ast_node_ptr& node,
+  static bool match(const id_expr& expr, const mparse::ast_node_ptr& node,
                     Ctx&) {
     if (auto* id_node = mparse::ast_node_cast<match_type>(node.get())) {
       return id_node->name() == expr.name;
@@ -74,8 +71,7 @@ private:
   template <typename... Args, size_t... I, typename Ctx>
   static bool match_helper(const std::tuple<Args...>& args,
                            match_type::arg_list& arg_nodes,
-                           std::index_sequence<I...>,
-                           Ctx& ctx) {
+                           std::index_sequence<I...>, Ctx& ctx) {
     return (... &&
             matcher_traits<Args>::match(std::get<I>(args), arg_nodes[I], ctx));
   }
@@ -83,8 +79,7 @@ private:
 public:
   template <typename Ctx>
   static bool match(const func_expr<Args...>& expr,
-                    const mparse::ast_node_ptr& node,
-                    Ctx& ctx) {
+                    const mparse::ast_node_ptr& node, Ctx& ctx) {
     if (auto* fn_node = mparse::ast_node_cast<match_type>(node.get())) {
       if (fn_node->name() != expr.name) {
         return false;
@@ -109,8 +104,7 @@ struct matcher_traits<binary_op_pred_expr<Pred, Lhs, Rhs, Commute>> {
 
   template <typename Ctx>
   static bool match(const binary_op_pred_expr<Pred, Lhs, Rhs, Commute>& expr,
-                    const mparse::ast_node_ptr& node,
-                    Ctx& ctx) {
+                    const mparse::ast_node_ptr& node, Ctx& ctx) {
     if (auto* bin_node = mparse::ast_node_cast<match_type>(node.get())) {
       if (!Pred{}(bin_node->type())) {
         return false;
@@ -142,8 +136,7 @@ struct matcher_traits<unary_expr<Node, Inner>> {
 
   template <typename Ctx>
   static bool match(const unary_expr<Node, Inner>& expr,
-                    const mparse::ast_node_ptr& node,
-                    Ctx& ctx) {
+                    const mparse::ast_node_ptr& node, Ctx& ctx) {
     if (auto* un_node = mparse::ast_node_cast<match_type>(node.get())) {
       return matcher_traits<Inner>::match(expr.inner, un_node->ref_child(),
                                           ctx);
@@ -159,8 +152,7 @@ struct matcher_traits<unary_op_pred_expr<Pred, Inner>> {
 
   template <typename Ctx>
   static bool match(const unary_op_pred_expr<Pred, Inner>& expr,
-                    const mparse::ast_node_ptr& node,
-                    Ctx& ctx) {
+                    const mparse::ast_node_ptr& node, Ctx& ctx) {
     if (auto* un_node = mparse::ast_node_cast<match_type>(node.get())) {
       if (!Pred{}(un_node->type())) {
         return false;
@@ -179,8 +171,7 @@ struct matcher_traits<negation_expr<Expr>> {
 
   template <typename Ctx>
   static bool match(const negation_expr<Expr>& expr,
-                    const mparse::ast_node_ptr& node,
-                    Ctx&) {
+                    const mparse::ast_node_ptr& node, Ctx&) {
     match_results_for<Expr> child_ctx;
     return !matcher_traits<Expr>::match(expr.expr, node, child_ctx);
   }
@@ -192,8 +183,7 @@ struct matcher_traits<conjunction_expr<First, Second>> {
 
   template <typename Ctx>
   static bool match(const conjunction_expr<First, Second>& expr,
-                    const mparse::ast_node_ptr& node,
-                    Ctx&) {
+                    const mparse::ast_node_ptr& node, Ctx&) {
     match_results_for<First> fist_ctx;
     if (!matcher_traits<First>::match(expr.first, node, fist_ctx)) {
       return false;
@@ -210,8 +200,7 @@ struct matcher_traits<disjunction_expr<First, Second>> {
 
   template <typename Ctx>
   static bool match(const disjunction_expr<First, Second>& expr,
-                    const mparse::ast_node_ptr& node,
-                    Ctx&) {
+                    const mparse::ast_node_ptr& node, Ctx&) {
     match_results_for<First> first_ctx;
     if (matcher_traits<First>::match(expr.first, node, first_ctx)) {
       return true;
@@ -250,8 +239,7 @@ struct matcher_traits<capture_expr_impl<Tag, Expr>> {
 
   template <typename Ctx>
   static bool match(const capture_expr_impl<Tag, Expr>& expr,
-                    const mparse::ast_node_ptr& node,
-                    Ctx& ctx) {
+                    const mparse::ast_node_ptr& node, Ctx& ctx) {
     if (matcher_traits<Expr>::match(expr.expr, node, ctx)) {
       get_result<Tag>(ctx) =
           mparse::static_ast_node_ptr_cast<inner_match_type>(node);
@@ -267,8 +255,7 @@ struct matcher_traits<subexpr_expr<C, Comp>> {
 
   template <typename Ctx>
   static bool match(const subexpr_expr<C, Comp>& expr,
-                    const mparse::ast_node_ptr& node,
-                    Ctx& ctx) {
+                    const mparse::ast_node_ptr& node, Ctx& ctx) {
     auto& saved = get_subexpr<C>(ctx);
 
     if constexpr (Ctx::template count_caps_with<subexpr_expr_tag<C>>() > 1) {
@@ -292,8 +279,7 @@ struct matcher_traits<subexpr_expr<C, Comp>> {
 
 template <typename Expr, typename = std::enable_if_t<is_match_expr<Expr>>>
 std::optional<match_results_for<Expr>> exec_match(
-    Expr expr,
-    const mparse::ast_node_ptr& node) {
+    Expr expr, const mparse::ast_node_ptr& node) {
   match_results_for<Expr> res;
   if (matcher_traits<Expr>::match(expr, node, res)) {
     return res;

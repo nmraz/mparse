@@ -34,8 +34,7 @@ constexpr bool is_in_caplist_v = is_in_caplist<T, List>::value;
 
 template <typename List, typename T>
 using caplist_append_unique =
-    std::conditional_t<is_in_caplist_v<T, List>,
-                       List,
+    std::conditional_t<is_in_caplist_v<T, List>, List,
                        util::type_list_append_t<List, T>>;
 
 template <typename List, typename... Ts>

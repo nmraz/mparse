@@ -150,8 +150,7 @@ void eval_visitor::visit(const mparse::id_node& node) {
 } // namespace
 
 
-number eval(const mparse::ast_node* node,
-            const var_scope& vscope,
+number eval(const mparse::ast_node* node, const var_scope& vscope,
             const func_scope& fscope) {
   eval_visitor vis(vscope, fscope);
   node->apply_visitor(vis);
