@@ -124,8 +124,6 @@ struct matcher_traits<binary_op_pred_expr<Pred, Lhs, Rhs, Commute>> {
           return true;
         }
       }
-
-      return false;
     }
     return false;
   }
