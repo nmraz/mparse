@@ -273,12 +273,6 @@ struct capture_expr_tag {};
 template <int N, typename Expr>
 using capture_expr = capture_expr_impl<capture_expr_tag<N>, Expr>;
 
-template <int N, typename Expr,
-          typename = std::enable_if_t<is_match_expr<Expr>>>
-constexpr capture_expr<N, Expr> capture_as(Expr expr) {
-  return {expr};
-}
-
 
 struct retrieve_capture_dummy_expr {};
 
@@ -338,8 +332,16 @@ constexpr literal_expr operator""_lit(long double val) {
   return {static_cast<double>(val)};
 }
 
+
+template <int N, typename Expr,
+          typename = std::enable_if_t<is_match_expr<Expr>>>
+constexpr capture_expr<N, Expr> capture_as(Expr expr) {
+  return {expr};
+}
+
 template <int N>
 constexpr retrieve_capture_expr<N> cap{};
+
 
 constexpr constant_expr<1> c1{};
 constexpr constant_expr<2> c2{};
