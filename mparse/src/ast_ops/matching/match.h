@@ -21,7 +21,7 @@ struct matcher_traits {
 
 template <typename Node, typename Pred, typename... Caps>
 struct matcher_traits<custom_matcher_expr<Node, Pred, Caps...>> {
-  using match_type = mparse::node_ptr<Node>;
+  using match_type = Node;
   using captures = caplist<Caps...>;
 
   template <typename Ctx>
