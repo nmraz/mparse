@@ -1,4 +1,5 @@
 #include "ast_ops/ast_dump.h"
+#include "ast_ops/eval/builtins.h"
 #include "ast_ops/eval/eval.h"
 #include "ast_ops/eval/eval_error.h"
 #include "ast_ops/pretty_print.h"
@@ -103,11 +104,11 @@ int main(int argc, const char* const* argv) {
     ast_ops::strip_parens(ast);
     std::cout << ast_ops::pretty_print(ast.get()) << "\n";
   } else if (cmd == "eval") {
-    ast_ops::var_scope vscope = default_var_scope();
+    ast_ops::var_scope vscope = ast_ops::builtin_var_scope();
     parse_vardefs(vscope, argc - 3, argv + 3);
 
     try {
-      auto result = ast_ops::eval(ast.get(), vscope, default_func_scope());
+      auto result = ast_ops::eval(ast.get(), vscope, ast_ops::builtin_func_scope());
       result.real(to_precision(result.real()));
       result.imag(to_precision(result.imag()));
 

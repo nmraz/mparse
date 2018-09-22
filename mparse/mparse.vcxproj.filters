@@ -81,9 +81,6 @@
     <ClCompile Include="src\diagnostics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\builtins.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ast_ops\eval\func_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -91,6 +88,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ast_ops\clone.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ast_ops\eval\builtins.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -185,9 +185,6 @@
     <ClInclude Include="src\diagnostics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\builtins.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\ast_ops\eval\func_util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -219,6 +216,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ast_ops\clone.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ast_ops\eval\builtins.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
