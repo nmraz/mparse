@@ -332,6 +332,10 @@ constexpr literal_expr operator""_lit(long double val) {
   return {static_cast<double>(val)};
 }
 
+constexpr literal_expr operator""_lit(unsigned long long val) {
+  return {static_cast<double>(val)};
+}
+
 
 template <int N, typename Expr,
           typename = std::enable_if_t<is_match_expr<Expr>>>
