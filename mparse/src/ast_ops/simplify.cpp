@@ -1,4 +1,4 @@
-#include "strip_parens.h"
+#include "simplify.h"
 
 #include "ast_ops/matching/rewrite.h"
 

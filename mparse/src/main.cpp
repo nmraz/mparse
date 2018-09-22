@@ -3,7 +3,7 @@
 #include "ast_ops/eval/eval.h"
 #include "ast_ops/eval/eval_error.h"
 #include "ast_ops/pretty_print.h"
-#include "ast_ops/strip_parens.h"
+#include "ast_ops/simplify.h"
 #include "error_handling.h"
 #include "helpers.h"
 #include "mparse/parse_error.h"
