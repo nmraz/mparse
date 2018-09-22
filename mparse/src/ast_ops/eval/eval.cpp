@@ -100,10 +100,17 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
           }
           return lhs_val / rhs_val;
         case mparse::binary_op_type::pow:
-          if (lhs_val == 0.0 && rhs_val.real() <= 0) {
-            throw eval_error("Real part of exponent for zero must be positive",
-                             eval_errc::bad_pow, &node);
+          if (lhs_val == 0.0) {
+            if (rhs_val.imag()) {
+              throw eval_error("Raising zero to complex power",
+                               eval_errc::bad_pow, &node);
+            }
+            if (rhs_val.real() < 0) {
+              throw eval_error("Raising zero to negative power",
+                               eval_errc::bad_pow, &node);
+            }
           }
+
           return std::pow(lhs_val, rhs_val);
         default:
           return 0i; // deduce as complex
