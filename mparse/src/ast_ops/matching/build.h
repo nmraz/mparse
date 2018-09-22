@@ -151,10 +151,10 @@ auto get_build_result(Ctx&& ctx) {
 
 template <typename Tag, typename Expr>
 struct builder_traits<capture_expr_impl<Tag, Expr>> {
-  using tags = util::type_list_append_t<impl::get_build_tags_t<Expr>, Tag>;
+  using tags = util::type_list<Tag>;
 
   template <typename BuildTags, typename Ctx>
-  static auto build(const capture_expr_impl<Tag, Expr>& expr, Ctx&& ctx) {
+  static auto build(const capture_expr_impl<Tag, Expr>&, Ctx&& ctx) {
     return impl::get_build_result<BuildTags, Tag>(std::forward<Ctx>(ctx));
   }
 };
