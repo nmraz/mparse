@@ -65,11 +65,15 @@ constexpr size_t count_caps_v =
 template <typename... Caps>
 class match_results_base {
 public:
-  void get() {} // dummy
+  template <typename T>
+  int get(T) { // dummy
+    static_assert(util::always_false<T>, "Expression not captured");
+    return 0;
+  }
 };
 
 template <typename Cap, typename... Caps>
-class match_results_base<Cap, Caps...> : match_results_base<Caps...> {
+class match_results_base<Cap, Caps...> : public match_results_base<Caps...> {
   using tag_type = typename Cap::tag_type;
   using cap_type = typename Cap::cap_type;
 
