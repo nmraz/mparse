@@ -31,7 +31,7 @@ constexpr ast_ops::matching::rewriter_list canon_rewriters = {
     pow(cap<1>, 1_lit), // x -> x ^ 1
 
     capture_as<1>(match_not(x * y)),
-    cap<1> * 1_lit // x -> 1 * x
+    1_lit * cap<1> // x -> 1 * x
 };
 
 // clang-format on
