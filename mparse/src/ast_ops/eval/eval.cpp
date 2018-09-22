@@ -122,7 +122,7 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
 void eval_visitor::visit(const mparse::func_node& node) {
   auto* func = fscope.lookup(node.name());
   if (!func) {
-    throw eval_error("Function '" + node.name() + "' not found.",
+    throw eval_error("Function '" + node.name() + "' not found",
                      eval_errc::bad_func_call, &node);
   }
 
