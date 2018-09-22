@@ -318,7 +318,7 @@ constexpr custom_matcher_expr<Node, std::decay_t<Pred>, Caps...> match_custom(
 }
 
 template <typename F, typename... Tags>
-constexpr custom_builder_expr<std::decay_t<F>, Tags...> build_custom(F&& func) {
+constexpr custom_builder_expr<std::decay_t<F>, Tags...> build_custom(F&& func, Tags...) {
   return {std::forward<F>(func)};
 }
 
