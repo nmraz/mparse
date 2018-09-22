@@ -149,9 +149,6 @@
     <ClInclude Include="src\ast_ops\eval\eval.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\mparse\lex_util.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\mparse\ast\abs_node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
