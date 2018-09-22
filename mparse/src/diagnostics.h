@@ -21,4 +21,4 @@ inline void print_loc(std::string_view source, mparse::source_range loc) {
   print_locs(source, {loc});
 }
 
-void print_fixit(std::string_view hint, int col);
+void print_fixit(std::string_view hint, std::size_t col);

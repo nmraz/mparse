@@ -44,6 +44,6 @@ void print_locs(std::string_view source,
   std::cout << esc_reset << "\n";
 }
 
-void print_fixit(std::string_view hint, int col) {
+void print_fixit(std::string_view hint, std::size_t col) {
   std::cout << esc_green << std::string(col, ' ') << hint << esc_reset << "\n";
 }

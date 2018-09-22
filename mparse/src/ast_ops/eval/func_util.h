@@ -10,9 +10,9 @@
 namespace ast_ops {
 namespace impl {
 
-void check_arity(int expected, int provided);
+void check_arity(std::size_t expected, std::size_t provided);
 
-void throw_if_nonreal(std::vector<int> nonreal_args);
+void throw_if_nonreal(std::vector<std::size_t> nonreal_args);
 void check_real(const std::vector<number>& args);
 
 template <typename F>
@@ -53,7 +53,7 @@ struct arg_checker<double> {
 template <std::size_t... I, typename... Args>
 void check_types(const std::vector<number>& args, std::index_sequence<I...>,
                  util::type_list<Args...>) {
-  std::vector<int> nonreal_args;
+  std::vector<std::size_t> nonreal_args;
   ((!arg_checker<Args>::check(args[I]) ? nonreal_args.push_back(I) : (void) 0),
    ...);
   throw_if_nonreal(std::move(nonreal_args));
@@ -63,7 +63,7 @@ template <typename F, std::size_t... I, typename... Args>
 number invoke_helper(F& func, const std::vector<number>& args,
                      std::index_sequence<I...> idx,
                      util::type_list<Args...> ts) {
-  check_arity(static_cast<int>(sizeof...(Args)), static_cast<int>(args.size()));
+  check_arity(sizeof...(Args), args.size());
   check_types(args, idx, ts);
   return func(arg_checker<Args>::convert(args[I])...);
 }

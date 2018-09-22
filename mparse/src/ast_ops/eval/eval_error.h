@@ -33,24 +33,25 @@ private:
 
 class arity_error : public std::runtime_error {
 public:
-  arity_error(std::string_view what, int expected, int provided);
+  arity_error(std::string_view what, std::size_t expected,
+              std::size_t provided);
 
-  int expected() const { return expected_; }
-  int provided() const { return provided_; }
+  std::size_t expected() const { return expected_; }
+  std::size_t provided() const { return provided_; }
 
 private:
-  int expected_;
-  int provided_;
+  std::size_t expected_;
+  std::size_t provided_;
 };
 
 class func_arg_error : public std::runtime_error {
 public:
-  func_arg_error(std::string_view what, std::vector<int> indices);
+  func_arg_error(std::string_view what, std::vector<std::size_t> indices);
 
-  util::span<const int> indices() const { return indices_; }
+  util::span<const std::size_t> indices() const { return indices_; }
 
 private:
-  std::vector<int> indices_;
+  std::vector<std::size_t> indices_;
 };
 
 } // namespace ast_ops

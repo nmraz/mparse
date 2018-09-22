@@ -25,8 +25,9 @@ void handle_bad_func_call(const ast_ops::eval_error& err,
   auto* node = static_cast<const mparse::func_node*>(err.node());
 
   std::ostringstream msg;
-  std::vector<mparse::source_range> locs{
-      smap.find_locs(node)[1]}; // function name
+  std::vector<mparse::source_range> locs = {
+      smap.find_locs(node)[1], // function name
+  };
 
   msg << err.what();
 
@@ -35,18 +36,19 @@ void handle_bad_func_call(const ast_ops::eval_error& err,
   } catch (const ast_ops::arity_error& arity_err) {
     msg << ": " << arity_err.what();
 
-    int exp = arity_err.expected();
-    int prov = arity_err.provided();
+    auto expected = arity_err.expected();
+    auto provided = arity_err.provided();
 
-    if (exp < prov) {
-      for (const auto& arg : util::span(node->args()).last(prov - exp)) {
+    if (expected < provided) {
+      for (const auto& arg :
+           util::span{node->args()}.last(provided - expected)) {
         locs.push_back(smap.find_primary_loc(arg.get()));
       }
     }
   } catch (const ast_ops::func_arg_error& arg_err) {
     msg << ": " << arg_err.what();
 
-    for (int index : arg_err.indices()) {
+    for (auto index : arg_err.indices()) {
       locs.push_back(smap.find_primary_loc(node->args()[index].get()));
     }
   } catch (const std::exception& inner) {
