@@ -118,9 +118,11 @@ struct matcher_traits<binary_op_pred_expr<Pred, Lhs, Rhs, Commute>> {
         return true;
       }
 
-      if (Commute && matcher_traits<Lhs>::match(expr.lhs, node_rhs, ctx) &&
-          matcher_traits<Rhs>::match(expr.rhs, node_lhs, ctx)) {
-        return true;
+      if constexpr (Commute) {
+        if (matcher_traits<Lhs>::match(expr.lhs, node_rhs, ctx) &&
+            matcher_traits<Rhs>::match(expr.rhs, node_lhs, ctx)) {
+          return true;
+        }
       }
 
       return false;
