@@ -94,7 +94,17 @@ bool apply_rewriters(mparse::ast_node_ptr& node,
 
 using rewriter_func = std::function<bool(mparse::ast_node_ptr&)>;
 
-bool apply_recursively(mparse::ast_node_ptr& node, rewriter_func func);
+bool apply_to_children(mparse::ast_node_ptr& node, const rewriter_func& func);
+
+template <typename F>
+bool apply_recursively(mparse::ast_node_ptr& node, F&& func) {
+  return apply_to_children(node,
+                           [&](mparse::ast_node_ptr& cur_node) {
+                             return apply_recursively(cur_node,
+                                                      std::forward<F>(func));
+                           }) |
+         func(node);
+}
 
 template <typename... Ts>
 bool apply_rewriters_recursively(mparse::ast_node_ptr& node,
