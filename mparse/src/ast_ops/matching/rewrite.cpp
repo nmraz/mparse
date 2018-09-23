@@ -47,9 +47,9 @@ void child_apply_visitor::visit(mparse::func_node& node) {
 } // namespace
 
 
-bool apply_to_children(mparse::ast_node_ptr& node, const rewriter_func& func) {
+bool apply_to_children(mparse::ast_node& node, const rewriter_func& func) {
   child_apply_visitor vis(func);
-  node->apply_visitor(vis);
+  node.apply_visitor(vis);
   return vis.result;
 }
 
