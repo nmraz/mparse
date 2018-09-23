@@ -102,7 +102,7 @@ bool apply_recursively(mparse::ast_node_ptr& node, F&& func) {
       apply_to_children(*node, [&](mparse::ast_node_ptr& cur_node) {
         return apply_recursively(cur_node, std::forward<F>(func));
       });
-  return applied_to_children | func(node);
+  return applied_to_children | std::forward<F>(func)(node);
 }
 
 template <typename... Ts>
