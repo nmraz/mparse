@@ -98,12 +98,11 @@ bool apply_to_children(mparse::ast_node_ptr& node, const rewriter_func& func);
 
 template <typename F>
 bool apply_recursively(mparse::ast_node_ptr& node, F&& func) {
-  return apply_to_children(node,
-                           [&](mparse::ast_node_ptr& cur_node) {
-                             return apply_recursively(cur_node,
-                                                      std::forward<F>(func));
-                           }) |
-         func(node);
+  bool applied_to_children =
+      apply_to_children(node, [&](mparse::ast_node_ptr& cur_node) {
+        return apply_recursively(cur_node, std::forward<F>(func));
+      });
+  return applied_to_children | func(node);
 }
 
 template <typename... Ts>
