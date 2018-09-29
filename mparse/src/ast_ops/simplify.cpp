@@ -7,6 +7,8 @@ using namespace ast_ops::matching::literals;
 namespace ast_ops {
 namespace {
 
+// clang-format off
+
 constexpr ast_ops::matching::rewriter_list strip_paren_rewriters = {
     paren(x),
     x, // (x) -> x
@@ -37,6 +39,8 @@ constexpr ast_ops::matching::rewriter_list canon_rewriters = {
     capture_as<1>(match_not(match_or(x * y, lit_or_neg))),
     1_lit * cap<1> // x -> 1 * x
 };
+
+// clang-format on
 
 } // namespace
 
