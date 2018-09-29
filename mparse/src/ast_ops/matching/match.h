@@ -233,9 +233,10 @@ using get_match_type_t = typename get_match_type<E>::type;
 template <typename Tag, typename Expr>
 struct matcher_traits<capture_expr_impl<Tag, Expr>> {
   using inner_match_type = impl::get_match_type_t<Expr>;
-  using captures =
-      caplist_append<get_captures_t<Expr>,
-                     capture<Tag, mparse::node_ptr<inner_match_type>>>;
+  using captures = caplist<capture<Tag, mparse::node_ptr<inner_match_type>>>;
+
+  static_assert(std::is_same_v<get_captures_t<Expr>, caplist<>>,
+                "Nested captures are not supported");
 
   template <typename Ctx>
   static bool match(const capture_expr_impl<Tag, Expr>& expr,
