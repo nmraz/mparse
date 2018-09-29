@@ -10,18 +10,18 @@ namespace {
 // clang-format off
 
 constexpr ast_ops::matching::rewriter_list strip_paren_rewriters = {
-    paren(x), x // (x) -> x
+    paren(x), x
 };
 
 
 constexpr ast_ops::matching::rewriter_list canon_op_rewriters = {
-    +x, x, // +x -> x
+    +x, x,
 
-    x - y, x + -y, // x - y -> x + -y
+    x - y, x + -y,
     
-    -capture_as<1>(match_not(lit)), -1_lit * cap<1>, // -x -> -1 * x
+    -capture_as<1>(match_not(lit)), -1_lit * cap<1>,
     
-    x / y, x * pow(y, -1_lit) // x / y -> x * y^-1
+    x / y, x * pow(y, -1_lit)
 };
 
 
