@@ -72,8 +72,8 @@ private:
   static bool match_helper(const std::tuple<Args...>& args,
                            match_type::arg_list& arg_nodes,
                            std::index_sequence<I...>, Ctx& ctx) {
-    return (... &&
-            matcher_traits<Args>::match(std::get<I>(args), arg_nodes[I], ctx));
+    return (matcher_traits<Args>::match(std::get<I>(args), arg_nodes[I], ctx) &&
+            ...);
   }
 
 public:

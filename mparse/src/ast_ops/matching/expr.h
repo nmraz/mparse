@@ -323,7 +323,7 @@ constexpr id_expr id(std::string_view name) {
 }
 
 template <typename... Args,
-          typename = std::enable_if_t<(... && is_match_expr<Args>)>>
+          typename = std::enable_if_t<(is_match_expr<Args> && ...)>>
 constexpr func_expr<Args...> func(std::string_view name, Args... args) {
   return {name, {args...}};
 }
