@@ -65,26 +65,21 @@ struct builder_traits<id_expr> {
 
 template <typename... Args>
 struct builder_traits<func_expr<Args...>> {
-private:
-  template <typename BuildTags, typename... Args, size_t... I, typename Ctx>
-  static mparse::func_node::arg_list build_args(const std::tuple<Args...>& args,
-                                                std::index_sequence<I...>,
-                                                Ctx&& ctx) {
-    mparse::func_node::arg_list arg_nodes;
-    (..., arg_nodes.push_back(builder_traits<Args>::template build<BuildTags>(
-              std::get<I>(args), std::forward<Ctx>(ctx))));
-    return arg_nodes;
-  }
-
-public:
   using tags = util::type_list_cat_t<impl::get_build_tags_t<Args>...>;
 
   template <typename BuildTags, typename Ctx>
   static auto build(const func_expr<Args...>& expr, Ctx&& ctx) {
-    return mparse::make_ast_node<mparse::func_node>(
-        std::string(expr.name),
-        build_args<BuildTags>(expr.args, std::index_sequence_for<Args...>{},
-                              std::forward<Ctx>(ctx)));
+    auto args = std::apply(
+        [&](auto&&... arg_exprs) {
+          mparse::func_node::arg_list args;
+          (args.push_back(builder_traits<Args>::template build<BuildTags>(
+               arg_exprs, std::forward<Ctx>(ctx))),
+           ...);
+        },
+        expr.args);
+
+    return mparse::make_ast_node<mparse::func_node>(std::string(expr.name),
+                                                    std::move(args));
   }
 };
 
