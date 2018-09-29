@@ -113,8 +113,7 @@ double cbrt(double x) {
 
 double nroot(double n, double val) {
   if (val < 0 && std::fmod(n, 2) != 1) {
-    throw func_arg_error("taking non-odd nth-root of negative number",
-                                  {0, 1});
+    throw func_arg_error("taking non-odd nth-root of negative number", {0, 1});
   }
   if (n == 0) {
     throw func_arg_error("taking zero-th root of number", {0});
