@@ -20,7 +20,7 @@ constexpr ast_ops::matching::rewriter_list canon_op_rewriters = {
     x - y,
     x + -y, // x - y -> x + -y
 
-    -capture_as<1>(match_not(matching::node_type_expr<mparse::literal_node>{})),
+    -capture_as<1>(match_not(lit)),
     -1_lit * cap<1>, // -x -> -1 * x
 
     x / y,
@@ -28,8 +28,7 @@ constexpr ast_ops::matching::rewriter_list canon_op_rewriters = {
 };
 
 
-constexpr auto lit_or_neg =
-    match_or(matching::node_type_expr<mparse::literal_node>{}, -x);
+constexpr auto lit_or_neg = match_or(lit, -any);
 
 constexpr ast_ops::matching::rewriter_list canon_rewriters = {
     capture_as<1>(match_not(match_or(match_or(pow(x, y), x * y), lit_or_neg))),
