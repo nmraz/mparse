@@ -348,6 +348,9 @@ template <int N>
 constexpr retrieve_capture_expr<N> cap{};
 
 
+constexpr node_type_expr<mparse::ast_node> any{};
+constexpr node_type_expr<mparse::literal_node> lit{};
+
 constexpr constant_expr<1> c1{};
 constexpr constant_expr<2> c2{};
 constexpr constant_expr<3> c3{};
