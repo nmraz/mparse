@@ -7,8 +7,10 @@ using namespace ast_ops::matching::literals;
 namespace ast_ops {
 namespace {
 
-constexpr ast_ops::matching::rewriter_list strip_paren_rewriters = {paren(x),
-                                                                    x};
+constexpr ast_ops::matching::rewriter_list strip_paren_rewriters = {
+    paren(x),
+    x, // (x) -> x
+};
 
 
 constexpr ast_ops::matching::rewriter_list canon_op_rewriters = {
