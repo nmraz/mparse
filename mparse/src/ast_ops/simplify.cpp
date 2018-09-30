@@ -72,6 +72,7 @@ void canonicalize(mparse::ast_node_ptr& node) {
   do_canonicalize(node);
 }
 
-void decanonicalize(mparse::ast_node_ptr& node) {}
+
+void uncanonicalize(mparse::ast_node_ptr& node) {}
 
 } // namespace ast_ops
