@@ -93,18 +93,21 @@ using basic_rewriter_func = std::function<void(mparse::ast_node_ptr&)>;
 
 void apply_to_children(mparse::ast_node& node, const basic_rewriter_func& func);
 
+template <typename F>
+void apply_recursively(mparse::ast_node_ptr& node, F&& func) {
+  apply_to_children(*node, [&](mparse::ast_node_ptr& cur_node) {
+    apply_recursively(cur_node, std::forward<F>(func));
+  });
+  std::forward<F>(func)(node);
+}
+
 template <typename... Ts>
 bool apply_rewriters_recursively(mparse::ast_node_ptr& node,
                                  const rewriter_list<Ts...>& list) {
   bool ret = false;
-  while (apply_rewriters(node, list)) {
-    ret = true;
-  }
-
-  apply_to_children(*node, [&](mparse::ast_node_ptr& child) {
-    ret |= apply_rewriters_recursively(child, list);
+  apply_recursively(node, [&](mparse::ast_node_ptr& cur_node) {
+    ret |= apply_rewriters(cur_node, list);
   });
-
   return ret;
 }
 
