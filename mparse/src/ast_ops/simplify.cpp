@@ -28,10 +28,11 @@ constexpr ast_ops::matching::rewriter_list canon_op_rewriters = {
 constexpr auto lit_or_neg = match_or(lit, -any);
 
 constexpr ast_ops::matching::rewriter_list canon_rewriters = {
-    capture_as<1>(match_not(match_or(match_or(pow(x, y), x * y), lit_or_neg))),
+    capture_as<1>(
+        match_not(match_or(match_or(pow(any, any), any * any), lit_or_neg))),
     pow(cap<1>, 1_lit), // x -> x ^ 1
 
-    capture_as<1>(match_not(match_or(x * y, lit_or_neg))),
+    capture_as<1>(match_not(match_or(any * any, lit_or_neg))),
     1_lit * cap<1> // x -> 1 * x
 };
 
