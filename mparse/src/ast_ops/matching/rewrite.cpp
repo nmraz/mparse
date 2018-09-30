@@ -15,42 +15,40 @@ struct child_apply_visitor : mparse::ast_visitor {
   void visit(mparse::func_node& node) override;
 
   const rewriter_func& func;
-  bool result = false;
 };
 
 void child_apply_visitor::visit(mparse::unary_node& node) {
   auto child = node.ref_child(); // ref here for strong exception guarantee
-  result |= func(child);         // no short-circuiting
+  func(child);
   node.set_child(std::move(child));
 }
 
 void child_apply_visitor::visit(mparse::binary_op_node& node) {
   {
     auto lhs = node.ref_lhs(); // ref here for strong exception guarantee
-    result |= func(lhs);       // no short-circuiting
+    func(lhs);
     node.set_lhs(std::move(lhs));
   }
 
   {
     auto rhs = node.ref_rhs(); // ref here for strong exception guarantee
-    result |= func(rhs);       // no short-circuiting
+    func(rhs);
     node.set_rhs(std::move(rhs));
   }
 }
 
 void child_apply_visitor::visit(mparse::func_node& node) {
   for (auto& arg : node.args()) {
-    result |= func(arg);
+    func(arg);
   }
 }
 
 } // namespace
 
 
-bool apply_to_children(mparse::ast_node& node, const rewriter_func& func) {
+void apply_to_children(mparse::ast_node& node, const rewriter_func& func) {
   child_apply_visitor vis(func);
   node.apply_visitor(vis);
-  return vis.result;
 }
 
 } // namespace ast_ops::matching
