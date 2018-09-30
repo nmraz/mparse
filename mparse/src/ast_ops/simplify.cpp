@@ -37,6 +37,22 @@ constexpr ast_ops::matching::rewriter_list canon_rewriters = {
 
 // clang-format on
 
+
+void do_canonicalize(mparse::ast_node_ptr& node) {
+  matching::apply_rewriters(node, canon_rewriters);
+
+  // At this point, the expression is of the form `lit * (___ ^ lit)`. We now
+  // need to canonicalize the children of `___`.
+  matching::apply_to_children(*node, [](mparse::ast_node_ptr& mul_child) {
+    matching::apply_to_children(
+        *mul_child, [](mparse::ast_node_ptr& pow_child) {
+          matching::apply_to_children(
+              *pow_child,
+              [](mparse::ast_node_ptr& child) { do_canonicalize(child); });
+        });
+  });
+}
+
 } // namespace
 
 
@@ -46,8 +62,12 @@ void strip_parens(mparse::ast_node_ptr& node) {
 
 
 void canonicalize(mparse::ast_node_ptr& node) {
+  // setup
+  strip_parens(node);
   matching::apply_rewriters_recursively(node, canon_op_rewriters);
-  matching::apply_rewriters_recursively(node, canon_rewriters);
+
+  // actual canonicalization
+  do_canonicalize(node);
 }
 
 void decanonicalize(mparse::ast_node_ptr& node) {}
