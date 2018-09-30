@@ -60,8 +60,11 @@ constexpr auto get_rewriters_after_expr(const M& matcher, const B& builder,
 
 template <typename... Ts>
 bool do_apply_rewriters(mparse::ast_node_ptr& node, const Ts&... rewriters) {
-  // note: not || as we don't want short-circuiting
-  return (rewriters(node) | ...);
+  bool ret = false;
+
+  // no short-circuiting, executed in order
+  ((ret |= rewriters(node)), ...);
+  return ret;
 }
 
 } // namespace impl
