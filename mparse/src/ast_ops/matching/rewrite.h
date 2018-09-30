@@ -57,16 +57,6 @@ constexpr auto get_rewriters_after_expr(const M& matcher, const B& builder,
                         get_rewriters(rest...));
 }
 
-
-template <typename... Ts>
-bool do_apply_rewriters(mparse::ast_node_ptr& node, const Ts&... rewriters) {
-  bool ret = false;
-
-  // no short-circuiting, executed in order
-  ((ret |= rewriters(node)), ...);
-  return ret;
-}
-
 } // namespace impl
 
 
@@ -89,7 +79,11 @@ bool apply_rewriters(mparse::ast_node_ptr& node,
                      const rewriter_list<Ts...>& list) {
   return std::apply(
       [&](auto&&... rewriters) {
-        return impl::do_apply_rewriters(node, rewriters...);
+        bool ret = false;
+
+        // no short-circuiting, executed in order
+        ((ret |= rewriters(node)), ...);
+        return ret;
       },
       list.rewriters_);
 }
