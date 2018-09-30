@@ -61,13 +61,14 @@ void strip_parens(mparse::ast_node_ptr& node) {
 }
 
 
-void canonicalize(mparse::ast_node_ptr& node) {
-  // setup
+void canonicalize_ops(mparse::ast_node_ptr& node) {
   strip_parens(node);
   while (matching::apply_rewriters_recursively(node, canon_op_rewriters)) {
   }
+}
 
-  // actual canonicalization
+void canonicalize(mparse::ast_node_ptr& node) {
+  canonicalize_ops(node);
   do_canonicalize(node);
 }
 
