@@ -8,13 +8,13 @@ namespace ast_ops::matching {
 namespace {
 
 struct child_apply_visitor : mparse::ast_visitor {
-  child_apply_visitor(const rewriter_func& func) : func(func) {}
+  child_apply_visitor(const basic_rewriter_func& func) : func(func) {}
 
   void visit(mparse::unary_node& node) override;
   void visit(mparse::binary_op_node& node) override;
   void visit(mparse::func_node& node) override;
 
-  const rewriter_func& func;
+  const basic_rewriter_func& func;
 };
 
 void child_apply_visitor::visit(mparse::unary_node& node) {
@@ -46,7 +46,7 @@ void child_apply_visitor::visit(mparse::func_node& node) {
 } // namespace
 
 
-void apply_to_children(mparse::ast_node& node, const rewriter_func& func) {
+void apply_to_children(mparse::ast_node& node, const basic_rewriter_func& func) {
   child_apply_visitor vis(func);
   node.apply_visitor(vis);
 }
