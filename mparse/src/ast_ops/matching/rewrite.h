@@ -105,9 +105,14 @@ template <typename... Ts>
 bool apply_rewriters_recursively(mparse::ast_node_ptr& node,
                                  const rewriter_list<Ts...>& list) {
   bool ret = false;
-  apply_recursively(node, [&](mparse::ast_node_ptr& cur_node) {
-    ret |= apply_rewriters(cur_node, list);
+  while (apply_rewriters(node, list)) {
+    ret = true;
+  }
+
+  apply_to_children(*node, [&](mparse::ast_node_ptr& child) {
+    ret |= apply_rewriters_recursively(child, list);
   });
+
   return ret;
 }
 
