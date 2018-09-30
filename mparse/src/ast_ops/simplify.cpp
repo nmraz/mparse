@@ -9,12 +9,12 @@ namespace {
 
 // clang-format off
 
-constexpr ast_ops::matching::rewriter_list strip_paren_rewriters = {
+constexpr matching::rewriter_list strip_paren_rewriters = {
     paren(x), x
 };
 
 
-constexpr ast_ops::matching::rewriter_list canon_op_rewriters = {
+constexpr matching::rewriter_list canon_op_rewriters = {
     +x, x,
 
     x - y, x + -y,
@@ -27,7 +27,7 @@ constexpr ast_ops::matching::rewriter_list canon_op_rewriters = {
 
 constexpr auto lit_or_neg = match_or(lit, -any);
 
-constexpr ast_ops::matching::rewriter_list canon_rewriters = {
+constexpr matching::rewriter_list canon_rewriters = {
     capture_as<1>(
         match_not(match_or(match_or(pow(any, any), any * any), lit_or_neg))),
     pow(cap<1>, 1_lit), // x -> x ^ 1
