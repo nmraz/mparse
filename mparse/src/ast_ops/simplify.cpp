@@ -26,9 +26,10 @@ constexpr matching::rewriter_list canon_op_rewriters = {
 
 
 constexpr auto lit_or_neg = match_or(lit, -any);
+constexpr auto non_mul = match_not(match_or(any * any, lit_or_neg));
 
 constexpr matching::rewriter_list canon_mul_rewriter = {
-    capture_as<1>(match_not(match_or(any * any, lit_or_neg))),
+    capture_as<1>(non_mul),
     1_lit * cap<1> // x -> 1 * x
 };
 
@@ -43,7 +44,7 @@ constexpr matching::rewriter_list canon_pow_rewriter = {
 void do_canonicalize(mparse::ast_node_ptr& node);
 
 void do_canonicalize_pow(mparse::ast_node_ptr& node) {
-  if (!matching::exec_match(match_or(any * any, lit_or_neg), node)) {
+  if (matching::exec_match(non_mul, node)) {
     // insert pow or ignore existing one
     matching::apply_rewriters(node, canon_pow_rewriter);
 
