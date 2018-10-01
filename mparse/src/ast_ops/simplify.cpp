@@ -27,30 +27,44 @@ constexpr matching::rewriter_list canon_op_rewriters = {
 
 constexpr auto lit_or_neg = match_or(lit, -any);
 
-constexpr matching::rewriter_list canon_rewriters = {
-    capture_as<1>(
-        match_not(match_or(match_or(pow(any, any), any * any), lit_or_neg))),
-    pow(cap<1>, 1_lit), // x -> x ^ 1
-
+constexpr matching::rewriter_list canon_mul_rewriter = {
     capture_as<1>(match_not(match_or(any * any, lit_or_neg))),
     1_lit * cap<1> // x -> 1 * x
+};
+
+constexpr matching::rewriter_list canon_pow_rewriter = {
+    capture_as<1>(match_not(pow(any, any))),
+    pow(cap<1>, 1_lit), // x -> x ^ 1
 };
 
 // clang-format on
 
 
-void do_canonicalize(mparse::ast_node_ptr& node) {
-  matching::apply_rewriters(node, canon_rewriters);
+void do_canonicalize(mparse::ast_node_ptr& node);
 
-  // At this point, the expression is of the form `lit * (___ ^ lit)`. We now
-  // need to canonicalize the children of `___`.
-  matching::apply_to_children(*node, [](mparse::ast_node_ptr& mul_child) {
+void do_canonicalize_pow(mparse::ast_node_ptr& node) {
+  if (!matching::exec_match(match_or(any * any, lit_or_neg), node)) {
+    // insert pow or ignore existing one
+    matching::apply_rewriters(node, canon_pow_rewriter);
+
+    matching::apply_to_children(*node, [](mparse::ast_node_ptr& pow_child) {
+      matching::apply_to_children(*pow_child, [](mparse::ast_node_ptr& child) {
+        do_canonicalize(child);
+      });
+    });
+  } else {
+    // couldn't add a pow here - try children
     matching::apply_to_children(
-        *mul_child, [](mparse::ast_node_ptr& pow_child) {
-          matching::apply_to_children(
-              *pow_child,
-              [](mparse::ast_node_ptr& child) { do_canonicalize(child); });
-        });
+        *node, [](mparse::ast_node_ptr& child) { do_canonicalize_pow(child); });
+  }
+}
+
+void do_canonicalize(mparse::ast_node_ptr& node) {
+  matching::apply_rewriters(node, canon_mul_rewriter);
+
+  // expression is of the form `x * ___`
+  matching::apply_to_children(*node, [](mparse::ast_node_ptr& mul_child) {
+    do_canonicalize_pow(mul_child);
   });
 }
 
