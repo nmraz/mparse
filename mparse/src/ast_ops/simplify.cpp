@@ -7,6 +7,12 @@ using namespace ast_ops::matching::literals;
 namespace ast_ops {
 namespace {
 
+/* CANONICALIZATION */
+
+constexpr auto lit_or_neg = match_or(lit, -any);
+constexpr auto non_mul = match_not(match_or(any * any, lit_or_neg));
+
+
 // clang-format off
 
 constexpr matching::rewriter_list strip_paren_rewriters = {
@@ -16,26 +22,17 @@ constexpr matching::rewriter_list strip_paren_rewriters = {
 
 constexpr matching::rewriter_list canon_op_rewriters = {
     +x, x,
-
     x - y, x + -y,
-    
     -capture_as<1>(match_not(lit)), -1_lit * cap<1>,
-    
     x / y, x * pow(y, -1_lit)
 };
 
-
-constexpr auto lit_or_neg = match_or(lit, -any);
-constexpr auto non_mul = match_not(match_or(any * any, lit_or_neg));
-
 constexpr matching::rewriter_list canon_mul_rewriter = {
-    capture_as<1>(non_mul),
-    1_lit * cap<1> // x -> 1 * x
+    capture_as<1>(non_mul), 1_lit * cap<1>
 };
 
 constexpr matching::rewriter_list canon_pow_rewriter = {
-    capture_as<1>(match_not(pow(any, any))),
-    pow(cap<1>, 1_lit), // x -> x ^ 1
+    capture_as<1>(match_not(pow(any, any))), pow(cap<1>, 1_lit)
 };
 
 // clang-format on
