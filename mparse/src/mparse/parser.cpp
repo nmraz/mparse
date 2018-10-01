@@ -417,7 +417,7 @@ void parser::parser_impl::set_bin_locs(const binary_op_node* node,
 }
 
 
-// PUBLIC API
+/* PUBLIC API */
 
 parser::parser(source_stream& stream, source_map* smap)
     : impl_(std::make_unique<parser_impl>(stream, smap)) {}
