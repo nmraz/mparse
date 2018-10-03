@@ -27,42 +27,43 @@ constexpr matching::rewriter_list canon_op_rewriters = {
     x / y, x * pow(y, -1_lit)
 };
 
-constexpr matching::rewriter_list canon_mul_rewriter = {
+constexpr matching::rewriter_list canon_mul_ident_rewriter = {
     capture_as<1>(non_mul), 1_lit * cap<1>
 };
 
-constexpr matching::rewriter_list canon_pow_rewriter = {
+constexpr matching::rewriter_list canon_pow_ident_rewriter = {
     capture_as<1>(match_not(pow(any, any))), pow(cap<1>, 1_lit)
 };
 
 // clang-format on
 
 
-void do_canonicalize(mparse::ast_node_ptr& node);
+void canonicalize_mul_ident(mparse::ast_node_ptr& node);
 
-void do_canonicalize_pow(mparse::ast_node_ptr& node) {
+void canonicalize_pow_ident(mparse::ast_node_ptr& node) {
   if (matching::exec_match(non_mul, node)) {
     // insert pow or ignore existing one
-    matching::apply_rewriters(node, canon_pow_rewriter);
+    matching::apply_rewriters(node, canon_pow_ident_rewriter);
 
     matching::apply_to_children(*node, [](mparse::ast_node_ptr& pow_child) {
       matching::apply_to_children(*pow_child, [](mparse::ast_node_ptr& child) {
-        do_canonicalize(child);
+        canonicalize_mul_ident(child);
       });
     });
   } else {
     // couldn't add a pow here - try children
-    matching::apply_to_children(
-        *node, [](mparse::ast_node_ptr& child) { do_canonicalize_pow(child); });
+    matching::apply_to_children(*node, [](mparse::ast_node_ptr& child) {
+      canonicalize_pow_ident(child);
+    });
   }
 }
 
-void do_canonicalize(mparse::ast_node_ptr& node) {
-  matching::apply_rewriters(node, canon_mul_rewriter);
+void canonicalize_mul_ident(mparse::ast_node_ptr& node) {
+  matching::apply_rewriters(node, canon_mul_ident_rewriter);
 
   // expression is of the form `x * ___`
   matching::apply_to_children(*node, [](mparse::ast_node_ptr& mul_child) {
-    do_canonicalize_pow(mul_child);
+    canonicalize_pow_ident(mul_child);
   });
 }
 
@@ -93,7 +94,7 @@ void canonicalize_ops(mparse::ast_node_ptr& node) {
 
 void canonicalize(mparse::ast_node_ptr& node) {
   canonicalize_ops(node);
-  do_canonicalize(node);
+  canonicalize_mul_ident(node);
 }
 
 
