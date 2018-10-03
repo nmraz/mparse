@@ -236,22 +236,23 @@ constexpr bool is_match_expr<disjunction_expr<First, Second>> = true;
 
 
 template <typename Expr, typename = std::enable_if_t<is_match_expr<Expr>>>
-constexpr negation_expr<Expr> match_not(Expr expr) {
+constexpr negation_expr<Expr> operator!(Expr expr) {
   return {expr};
 }
 
 template <
     typename First, typename Second,
     typename = std::enable_if_t<is_match_expr<First> && is_match_expr<Second>>>
-constexpr conjunction_expr<First, Second> match_and(First first,
-                                                    Second second) {
+constexpr conjunction_expr<First, Second> operator&&(First first,
+                                                     Second second) {
   return {first, second};
 }
 
 template <
     typename First, typename Second,
     typename = std::enable_if_t<is_match_expr<First> && is_match_expr<Second>>>
-constexpr disjunction_expr<First, Second> match_or(First first, Second second) {
+constexpr disjunction_expr<First, Second> operator||(First first,
+                                                     Second second) {
   return {first, second};
 }
 
