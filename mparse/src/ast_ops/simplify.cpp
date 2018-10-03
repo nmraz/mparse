@@ -77,7 +77,17 @@ constexpr matching::rewriter_list uncanon_op_rewriters = {
     x * (1_lit / y), x / y
 };
 
+constexpr matching::rewriter_list uncanon_ident_rewriters = {
+    1_lit * x, x,
+    pow(x, 1_lit), x
+};
+
 // clang-format on
+
+
+void uncanonicalize_ident(mparse::ast_node_ptr& node) {
+  matching::apply_rewriters_recursively(node, uncanon_ident_rewriters);
+}
 
 } // namespace
 
@@ -102,6 +112,9 @@ void uncanonicalize_ops(mparse::ast_node_ptr& node) {
   matching::apply_rewriters_recursively(node, uncanon_op_rewriters);
 }
 
-void uncanonicalize(mparse::ast_node_ptr&) {}
+void uncanonicalize(mparse::ast_node_ptr& node) {
+  uncanonicalize_ops(node);
+  uncanonicalize_ident(node);
+}
 
 } // namespace ast_ops
