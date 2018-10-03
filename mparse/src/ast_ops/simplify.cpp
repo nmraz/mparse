@@ -66,6 +66,18 @@ void do_canonicalize(mparse::ast_node_ptr& node) {
   });
 }
 
+
+// clang-format off
+
+constexpr matching::rewriter_list uncanon_op_rewriters = {
+    -1_lit * x, -x,
+    x + -y * z, x - y * z,
+    pow(x, -c1), 1_lit / pow(x, c1),
+    x * (1_lit / y), x / y
+};
+
+// clang-format on
+
 } // namespace
 
 
@@ -85,7 +97,9 @@ void canonicalize(mparse::ast_node_ptr& node) {
 }
 
 
-void uncanonicalize_ops(mparse::ast_node_ptr&) {}
+void uncanonicalize_ops(mparse::ast_node_ptr& node) {
+  matching::apply_rewriters_recursively(node, uncanon_op_rewriters);
+}
 
 void uncanonicalize(mparse::ast_node_ptr&) {}
 
