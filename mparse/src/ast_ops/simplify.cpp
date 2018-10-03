@@ -22,7 +22,7 @@ constexpr matching::rewriter_list strip_paren_rewriters = {
 
 constexpr matching::rewriter_list canon_op_rewriters = {
     +x, x,
-    x - y, x + -y,
+    x - y, x + -1_lit * y,
     -capture_as<1>(match_not(lit)), -1_lit * cap<1>,
     x / y, x * pow(y, -1_lit)
 };
@@ -76,8 +76,7 @@ void strip_parens(mparse::ast_node_ptr& node) {
 
 void canonicalize_ops(mparse::ast_node_ptr& node) {
   strip_parens(node);
-  while (matching::apply_rewriters_recursively(node, canon_op_rewriters)) {
-  }
+  matching::apply_rewriters_recursively(node, canon_op_rewriters);
 }
 
 void canonicalize(mparse::ast_node_ptr& node) {
