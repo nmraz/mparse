@@ -25,8 +25,8 @@ std::string stringify_source_locs(const mparse::ast_node& node,
 
   std::string ret;
   for (const auto& loc : smap->find_locs(&node)) {
-    ret += " <col:" + std::to_string(loc.from() + 1) +
-           ", col:" + std::to_string(loc.to()) + ">";
+    ret += " <" + std::to_string(loc.from() + 1) + "," +
+           std::to_string(loc.to()) + ">";
   }
 
   return ret;
