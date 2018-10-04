@@ -73,7 +73,6 @@ void canonicalize_mul_ident(mparse::ast_node_ptr& node) {
 constexpr matching::rewriter_list uncanon_op_rewriters = {
     -1_lit * x, -x,
     x + -y, x - y,
-    x + -y * z, x - y * z,
     
     pow(x, -c1), 1_lit / pow(x, c1),
     x * (1_lit / y), x / y
