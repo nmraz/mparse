@@ -258,10 +258,10 @@ ast_node_ptr parser::parser_impl::consume_literal() {
   std::string_view tok_val = cur_token_.val;
   double val;
 
-  auto res =
-      std::from_chars(tok_val.data(), tok_val.data() + tok_val.size(), val);
-  if (res.ec == std::errc::result_out_of_range) {
-    throw syntax_error("Literal too large", {get_loc(cur_token_)});
+  auto status = std::from_chars(tok_val.data(), tok_val.data() + tok_val.size(),
+                                val, std::chars_format::fixed);
+  if (status.ec != std::errc{}) {
+    throw syntax_error("Error parsing literal", {get_loc(cur_token_)});
   }
 
   auto node = make_ast_node<literal_node>(val);
