@@ -1,6 +1,7 @@
 #include "helpers.h"
 
 #include "mparse/lex.h"
+#include <charconv>
 #include <cmath>
 #include <string>
 
@@ -44,7 +45,14 @@ void parse_vardefs(ast_ops::var_scope& vscope, int argc,
     if (last_tok.type != mparse::token_type::literal) {
       continue;
     }
-    val = std::strtod(last_tok.val.data(), nullptr);
+
+    auto status = std::from_chars(last_tok.val.data(),
+                                  last_tok.val.data() + last_tok.val.size(),
+                                  val, std::chars_format::fixed);
+
+    if (status.ec != std::errc{}) {
+      continue;
+    }
 
     vscope.set_binding(std::move(name), val);
   } while (last_tok.type != mparse::token_type::eof);
