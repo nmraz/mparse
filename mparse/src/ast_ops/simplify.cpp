@@ -71,8 +71,10 @@ void canonicalize_mul_ident(mparse::ast_node_ptr& node) {
 // clang-format off
 
 constexpr matching::rewriter_list uncanon_op_rewriters = {
-    -1_lit * x, -x,
+    // order is important - match subtraction before negation
     x + -y * z, x - y * z,
+    -1_lit * x, -x,
+    
     pow(x, -c1), 1_lit / pow(x, c1),
     x * (1_lit / y), x / y
 };
