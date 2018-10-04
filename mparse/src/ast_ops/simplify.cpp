@@ -118,8 +118,9 @@ void uncanonicalize_ops(mparse::ast_node_ptr& node) {
 }
 
 void uncanonicalize(mparse::ast_node_ptr& node) {
+  uncanonicalize_ident(node); // initial pass
   uncanonicalize_ops(node);
-  uncanonicalize_ident(node);
+  uncanonicalize_ident(node); // clean up after operator uncanonicalization
 }
 
 } // namespace ast_ops
