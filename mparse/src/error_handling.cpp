@@ -19,22 +19,26 @@ void print_syntax_error(std::string_view msg) {
 }
 
 
+void append_msg(std::ostream& msg, const std::exception& nested) {
+  msg << ": " << nested.what();
+}
+
 void handle_bad_func_call(const ast_ops::eval_error& err,
                           const mparse::source_map& smap,
                           std::string_view input) {
   auto* node = static_cast<const mparse::func_node*>(err.node());
 
-  std::ostringstream msg;
-  std::vector<mparse::source_range> locs = {
+  std::vector locs = {
       smap.find_locs(node)[1], // function name
   };
 
+  std::ostringstream msg;
   msg << err.what();
 
   try {
     std::rethrow_if_nested(err);
   } catch (const ast_ops::arity_error& arity_err) {
-    msg << ": " << arity_err.what();
+    append_msg(msg, arity_err);
 
     auto expected = arity_err.expected();
     auto provided = arity_err.provided();
@@ -46,13 +50,13 @@ void handle_bad_func_call(const ast_ops::eval_error& err,
       }
     }
   } catch (const ast_ops::func_arg_error& arg_err) {
-    msg << ": " << arg_err.what();
+    append_msg(msg, arg_err);
 
     for (auto index : arg_err.indices()) {
       locs.push_back(smap.find_primary_loc(node->args()[index].get()));
     }
   } catch (const std::exception& inner) {
-    msg << ": " << inner.what();
+    append_msg(msg, inner);
   } catch (...) {
   }
 
@@ -66,6 +70,7 @@ void handle_bad_func_call(const ast_ops::eval_error& err,
 void handle_syntax_error(const mparse::syntax_error& err,
                          std::string_view input) {
   print_syntax_error(err.what());
+
   print_locs(input, err.where());
   if (!err.fixit_hint().empty()) {
     print_fixit(err.fixit_hint(), err.fixit_col());
