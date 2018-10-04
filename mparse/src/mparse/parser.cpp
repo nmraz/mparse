@@ -141,8 +141,8 @@ void parser::parser_impl::end_parse() {
 
 ast_node_ptr parser::parser_impl::parse_add() {
   static constexpr delim_val_mapping<binary_op_type> ops[] = {
-      {"+"sv, binary_op_type::add},
-      {"-"sv, binary_op_type::sub},
+      {"+", binary_op_type::add},
+      {"-", binary_op_type::sub},
   };
 
   const binary_op_type* op = nullptr;
@@ -164,8 +164,8 @@ ast_node_ptr parser::parser_impl::parse_add() {
 
 ast_node_ptr parser::parser_impl::parse_mult() {
   static constexpr delim_val_mapping<binary_op_type> ops[] = {
-      {"*"sv, binary_op_type::mult},
-      {"/"sv, binary_op_type::div},
+      {"*", binary_op_type::mult},
+      {"/", binary_op_type::div},
   };
 
   const binary_op_type* op = nullptr;
@@ -187,8 +187,8 @@ ast_node_ptr parser::parser_impl::parse_mult() {
 
 ast_node_ptr parser::parser_impl::parse_unary() {
   static constexpr delim_val_mapping<unary_op_type> ops[] = {
-      {"+"sv, unary_op_type::plus},
-      {"-"sv, unary_op_type::neg},
+      {"+", unary_op_type::plus},
+      {"-", unary_op_type::neg},
   };
 
   const unary_op_type* op = find_delim_val(ops, cur_token_);
@@ -217,7 +217,7 @@ ast_node_ptr parser::parser_impl::parse_unary() {
 ast_node_ptr parser::parser_impl::parse_pow() {
   ast_node_ptr node = parse_atom();
 
-  if (has_delim("^"sv)) {
+  if (has_delim("^")) {
     source_range op_loc = get_loc(cur_token_);
 
     get_next_token();
@@ -241,10 +241,10 @@ ast_node_ptr parser::parser_impl::parse_atom() {
     ret = consume_literal();
   } else if (cur_token_.type == token_type::ident) {
     ret = consume_ident();
-  } else if (has_delim("("sv)) {
-    ret = consume_paren_like<paren_node>(")"sv, "parentheses");
-  } else if (has_delim("|"sv)) {
-    ret = consume_paren_like<abs_node>("|"sv, "absolute value bars");
+  } else if (has_delim("(")) {
+    ret = consume_paren_like<paren_node>(")", "parentheses");
+  } else if (has_delim("|")) {
+    ret = consume_paren_like<abs_node>("|", "absolute value bars");
   } else {
     error();
   }
@@ -276,7 +276,7 @@ ast_node_ptr parser::parser_impl::consume_literal() {
 ast_node_ptr parser::parser_impl::consume_ident() {
   token name = cur_token_;
   get_next_token();
-  if (has_delim("("sv)) {
+  if (has_delim("(")) {
     return consume_func(name);
   }
 
@@ -294,19 +294,19 @@ ast_node_ptr parser::parser_impl::consume_func(token name) {
 
   func_node::arg_list args;
   {
-    term_tok_pusher push_paren(*this, ")"sv);
-    term_tok_pusher push_comma(*this, ","sv);
+    term_tok_pusher push_paren(*this, ")");
+    term_tok_pusher push_comma(*this, ",");
 
     get_next_token();
-    if (!has_delim(")"sv)) {
+    if (!has_delim(")")) {
       args.push_back(parse_add());
-      while (has_delim(","sv)) {
+      while (has_delim(",")) {
         get_next_token();
         args.push_back(parse_add());
       }
     }
 
-    check_balanced(open_loc, ")"sv, "parentheses in function call");
+    check_balanced(open_loc, ")", "parentheses in function call");
   }
 
   source_range close_loc = get_loc(cur_token_);
