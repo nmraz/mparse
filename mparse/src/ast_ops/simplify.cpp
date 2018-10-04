@@ -80,6 +80,9 @@ constexpr matching::rewriter_list uncanon_op_rewriters = {
 };
 
 constexpr matching::rewriter_list uncanon_ident_rewriters = {
+    0_lit * x, 0_lit,
+    x + 0_lit, x,
+
     1_lit * x, x,
     pow(x, 1_lit), x
 };
