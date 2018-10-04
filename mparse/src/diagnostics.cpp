@@ -14,12 +14,16 @@ std::string make_marker(std::size_t size) {
   return std::string(size, '~');
 }
 
-constexpr auto esc_white = "\x1b[37m"sv;
-constexpr auto esc_red = "\x1b[31m"sv;
-constexpr auto esc_green = "\x1b[32m"sv;
-constexpr auto esc_bold = "\x1b[1m"sv;
+std::string make_padding(std::size_t size) {
+  return std::string(size, ' ');
+}
 
-constexpr auto esc_reset = "\x1b[0m"sv;
+constexpr std::string_view esc_white = "\x1b[37m";
+constexpr std::string_view esc_red = "\x1b[31m";
+constexpr std::string_view esc_green = "\x1b[32m";
+constexpr std::string_view esc_bold = "\x1b[1m";
+
+constexpr std::string_view esc_reset = "\x1b[0m";
 
 } // namespace
 
@@ -37,7 +41,7 @@ void print_locs(std::string_view source,
   for (const auto& loc : underline_locs) {
     assert(prev_underline_loc.to() <= loc.from() &&
            "Overlapping or non-sorted source ranges");
-    std::cout << std::string(loc.from() - prev_underline_loc.to(), ' ')
+    std::cout << make_padding(loc.from() - prev_underline_loc.to())
               << make_marker(loc.to() - loc.from());
     prev_underline_loc = loc;
   }
@@ -45,5 +49,5 @@ void print_locs(std::string_view source,
 }
 
 void print_fixit(std::string_view hint, std::size_t col) {
-  std::cout << esc_green << std::string(col, ' ') << hint << esc_reset << "\n";
+  std::cout << esc_green << make_padding(col) << hint << esc_reset << "\n";
 }
