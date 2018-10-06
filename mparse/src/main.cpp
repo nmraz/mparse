@@ -66,6 +66,41 @@ auto parse_diag(std::string_view input) {
   }
 }
 
+
+void cmd_dump(mparse::ast_node_ptr ast, mparse::source_map smap,
+              std::string_view, int, const char* const*) {
+  ast_ops::dump_ast(ast.get(), &smap);
+}
+
+void cmd_pretty(mparse::ast_node_ptr ast, mparse::source_map, std::string_view,
+                int, const char* const*) {
+  std::cout << ast_ops::pretty_print(ast.get()) << "\n";
+}
+
+void cmd_strip(mparse::ast_node_ptr ast, mparse::source_map, std::string_view,
+               int, const char* const*) {
+  ast_ops::strip_parens(ast);
+  std::cout << ast_ops::pretty_print(ast.get()) << "\n";
+}
+
+void cmd_eval(mparse::ast_node_ptr ast, mparse::source_map smap,
+              std::string_view input, int argc, const char* const* argv) {
+  auto vscope = ast_ops::builtin_var_scope();
+  parse_vardefs(vscope, argc, argv);
+
+  try {
+    auto result =
+        ast_ops::eval(ast.get(), vscope, ast_ops::builtin_func_scope());
+    result.real(to_precision(result.real()));
+    result.imag(to_precision(result.imag()));
+
+    print_number(std::cout, result) << '\n';
+  } catch (const ast_ops::eval_error& err) {
+    handle_math_error(err, smap, input);
+    std::exit(1);
+  }
+}
+
 } // namespace
 
 
@@ -73,7 +108,14 @@ int main(int argc, const char* const* argv) {
   std::cout << std::setprecision(std::numeric_limits<double>::digits10 + 1);
 
   command_map commands = {
-
+      {"dump", {"Print a visualization of the AST.", cmd_dump}},
+      {"pretty", {"Pretty print the expression.", cmd_pretty}},
+      {"strip",
+       {"Pretty print the expression, with superfluous parentheses removed.",
+        cmd_strip}},
+      {"eval",
+       {"Evaluate the expression, using the passed variable definitions.",
+        cmd_eval}},
   };
 
   if (argc < 3) {
