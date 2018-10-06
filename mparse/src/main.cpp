@@ -68,4 +68,21 @@ auto parse_diag(std::string_view input) {
 
 int main(int argc, const char* const* argv) {
   std::cout << std::setprecision(std::numeric_limits<double>::digits10 + 1);
+
+  command_map commands = {
+
+  };
+
+  if (argc < 3) {
+    print_help(argv[0], commands);
+  }
+
+  std::string_view input = argv[2];
+  auto [ast, smap] = parse_diag(input);
+
+  if (auto it = commands.find(argv[1]); it != commands.end()) {
+    it->second.func(std::move(ast), std::move(smap), input, argc - 3, argv + 3);
+  } else {
+    print_help(argv[0], commands);
+  }
 }
