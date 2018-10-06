@@ -20,8 +20,9 @@ using namespace std::literals;
 
 namespace {
 
-using subcommand_func = std::function<int(
-    mparse::ast_node_ptr, mparse::source_map, int, const char* const*)>;
+using subcommand_func =
+    std::function<void(mparse::ast_node_ptr, mparse::source_map,
+                       std::string_view, int, const char* const*)>;
 
 struct subcommand {
   std::string_view desc;
