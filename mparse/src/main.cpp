@@ -9,14 +9,26 @@
 #include "mparse/parse_error.h"
 #include "mparse/parser.h"
 #include "mparse/source_map.h"
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <map>
 #include <utility>
 
 using namespace std::literals;
 
 namespace {
+
+using subcommand_func = std::function<int(
+    mparse::ast_node_ptr, mparse::source_map, int, const char* const*)>;
+
+struct subcommand {
+  std::string_view desc;
+  subcommand_func func;
+};
+
+using command_map = std::map<std::string, subcommand, std::less<>>;
 
 void print_help(std::string_view prog_name) {
   prog_name.remove_prefix(
