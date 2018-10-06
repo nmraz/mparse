@@ -111,7 +111,8 @@ int main(int argc, const char* const* argv) {
        {"Pretty print the expression, with superfluous parentheses removed.",
         cmd_strip}},
       {"eval",
-       {"Evaluate the expression, using the passed variable definitions.",
+       {"Evaluate the expression, using passed variable definitions of the "
+        "form 'var1=val1 var2=val2'.",
         cmd_eval}},
   };
 
