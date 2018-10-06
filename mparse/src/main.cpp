@@ -59,7 +59,7 @@ auto parse_diag(std::string_view input) {
   try {
     mparse::source_map smap;
     mparse::ast_node_ptr ast = mparse::parse(input, &smap);
-    return std::make_pair(std::move(ast), std::move(smap));
+    return std::pair{std::move(ast), std::move(smap)};
   } catch (const mparse::syntax_error& err) {
     handle_syntax_error(err, input);
     std::exit(1);
