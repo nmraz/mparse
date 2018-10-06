@@ -32,6 +32,9 @@ struct subcommand {
 using command_map = std::map<std::string, subcommand, std::less<>>;
 
 void print_help(std::string_view prog_name, const command_map& commands) {
+  prog_name.remove_prefix(
+      std::min(prog_name.find_last_of("\\/") + 1, prog_name.size()));
+
   std::cout << "Usage: " << prog_name << " ";
 
   bool first_iter = true;
