@@ -93,7 +93,7 @@ std::ostream& print_number(std::ostream& stream, ast_ops::number num,
     stream << " ";
   }
   if (num.imag() != 1.0) {
-    stream << num.imag() << "*";
+    stream << num.imag() << " * ";
   }
   return stream << "i";
 }
