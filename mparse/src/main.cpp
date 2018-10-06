@@ -30,8 +30,25 @@ struct subcommand {
 
 using command_map = std::map<std::string, subcommand, std::less<>>;
 
-void print_help(std::string_view prog_name) {
+void print_help(std::string_view prog_name, const command_map& commands) {
+  std::cout << "Usage: " << prog_name << " ";
 
+  bool first_iter = true;
+  for (const auto& [name, cmd] : commands) {
+    if (!first_iter) {
+      std::cout << "|";
+    }
+    first_iter = false;
+    std::cout << name;
+  }
+
+  std::cout << " <expr> [options]\n\n";
+
+  for (const auto& [name, cmd] : commands) {
+    std::cout << name << " - " << cmd.desc << "\n";
+  }
+
+  std::exit(2);
 }
 
 auto parse_diag(std::string_view input) {
