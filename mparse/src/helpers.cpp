@@ -17,6 +17,14 @@ std::string accumulate_argv(int argc, const char* const* argv) {
   return ret;
 }
 
+
+double to_precision(double num, double round_prec) {
+  if (std::abs(num - std::nextafter(num, 0)) > 1 / round_prec) {
+    return num;
+  }
+  return std::round(num * round_prec) / round_prec;
+}
+
 } // namespace
 
 void parse_vardefs(ast_ops::var_scope& vscope, int argc,
@@ -58,16 +66,11 @@ void parse_vardefs(ast_ops::var_scope& vscope, int argc,
   } while (last_tok.type != mparse::token_type::eof);
 }
 
+std::ostream& print_number(std::ostream& stream, ast_ops::number num,
+                           double round_prec) {
+  num.real(to_precision(num.real(), round_prec));
+  num.imag(to_precision(num.imag(), round_prec));
 
-double to_precision(double num, double round_prec) {
-  if (std::abs(num - std::nextafter(num, 0)) > 1 / round_prec) {
-    return num;
-  }
-  return std::round(num * round_prec) / round_prec;
-}
-
-
-std::ostream& print_number(std::ostream& stream, ast_ops::number num) {
   if (num == 0.0) {
     return stream << 0.0;
   }

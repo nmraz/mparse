@@ -91,9 +91,6 @@ void cmd_eval(mparse::ast_node_ptr ast, mparse::source_map smap,
   try {
     auto result =
         ast_ops::eval(ast.get(), vscope, ast_ops::builtin_func_scope());
-    result.real(to_precision(result.real()));
-    result.imag(to_precision(result.imag()));
-
     print_number(std::cout, result) << '\n';
   } catch (const ast_ops::eval_error& err) {
     handle_math_error(err, smap, input);
