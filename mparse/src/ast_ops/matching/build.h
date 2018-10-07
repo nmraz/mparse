@@ -71,10 +71,9 @@ struct builder_traits<func_expr<Args...>> {
   static auto build(const func_expr<Args...>& expr, Ctx&& ctx) {
     auto args = std::apply(
         [&](auto&&... arg_exprs) {
-          mparse::func_node::arg_list args;
-          (args.push_back(builder_traits<Args>::template build<BuildTags>(
-               arg_exprs, std::forward<Ctx>(ctx))),
-           ...);
+          return mparse::func_node::arg_list{
+              builder_traits<Args>::template build<BuildTags>(
+                  arg_exprs, std::forward<Ctx>(ctx)), ...};
         },
         expr.args);
 
