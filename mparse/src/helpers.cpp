@@ -9,10 +9,10 @@ using namespace std::literals;
 
 namespace {
 
-std::string accumulate_argv(int argc, const char* const* argv) {
+std::string accumulate_argv(util::span<const char* const> argv) {
   std::string ret;
-  for (int i = 0; i < argc; i++) {
-    ret += " "s + argv[i];
+  for (auto arg : argv) {
+    ret += " "s + arg;
   }
   return ret;
 }
@@ -27,9 +27,9 @@ double to_precision(double num, double round_prec) {
 
 } // namespace
 
-void parse_vardefs(ast_ops::var_scope& vscope, int argc,
-                   const char* const* argv) {
-  std::string input = accumulate_argv(argc, argv);
+void parse_vardefs(ast_ops::var_scope& vscope,
+                   util::span<const char* const> argv) {
+  std::string input = accumulate_argv(argv);
   mparse::source_stream stream(input);
 
   mparse::token last_tok;

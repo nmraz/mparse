@@ -9,6 +9,7 @@
 #include "mparse/parse_error.h"
 #include "mparse/parser.h"
 #include "mparse/source_map.h"
+#include "util/span.h"
 #include <functional>
 #include <iomanip>
 #include <iostream>
@@ -22,7 +23,7 @@ namespace {
 
 using subcommand_func =
     std::function<void(mparse::ast_node_ptr, mparse::source_map,
-                       std::string_view, int, const char* const*)>;
+                       std::string_view, util::span<const char* const>)>;
 
 struct subcommand {
   std::string_view desc;
@@ -68,25 +69,25 @@ auto parse_diag(std::string_view input) {
 
 
 void cmd_dump(mparse::ast_node_ptr ast, mparse::source_map smap,
-              std::string_view, int, const char* const*) {
+              std::string_view, util::span<const char* const>) {
   ast_ops::dump_ast(ast.get(), &smap);
 }
 
 void cmd_pretty(mparse::ast_node_ptr ast, mparse::source_map, std::string_view,
-                int, const char* const*) {
+                util::span<const char* const>) {
   std::cout << ast_ops::pretty_print(ast.get()) << "\n";
 }
 
 void cmd_strip(mparse::ast_node_ptr ast, mparse::source_map, std::string_view,
-               int, const char* const*) {
+               util::span<const char* const>) {
   ast_ops::strip_parens(ast);
   std::cout << ast_ops::pretty_print(ast.get()) << "\n";
 }
 
 void cmd_eval(mparse::ast_node_ptr ast, mparse::source_map smap,
-              std::string_view input, int argc, const char* const* argv) {
+              std::string_view input, util::span<const char* const> argv) {
   auto vscope = ast_ops::builtin_var_scope();
-  parse_vardefs(vscope, argc, argv);
+  parse_vardefs(vscope, argv);
 
   try {
     auto result =
@@ -124,7 +125,8 @@ int main(int argc, const char* const* argv) {
   auto [ast, smap] = parse_diag(input);
 
   if (auto it = commands.find(argv[1]); it != commands.end()) {
-    it->second.func(std::move(ast), std::move(smap), input, argc - 3, argv + 3);
+    it->second.func(std::move(ast), std::move(smap), input,
+                    util::span{argv + 3, argc - 3});
   } else {
     print_help(argv[0], commands);
   }
