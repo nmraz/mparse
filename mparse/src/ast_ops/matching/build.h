@@ -73,7 +73,7 @@ struct builder_traits<func_expr<Args...>> {
         [&](auto&&... arg_exprs) {
           return mparse::func_node::arg_list{
               builder_traits<Args>::template build<BuildTags>(
-                  arg_exprs, std::forward<Ctx>(ctx)), ...};
+                  arg_exprs, std::forward<Ctx>(ctx))...};
         },
         expr.args);
 
