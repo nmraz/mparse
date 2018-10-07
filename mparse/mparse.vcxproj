@@ -215,6 +215,7 @@
     <ClInclude Include="src\ast_ops\pretty_print.h" />
     <ClInclude Include="src\helpers.h" />
     <ClInclude Include="src\util\auto_restore.h" />
+    <ClInclude Include="src\util\finally.h" />
     <ClInclude Include="src\util\meta.h" />
     <ClInclude Include="src\util\span.h" />
   </ItemGroup>
