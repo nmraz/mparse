@@ -84,6 +84,13 @@ void cmd_strip(mparse::ast_node_ptr ast, mparse::source_map, std::string_view,
   std::cout << ast_ops::pretty_print(ast.get()) << "\n";
 }
 
+void cmd_paren(mparse::ast_node_ptr ast, mparse::source_map, std::string_view,
+               util::span<const char* const>) {
+  ast_ops::strip_parens(ast);
+  ast_ops::insert_parens(ast);
+  std::cout << ast_ops::pretty_print(ast.get()) << "\n";
+}
+
 void cmd_eval(mparse::ast_node_ptr ast, mparse::source_map smap,
               std::string_view input, util::span<const char* const> argv) {
   auto vscope = ast_ops::builtin_var_scope();
@@ -111,6 +118,9 @@ int main(int argc, const char* const* argv) {
       {"strip",
        {"Pretty print the expression, with superfluous parentheses removed.",
         cmd_strip}},
+      {"paren",
+       {"Pretty print the expression, showing all implicit parentheses.",
+        cmd_paren}},
       {"eval",
        {"Evaluate the expression, using passed variable definitions of the "
         "form 'var1=val1 var2=val2'.",
