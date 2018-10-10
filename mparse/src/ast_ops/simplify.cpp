@@ -5,13 +5,10 @@
 using namespace ast_ops::matching::literals;
 
 namespace ast_ops {
+
+/* PARENTHESES */
+
 namespace {
-
-/* CANONICALIZATION */
-
-constexpr auto lit_or_neg = lit || -any;
-constexpr auto non_mul = !(any * any || lit_or_neg);
-
 
 // clang-format off
 
@@ -19,6 +16,32 @@ constexpr matching::rewriter_list strip_paren_rewriters = {
     paren(x), x
 };
 
+constexpr matching::rewriter_list insert_paren_rewriters = {
+    capture_as<1>(!paren(any)), paren(cap<1>)
+};
+
+// clang-format on
+
+} // namespace
+
+
+void strip_parens(mparse::ast_node_ptr& node) {
+  matching::apply_rewriters_recursively(node, strip_paren_rewriters);
+}
+
+void insert_parens(mparse::ast_node_ptr& node) {
+  matching::apply_rewriters_recursively(node, insert_paren_rewriters);
+}
+
+
+/* CANONICALIZATION */
+
+namespace {
+constexpr auto lit_or_neg = lit || -any;
+constexpr auto non_mul = !(any * any || lit_or_neg);
+
+
+// clang-format off
 
 constexpr matching::rewriter_list canon_op_rewriters = {
     +x, x,
@@ -96,11 +119,6 @@ void uncanonicalize_ident(mparse::ast_node_ptr& node) {
 }
 
 } // namespace
-
-
-void strip_parens(mparse::ast_node_ptr& node) {
-  matching::apply_rewriters_recursively(node, strip_paren_rewriters);
-}
 
 
 void canonicalize_ops(mparse::ast_node_ptr& node) {
