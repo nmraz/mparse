@@ -26,6 +26,9 @@ template <typename M, typename B, typename... Rest>
 constexpr auto get_rewriters_after_expr(const M& matcher, const B& builder,
                                         const Rest&... rest);
 
+template <typename F, typename... Rest>
+constexpr auto get_rewriters_after_func(const F& func, const Rest&... rest);
+
 constexpr auto get_rewriters() { // base case
   return std::tuple{};
 }
@@ -37,24 +40,24 @@ constexpr auto get_rewriters(const First& first, const Rest&... rest) {
   } else {
     static_assert(std::is_invocable_r_v<bool, First, mparse::ast_node_ptr&>,
                   "Expected a rewriter function");
-    return std::tuple_cat(std::tuple{first}, get_rewriters(rest...));
+    return get_rewriters_after_func(first, rest...);
   }
 }
 
-
-template <typename M, typename B>
-constexpr auto get_expr_rewriter(const M& matcher, const B& builder) {
-  return [matcher, builder](mparse::ast_node_ptr& node) {
-    return rewrite(node, matcher, builder);
-  };
+template <typename F, typename... Rest>
+constexpr auto get_rewriters_after_func(const F& func, const Rest&... rest) {
+  return std::tuple_cat(std::tuple{func}, get_rewriters(rest...));
 }
 
 template <typename M, typename B, typename... Rest>
 constexpr auto get_rewriters_after_expr(const M& matcher, const B& builder,
                                         const Rest&... rest) {
   static_assert(is_match_expr<B>, "Expected a builder after match expression");
-  return std::tuple_cat(std::tuple{get_expr_rewriter(matcher, builder)},
-                        get_rewriters(rest...));
+  return get_rewriters_after_func(
+      [matcher, builder](mparse::ast_node_ptr& node) {
+        return rewrite(node, matcher, builder);
+      },
+      rest...);
 }
 
 } // namespace impl
