@@ -10,6 +10,8 @@ namespace ast_ops {
 
 namespace {
 
+constexpr auto leaf = lit || matching::node_type_expr<mparse::id_node>{};
+
 // clang-format off
 
 constexpr matching::rewriter_list strip_paren_rewriters = {
@@ -17,7 +19,7 @@ constexpr matching::rewriter_list strip_paren_rewriters = {
 };
 
 constexpr matching::rewriter_list insert_paren_rewriters = {
-    capture_as<1>(!paren(any)), paren(cap<1>)
+    capture_as<1>(!(paren(any) || leaf)), paren(cap<1>)
 };
 
 // clang-format on
@@ -37,6 +39,7 @@ void insert_parens(mparse::ast_node_ptr& node) {
 /* CANONICALIZATION */
 
 namespace {
+
 constexpr auto lit_or_neg = lit || -any;
 constexpr auto non_mul = !(any * any || lit_or_neg);
 
