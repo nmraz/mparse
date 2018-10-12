@@ -1,6 +1,8 @@
 #include "simplify.h"
 
 #include "ast_ops/matching/rewrite.h"
+#include "mparse/ast/func_node.h"
+#include "mparse/ast/literal_node.h"
 
 using namespace ast_ops::matching::literals;
 
@@ -145,4 +147,17 @@ void uncanonicalize(mparse::ast_node_ptr& node) {
   uncanonicalize_ident(node); // clean up after operator uncanonicalization
 }
 
+
+/* MATCHING UTILITIES */
+
+inline namespace simp_matching {
+mparse::ast_node_ptr build_cmplx_lit(number val) {
+  return mparse::make_ast_node<mparse::func_node>(
+      std::string(impl::cmplx_lit_func_name),
+      mparse::func_node::arg_list{
+          mparse::make_ast_node<mparse::literal_node>(val.real()),
+          mparse::make_ast_node<mparse::literal_node>(val.imag())});
+}
+
+} // namespace simp_matching
 } // namespace ast_ops
