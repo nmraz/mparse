@@ -1,6 +1,5 @@
 #include "simplify.h"
 
-#include "ast_ops/matching/rewrite.h"
 #include "mparse/ast/func_node.h"
 #include "mparse/ast/literal_node.h"
 
@@ -145,6 +144,15 @@ void uncanonicalize(mparse::ast_node_ptr& node) {
   uncanonicalize_ident(node); // initial pass
   uncanonicalize_ops(node);
   uncanonicalize_ident(node); // clean up after operator uncanonicalization
+}
+
+
+/* SIMPLIFICATION */
+
+void simplify(mparse::ast_node_ptr& node, const var_scope& vscope,
+              const func_scope& fscope, const simplify_hooks& hooks) {
+  canonicalize(node);
+  uncanonicalize(node);
 }
 
 
