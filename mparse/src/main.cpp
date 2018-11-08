@@ -156,7 +156,7 @@ int main(int argc, const char* const* argv) {
 
   if (auto it = commands.find(argv[1]); it != commands.end()) {
     it->second.func(std::move(ast), std::move(smap), input,
-                    util::span{argv + 3, argc - 3});
+                    util::span{argv, argc}.last(argc - 3));
   } else {
     print_help(argv[0], commands);
   }
