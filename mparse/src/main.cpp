@@ -106,8 +106,8 @@ void cmd_eval(mparse::ast_node_ptr ast, mparse::source_map smap,
   }
 }
 
-void cmd_simp(mparse::ast_node_ptr ast, mparse::source_map smap,
-              std::string_view input, util::span<const char* const> argv) {
+void cmd_simp(mparse::ast_node_ptr ast, mparse::source_map,
+              std::string_view, util::span<const char* const> argv) {
   auto vscope = ast_ops::builtin_var_scope();
   parse_vardefs(vscope, argv);
 
@@ -115,7 +115,9 @@ void cmd_simp(mparse::ast_node_ptr ast, mparse::source_map smap,
     ast_ops::simplify(ast, vscope, ast_ops::builtin_func_scope());
     std::cout << ast_ops::pretty_print(ast.get()) << "\n";
   } catch (const ast_ops::eval_error& err) {
-    handle_math_error(err, smap, input);
+    mparse::source_map smap;
+    std::string expr = ast_ops::pretty_print(ast.get(), &smap);
+    handle_math_error(err, smap, expr);
     std::exit(1);
   }
 }
