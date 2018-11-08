@@ -150,7 +150,7 @@ void uncanonicalize(mparse::ast_node_ptr& node) {
 /* SIMPLIFICATION */
 
 void simplify(mparse::ast_node_ptr& node, const var_scope& vscope,
-              const func_scope& fscope, const simplify_hooks& hooks) {
+              const func_scope& fscope) {
   canonicalize(node);
   uncanonicalize(node);
 }
