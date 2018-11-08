@@ -1,5 +1,6 @@
 #include "simplify.h"
 
+#include "ast_ops/eval/eval.h"
 #include "mparse/ast/func_node.h"
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
@@ -200,7 +201,8 @@ void remove_cmplx_lits(mparse::ast_node_ptr& node) {
 
 void propagate_vars(mparse::ast_node_ptr& node, const var_scope& vscope) {
   matching::apply_recursively(node, [&](mparse::ast_node_ptr& cur_node) {
-    if (auto* id_node = mparse::ast_node_cast<mparse::id_node>(cur_node.get())) {
+    if (auto* id_node =
+            mparse::ast_node_cast<mparse::id_node>(cur_node.get())) {
       if (auto val = vscope.lookup(id_node->name())) {
         cur_node = build_cmplx_lit(*val);
       }
@@ -209,13 +211,40 @@ void propagate_vars(mparse::ast_node_ptr& node, const var_scope& vscope) {
 }
 
 
+namespace {
+
+func_scope make_lit_eval_func_scope() {
+  func_scope scope;
+  scope.set_binding(
+      std::string(impl::cmplx_lit_func_name),
+      [](double real, double imag) { return number(real, imag); });
+  return scope;
+}
+
+const func_scope lit_eval_func_scope = make_lit_eval_func_scope();
+
+constexpr matching::rewriter_list const_eval_rewriters = {
+    capture_as<1>(-cmplx_lit || abs(cmplx_lit) || cmplx_lit + cmplx_lit ||
+                  cmplx_lit * cmplx_lit || pow(cmplx_lit, cmplx_lit)),
+    build_custom([](auto&& res) {
+      return build_cmplx_lit(
+          eval(matching::get_capture<1>(std::move(res)).get(), {},
+               lit_eval_func_scope));
+    }),
+};
+
+} // namespace
+
+
 void simplify(mparse::ast_node_ptr& node, const var_scope& vscope,
               const func_scope& fscope) {
+  canonicalize(node);
   run_with_cmplx_lits(node, [&] {
-    canonicalize(node);
     propagate_vars(node, vscope);
-    uncanonicalize(node);
+    while (matching::apply_rewriters_recursively(node, const_eval_rewriters)) {
+    }
   });
+  uncanonicalize(node);
 }
 
 
