@@ -7,6 +7,7 @@
 #include "mparse/ast/ast_node.h"
 #include "mparse/ast/cast.h"
 #include "mparse/ast/literal_node.h"
+#include "util/finally.h"
 #include <string_view>
 
 namespace ast_ops {
@@ -22,14 +23,29 @@ void uncanonicalize_ops(mparse::ast_node_ptr& node);
 void uncanonicalize(mparse::ast_node_ptr& node);
 
 
+namespace impl {
+
+void insert_cmplx_lits(mparse::ast_node_ptr& node);
+void remove_cmplx_lits(mparse::ast_node_ptr& node);
+
+} // namespace impl
+
+template <typename F>
+void run_with_cmplx_lits(mparse::ast_node_ptr& node, F&& func) {
+  impl::insert_cmplx_lits(node);
+  util::finally remove_cmplx([&] { impl::remove_cmplx_lits(node); });
+
+  std::forward<F>(func)();
+}
 
 void simplify(mparse::ast_node_ptr& node, const var_scope& vscope = {},
               const func_scope& fscope = {});
 
-
 inline namespace simp_matching {
 template <int N>
 struct cmplx_lit_tag {};
+
+} // namespace simp_matching
 
 namespace impl {
 
@@ -43,7 +59,7 @@ capture_as_cmplx_lit(Expr expr) {
 
 } // namespace impl
 
-
+inline namespace simp_matching {
 constexpr auto cmplx_lit_val(number val) {
   return func(impl::cmplx_lit_func_name, matching::literal_expr{val.real()},
               matching::literal_expr{val.imag()});
