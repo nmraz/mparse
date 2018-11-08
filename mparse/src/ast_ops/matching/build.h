@@ -42,7 +42,7 @@ struct builder_traits<custom_builder_expr<F, Tags...>> {
   using tags = util::type_list<Tags...>;
 
   template <typename BuildTags, typename Ctx>
-  static auto build(const custom_builder_expr<F>& expr, Ctx&& ctx) {
+  static auto build(const custom_builder_expr<F, Tags...>& expr, Ctx&& ctx) {
     return expr.func(std::forward<Ctx>(ctx));
   }
 };
