@@ -133,7 +133,7 @@ void eval_visitor::visit(const mparse::func_node& node) {
   }
 
   try {
-    result = check_errno([&] { return (*func)(std::move(args)); });
+    result = check_errno([&] { return (*func)(args); });
   } catch (...) {
     eval_error err("In function '" + node.name() + "'",
                    eval_errc::bad_func_call, &node);

@@ -167,21 +167,21 @@ double mod(double a, double b) {
 }
 
 
-double min(std::vector<double> vals) {
+double min(util::span<const double> vals) {
   if (vals.empty()) {
     throw arity_error("at least one argument is required", 1, 0);
   }
   return *std::min_element(vals.begin(), vals.end());
 }
 
-double max(std::vector<double> vals) {
+double max(util::span<const double> vals) {
   if (vals.empty()) {
     throw arity_error("at least one argument is required", 1, 0);
   }
   return *std::max_element(vals.begin(), vals.end());
 }
 
-number avg(std::vector<number> vals) {
+number avg(util::span<const number> vals) {
   if (vals.empty()) {
     throw arity_error("at least one argument is required", 1, 0);
   }
