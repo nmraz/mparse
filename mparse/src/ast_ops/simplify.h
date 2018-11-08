@@ -38,6 +38,8 @@ void run_with_cmplx_lits(mparse::ast_node_ptr& node, F&& func) {
   std::forward<F>(func)();
 }
 
+void propagate_vars(mparse::ast_node_ptr& node, const var_scope& vscope);
+
 void simplify(mparse::ast_node_ptr& node, const var_scope& vscope = {},
               const func_scope& fscope = {});
 

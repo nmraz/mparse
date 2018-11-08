@@ -197,10 +197,23 @@ void remove_cmplx_lits(mparse::ast_node_ptr& node) {
 
 } // namespace impl
 
+
+void propagate_vars(mparse::ast_node_ptr& node, const var_scope& vscope) {
+  matching::apply_recursively(node, [&](mparse::ast_node_ptr& cur_node) {
+    if (auto* id_node = mparse::ast_node_cast<mparse::id_node>(cur_node.get())) {
+      if (auto val = vscope.lookup(id_node->name())) {
+        cur_node = build_cmplx_lit(*val);
+      }
+    }
+  });
+}
+
+
 void simplify(mparse::ast_node_ptr& node, const var_scope& vscope,
               const func_scope& fscope) {
   run_with_cmplx_lits(node, [&] {
     canonicalize(node);
+    propagate_vars(node, vscope);
     uncanonicalize(node);
   });
 }
