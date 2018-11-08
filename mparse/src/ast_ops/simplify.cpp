@@ -199,8 +199,10 @@ void remove_cmplx_lits(mparse::ast_node_ptr& node) {
 
 void simplify(mparse::ast_node_ptr& node, const var_scope& vscope,
               const func_scope& fscope) {
-  canonicalize(node);
-  uncanonicalize(node);
+  run_with_cmplx_lits(node, [&] {
+    canonicalize(node);
+    uncanonicalize(node);
+  });
 }
 
 
