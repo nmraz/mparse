@@ -167,21 +167,21 @@ double mod(double a, double b) {
 }
 
 
-double min(util::span<const double> vals) {
+double min(real_func_args vals) {
   if (vals.empty()) {
     throw arity_error("at least one argument is required", 1, 0);
   }
   return *std::min_element(vals.begin(), vals.end());
 }
 
-double max(util::span<const double> vals) {
+double max(real_func_args vals) {
   if (vals.empty()) {
     throw arity_error("at least one argument is required", 1, 0);
   }
   return *std::max_element(vals.begin(), vals.end());
 }
 
-number avg(util::span<const number> vals) {
+number avg(func_args vals) {
   if (vals.empty()) {
     throw arity_error("at least one argument is required", 1, 0);
   }

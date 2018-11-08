@@ -24,7 +24,7 @@ void throw_if_nonreal(std::vector<std::size_t> nonreal_args) {
   }
 }
 
-void check_real(util::span<const number> args) {
+void check_real(func_args args) {
   std::vector<std::size_t> nonreal_args;
   for (std::ptrdiff_t i = 0; i < args.size(); i++) {
     if (args[i].imag() != 0) {

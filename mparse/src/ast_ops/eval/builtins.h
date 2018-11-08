@@ -48,9 +48,9 @@ double round(double x);
 
 double mod(double a, double b);
 
-double min(util::span<const double> vals);
-double max(util::span<const double> vals);
-number avg(util::span<const number> vals);
+double min(real_func_args vals);
+double max(real_func_args vals);
+number avg(func_args vals);
 
 } // namespace builtins
 

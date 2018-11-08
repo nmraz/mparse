@@ -13,7 +13,7 @@ namespace impl {
 void check_arity(std::size_t expected, std::size_t provided);
 
 void throw_if_nonreal(std::vector<std::size_t> nonreal_args);
-void check_real(util::span<const number> args);
+void check_real(func_args args);
 
 template <typename F>
 struct get_memfun_args;
@@ -51,7 +51,7 @@ struct arg_checker<double> {
 
 
 template <std::size_t... I, typename... Args>
-void check_types(util::span<const number> args, std::index_sequence<I...>,
+void check_types(func_args args, std::index_sequence<I...>,
                  util::type_list<Args...>) {
   std::vector<std::size_t> nonreal_args;
   ((!arg_checker<Args>::check(args[I]) ? nonreal_args.push_back(I) : (void) 0),
@@ -60,8 +60,7 @@ void check_types(util::span<const number> args, std::index_sequence<I...>,
 }
 
 template <typename F, std::size_t... I, typename... Args>
-number invoke_helper(F& func, util::span<const number> args,
-                     std::index_sequence<I...> idx,
+number invoke_helper(F& func, func_args args, std::index_sequence<I...> idx,
                      util::type_list<Args...> ts) {
   check_arity(sizeof...(Args), args.size());
   check_types(args, idx, ts);
@@ -76,7 +75,7 @@ function wrap_function(F&& func) {
   if constexpr (std::is_convertible_v<F&&, function>) {
     return std::forward<F>(func);
   } else if constexpr (std::is_convertible_v<F&&, real_function>) {
-    return [func = std::forward<F>(func)](util::span<const number> args) {
+    return [func = std::forward<F>(func)](func_args args) {
       impl::check_real(args);
 
       std::vector<double> real_args;
@@ -86,7 +85,7 @@ function wrap_function(F&& func) {
       return func(real_args);
     };
   } else {
-    return [func = std::forward<F>(func)](util::span<const number> args) {
+    return [func = std::forward<F>(func)](func_args args) {
       using arg_types = impl::get_args<std::decay_t<F>>;
       return impl::invoke_helper(func, args, typename arg_types::seq{},
                                  arg_types{});
