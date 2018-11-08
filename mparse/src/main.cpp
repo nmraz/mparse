@@ -106,6 +106,20 @@ void cmd_eval(mparse::ast_node_ptr ast, mparse::source_map smap,
   }
 }
 
+void cmd_simp(mparse::ast_node_ptr ast, mparse::source_map smap,
+              std::string_view input, util::span<const char* const> argv) {
+  auto vscope = ast_ops::builtin_var_scope();
+  parse_vardefs(vscope, argv);
+
+  try {
+    ast_ops::simplify(ast, vscope, ast_ops::builtin_func_scope());
+    std::cout << ast_ops::pretty_print(ast.get()) << "\n";
+  } catch (const ast_ops::eval_error& err) {
+    handle_math_error(err, smap, input);
+    std::exit(1);
+  }
+}
+
 } // namespace
 
 
@@ -125,6 +139,10 @@ int main(int argc, const char* const* argv) {
        {"Evaluate the expression, using passed variable definitions of the "
         "form 'var1=val1 var2=val2'.",
         cmd_eval}},
+      {"simp",
+       {"Simplify the expression, using passed variable definitions of the "
+        "form 'var1=val1 var2=val2'.",
+        cmd_simp}},
   };
 
   if (argc < 3) {
