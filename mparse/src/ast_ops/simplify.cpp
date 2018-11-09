@@ -215,9 +215,10 @@ namespace {
 
 func_scope make_lit_eval_func_scope() {
   func_scope scope;
-  scope.set_binding(
-      std::string(impl::cmplx_lit_func_name),
-      [](double real, double imag) { return number(real, imag); });
+  scope.set_binding(std::string(impl::cmplx_lit_func_name),
+                    [](util::span<const number> args) {
+                      return number(args[0].real(), args[1].real());
+                    });
   return scope;
 }
 
