@@ -151,54 +151,6 @@ void uncanonicalize(mparse::ast_node_ptr& node) {
 
 /* SIMPLIFICATION */
 
-namespace impl {
-namespace {
-
-mparse::ast_node_ptr build_lit(double val) {
-  if (val < 0) {
-    return mparse::make_ast_node<mparse::unary_op_node>(
-        mparse::unary_op_type::neg,
-        mparse::make_ast_node<mparse::literal_node>(-val));
-  }
-
-  return mparse::make_ast_node<mparse::literal_node>(val);
-}
-
-constexpr matching::rewriter_list insert_cmplx_lit_rewriter = {
-    c1,
-    build_custom(
-        [](auto&& res) {
-          return build_cmplx_lit(matching::get_constant<1>(res)->val());
-        },
-        matching::constant_expr_tag<1>{}),
-};
-
-constexpr matching::rewriter_list remove_cmplx_lit_rewriter = {
-    cmplx_lit_cap<1>,
-    build_custom(
-        [](auto&& res) { return build_lit(get_cmplx_lit_val<1>(res).real()); },
-        cmplx_lit_tag<1>{}) +
-        id("i") * build_custom(
-                      [](auto&& res) {
-                        return build_lit(get_cmplx_lit_val<1>(res).imag());
-                      },
-                      cmplx_lit_tag<1>{}),
-};
-
-} // namespace
-
-void insert_cmplx_lits(mparse::ast_node_ptr& node) {
-  matching::apply_rewriters_recursively(node, insert_cmplx_lit_rewriter);
-}
-
-void remove_cmplx_lits(mparse::ast_node_ptr& node) {
-  matching::apply_rewriters_recursively(node, remove_cmplx_lit_rewriter);
-  uncanonicalize_ident(node);
-}
-
-} // namespace impl
-
-
 void propagate_vars(mparse::ast_node_ptr& node, const var_scope& vscope) {
   matching::apply_recursively(node, [&](mparse::ast_node_ptr& cur_node) {
     if (auto* id_node =
@@ -261,4 +213,51 @@ mparse::ast_node_ptr build_cmplx_lit(number val) {
 }
 
 } // namespace simp_matching
+
+namespace impl {
+namespace {
+
+mparse::ast_node_ptr build_lit(double val) {
+  if (val < 0) {
+    return mparse::make_ast_node<mparse::unary_op_node>(
+        mparse::unary_op_type::neg,
+        mparse::make_ast_node<mparse::literal_node>(-val));
+  }
+
+  return mparse::make_ast_node<mparse::literal_node>(val);
+}
+
+constexpr matching::rewriter_list insert_cmplx_lit_rewriter = {
+    c1,
+    build_custom(
+        [](auto&& res) {
+          return build_cmplx_lit(matching::get_constant<1>(res)->val());
+        },
+        matching::constant_expr_tag<1>{}),
+};
+
+constexpr matching::rewriter_list remove_cmplx_lit_rewriter = {
+    cmplx_lit_cap<1>,
+    build_custom(
+        [](auto&& res) { return build_lit(get_cmplx_lit_val<1>(res).real()); },
+        cmplx_lit_tag<1>{}) +
+        id("i") * build_custom(
+                      [](auto&& res) {
+                        return build_lit(get_cmplx_lit_val<1>(res).imag());
+                      },
+                      cmplx_lit_tag<1>{}),
+};
+
+} // namespace
+
+void insert_cmplx_lits(mparse::ast_node_ptr& node) {
+  matching::apply_rewriters_recursively(node, insert_cmplx_lit_rewriter);
+}
+
+void remove_cmplx_lits(mparse::ast_node_ptr& node) {
+  matching::apply_rewriters_recursively(node, remove_cmplx_lit_rewriter);
+  uncanonicalize_ident(node);
+}
+
+} // namespace impl
 } // namespace ast_ops

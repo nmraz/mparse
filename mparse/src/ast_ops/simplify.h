@@ -23,22 +23,6 @@ void uncanonicalize_ops(mparse::ast_node_ptr& node);
 void uncanonicalize(mparse::ast_node_ptr& node);
 
 
-namespace impl {
-
-void insert_cmplx_lits(mparse::ast_node_ptr& node);
-void remove_cmplx_lits(mparse::ast_node_ptr& node);
-
-} // namespace impl
-
-template <typename F>
-void run_with_cmplx_lits(mparse::ast_node_ptr& node, F&& func) {
-  impl::insert_cmplx_lits(node);
-  util::finally remove_cmplx([&] { impl::remove_cmplx_lits(node); });
-
-  std::forward<F>(func)();
-}
-
-
 void propagate_vars(mparse::ast_node_ptr& node, const var_scope& vscope);
 
 void simplify(mparse::ast_node_ptr& node, const var_scope& vscope = {},
@@ -89,4 +73,20 @@ number get_cmplx_lit_val(Res&& results) {
 mparse::ast_node_ptr build_cmplx_lit(number val);
 
 } // namespace simp_matching
+
+namespace impl {
+
+void insert_cmplx_lits(mparse::ast_node_ptr& node);
+void remove_cmplx_lits(mparse::ast_node_ptr& node);
+
+} // namespace impl
+
+template <typename F>
+void run_with_cmplx_lits(mparse::ast_node_ptr& node, F&& func) {
+  impl::insert_cmplx_lits(node);
+  util::finally remove_cmplx([&] { impl::remove_cmplx_lits(node); });
+
+  std::forward<F>(func)();
+}
+
 } // namespace ast_ops
