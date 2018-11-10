@@ -32,16 +32,22 @@ private:
 
 
 class func_scope {
-  using impl_type = std::map<std::string, function, std::less<>>;
+  struct func_wrapper {
+    template <typename F>
+    func_wrapper(F&& func) : func(wrap_function(std::forward<F>(func))) {}
+
+    function func;
+  };
+
+  using impl_type = std::map<std::string, func_wrapper, std::less<>>;
 
 public:
   func_scope() = default;
   func_scope(std::initializer_list<impl_type::value_type> ilist);
-
-  template <typename F>
-  void set_binding(std::string name, F&& func);
-
+  
+  void set_binding(std::string name, func_wrapper func);
   void remove_binding(std::string_view name);
+  
   void clear() { map_.clear(); }
 
   const function* lookup(std::string_view name) const;
@@ -49,11 +55,5 @@ public:
 private:
   impl_type map_;
 };
-
-
-template <typename F>
-void func_scope::set_binding(std::string name, F&& func) {
-  map_[std::move(name)] = wrap_function(std::forward<F>(func));
-}
 
 } // namespace ast_ops

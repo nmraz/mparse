@@ -28,6 +28,10 @@ std::optional<number> var_scope::lookup(std::string_view name) const {
 func_scope::func_scope(std::initializer_list<impl_type::value_type> ilist)
     : map_(ilist) {}
 
+void func_scope::set_binding(std::string name, func_wrapper func) {
+  map_.insert_or_assign(std::move(name), std::move(func));
+}
+
 void func_scope::remove_binding(std::string_view name) {
   auto it = map_.find(name);
   if (it != map_.end()) {
@@ -38,7 +42,7 @@ void func_scope::remove_binding(std::string_view name) {
 const function* func_scope::lookup(std::string_view name) const {
   auto it = map_.find(name);
   if (it != map_.end()) {
-    return &it->second;
+    return &it->second.func;
   }
   return nullptr;
 }
