@@ -165,16 +165,12 @@ void propagate_vars(mparse::ast_node_ptr& node, const var_scope& vscope) {
 
 namespace {
 
-func_scope make_lit_eval_func_scope() {
-  func_scope scope;
-  scope.set_binding(std::string(impl::cmplx_lit_func_name),
-                    [](util::span<const number> args) {
-                      return number(args[0].real(), args[1].real());
-                    });
-  return scope;
-}
-
-const func_scope lit_eval_func_scope = make_lit_eval_func_scope();
+const func_scope lit_eval_func_scope = {
+    {std::string(impl::cmplx_lit_func_name),
+     [](util::span<const number> args) {
+       return number(args[0].real(), args[1].real());
+     }},
+};
 
 constexpr matching::rewriter_list const_eval_rewriters = {
     capture_as<1>(-cmplx_lit || abs(cmplx_lit) || cmplx_lit + cmplx_lit ||
