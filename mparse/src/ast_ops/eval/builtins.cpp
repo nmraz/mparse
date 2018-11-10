@@ -202,61 +202,58 @@ var_scope builtin_var_scope() {
 }
 
 func_scope builtin_func_scope() {
-  func_scope scope;
+  // clang-format off
 
-  scope.set_binding("sin", builtins::sin);
-  scope.set_binding("cos", builtins::cos);
-  scope.set_binding("tan", builtins::tan);
+  return {
+      {"sin", builtins::sin},
+      {"cos", builtins::cos},
+      {"tan", builtins::tan},
 
-  scope.set_binding("arcsin", builtins::asin);
-  scope.set_binding("asin", builtins::asin);
-  scope.set_binding("arccos", builtins::acos);
-  scope.set_binding("acos", builtins::acos);
-  scope.set_binding("arctan", builtins::atan);
-  scope.set_binding("atan", builtins::atan);
+      {"arcsin", builtins::asin},
+      {"asin", builtins::asin},
+      {"arccos", builtins::acos},
+      {"acos", builtins::acos},
+      {"arctan", builtins::atan},
+      {"atan", builtins::atan},
 
+      {"sinh", builtins::sinh},
+      {"cosh", builtins::cosh},
+      {"tanh", builtins::tanh},
 
-  scope.set_binding("sinh", builtins::sinh);
-  scope.set_binding("cosh", builtins::cosh);
-  scope.set_binding("tanh", builtins::tanh);
+      {"arcsinh", builtins::asinh},
+      {"asinh", builtins::asinh},
+      {"arccosh", builtins::acosh},
+      {"acosh", builtins::acosh},
+      {"arctanh", builtins::atanh},
+      {"atanh", builtins::atanh},
 
-  scope.set_binding("arcsinh", builtins::asinh);
-  scope.set_binding("asinh", builtins::asinh);
-  scope.set_binding("arccosh", builtins::acosh);
-  scope.set_binding("acosh", builtins::acosh);
-  scope.set_binding("arctanh", builtins::atanh);
-  scope.set_binding("atanh", builtins::atanh);
+      {"exp", builtins::exp},
+      {"ln", builtins::ln},
+      {"log", builtins::log},
 
+      {"sqrt", builtins::sqrt},
+      {"cbrt", builtins::cbrt},
+      {"nroot", builtins::nroot},
 
-  scope.set_binding("exp", builtins::exp);
-  scope.set_binding("ln", builtins::ln);
-  scope.set_binding("log", builtins::log);
+      {"re", builtins::re},
+      {"real", builtins::re},
+      {"im", builtins::im},
+      {"imag", builtins::im},
+      {"arg", builtins::arg},
+      {"conj", builtins::conj},
 
-  scope.set_binding("sqrt", builtins::sqrt);
-  scope.set_binding("cbrt", builtins::cbrt);
-  scope.set_binding("nroot", builtins::nroot);
+      {"floor", builtins::floor},
+      {"ceil", builtins::ceil},
+      {"round", builtins::round},
 
+      {"mod", builtins::mod},
 
-  scope.set_binding("re", builtins::re);
-  scope.set_binding("real", builtins::re);
-  scope.set_binding("im", builtins::im);
-  scope.set_binding("imag", builtins::im);
-  scope.set_binding("arg", builtins::arg);
-  scope.set_binding("conj", builtins::conj);
+      {"min", builtins::min},
+      {"max", builtins::max},
+      {"avg", builtins::avg},
+  };
 
-
-  scope.set_binding("floor", builtins::floor);
-  scope.set_binding("ceil", builtins::ceil);
-  scope.set_binding("round", builtins::round);
-
-  scope.set_binding("mod", builtins::mod);
-
-
-  scope.set_binding("min", builtins::min);
-  scope.set_binding("max", builtins::max);
-  scope.set_binding("avg", builtins::avg);
-
-  return scope;
+  // clang-format on
 }
 
 } // namespace ast_ops
