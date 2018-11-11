@@ -165,16 +165,29 @@ void propagate_vars(mparse::ast_node_ptr& node, const var_scope& vscope) {
 
 namespace {
 
+template <typename Lhs, typename Rhs>
+constexpr matching::binary_op_pred_expr<matching::always_true_pred, Lhs, Rhs,
+                                        false>
+match_binop(Lhs lhs, Rhs rhs) {
+  return {lhs, rhs};
+}
+
+template <typename Inner>
+constexpr matching::unary_expr<mparse::unary_node, Inner> match_unop(
+    Inner inner) {
+  return {inner};
+}
+
+number eval_cmplx_lit(util::span<const number> args) {
+  return {args[0].real(), args[1].real()};
+}
+
 const func_scope lit_eval_func_scope = {
-    {std::string(impl::cmplx_lit_func_name),
-     [](util::span<const number> args) {
-       return number(args[0].real(), args[1].real());
-     }},
+    {std::string(impl::cmplx_lit_func_name), eval_cmplx_lit},
 };
 
 constexpr matching::rewriter_list const_eval_rewriters = {
-    capture_as<1>(-cmplx_lit || abs(cmplx_lit) || cmplx_lit + cmplx_lit ||
-                  cmplx_lit * cmplx_lit || pow(cmplx_lit, cmplx_lit)),
+    capture_as<1>(match_unop(cmplx_lit) || match_binop(cmplx_lit, cmplx_lit)),
     build_custom([](auto&& res) {
       return build_cmplx_lit(
           eval(matching::get_capture<1>(std::move(res)).get(), {},
