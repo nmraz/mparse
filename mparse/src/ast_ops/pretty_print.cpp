@@ -155,7 +155,6 @@ public:
                       associativity parent_assoc, branch_side side);
 
 private:
-  print_visitor& vis_;
   util::auto_restore<op_precedence> restore_precedence_;
   util::auto_restore<bool> restore_assoc_paren_;
 };
@@ -164,8 +163,7 @@ child_visitor_scope::child_visitor_scope(print_visitor& vis,
                                          op_precedence parent_precedence,
                                          associativity parent_assoc,
                                          branch_side side)
-    : vis_(vis),
-      restore_precedence_(vis.parent_precedence, parent_precedence),
+    : restore_precedence_(vis.parent_precedence, parent_precedence),
       restore_assoc_paren_(vis.assoc_paren,
                            should_parenthesize_assoc(side, parent_assoc)) {}
 
