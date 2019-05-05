@@ -21,9 +21,14 @@ using namespace std::literals;
 
 namespace {
 
-using subcommand_func =
-    std::function<void(mparse::ast_node_ptr, mparse::source_map,
-                       std::string_view, util::span<const char* const>)>;
+struct subcommand_opts {
+  mparse::ast_node_ptr ast;
+  mparse::source_map smap;
+  std::string_view input;
+  util::span<const char* const> argv;
+};
+
+using subcommand_func = std::function<void(subcommand_opts)>;
 
 struct subcommand {
   std::string_view desc;
@@ -40,10 +45,9 @@ void print_help(std::string_view prog_name, const command_map& commands) {
 
   bool first_iter = true;
   for (const auto& [name, cmd] : commands) {
-    if (!first_iter) {
+    if (!std::exchange(first_iter, false)) {
       std::cout << "|";
     }
-    first_iter = false;
     std::cout << name;
   }
 
@@ -68,55 +72,49 @@ auto parse_diag(std::string_view input) {
 }
 
 
-void cmd_dump(mparse::ast_node_ptr ast, mparse::source_map smap,
-              std::string_view, util::span<const char* const>) {
-  ast_ops::dump_ast(ast.get(), &smap);
+void cmd_dump(subcommand_opts opts) {
+  ast_ops::dump_ast(opts.ast.get(), &opts.smap);
 }
 
-void cmd_pretty(mparse::ast_node_ptr ast, mparse::source_map, std::string_view,
-                util::span<const char* const>) {
-  std::cout << ast_ops::pretty_print(ast.get()) << "\n";
+void cmd_pretty(subcommand_opts opts) {
+  std::cout << ast_ops::pretty_print(opts.ast.get()) << "\n";
 }
 
-void cmd_strip(mparse::ast_node_ptr ast, mparse::source_map, std::string_view,
-               util::span<const char* const>) {
-  ast_ops::strip_parens(ast);
-  std::cout << ast_ops::pretty_print(ast.get()) << "\n";
+void cmd_strip(subcommand_opts opts) {
+  ast_ops::strip_parens(opts.ast);
+  std::cout << ast_ops::pretty_print(opts.ast.get()) << "\n";
 }
 
-void cmd_paren(mparse::ast_node_ptr ast, mparse::source_map, std::string_view,
-               util::span<const char* const>) {
-  ast_ops::strip_parens(ast);
-  ast_ops::insert_parens(ast);
-  std::cout << ast_ops::pretty_print(ast.get()) << "\n";
+void cmd_paren(subcommand_opts opts) {
+  ast_ops::strip_parens(opts.ast);
+  ast_ops::insert_parens(opts.ast);
+  std::cout << ast_ops::pretty_print(opts.ast.get()) << "\n";
 }
 
-void cmd_eval(mparse::ast_node_ptr ast, mparse::source_map smap,
-              std::string_view input, util::span<const char* const> argv) {
+void cmd_eval(subcommand_opts opts) {
   auto vscope = ast_ops::builtin_var_scope();
-  parse_vardefs(vscope, argv);
+  parse_vardefs(vscope, opts.argv);
 
   try {
     auto result =
-        ast_ops::eval(ast.get(), vscope, ast_ops::builtin_func_scope());
+        ast_ops::eval(opts.ast.get(), vscope, ast_ops::builtin_func_scope());
     print_number(std::cout, result) << '\n';
   } catch (const ast_ops::eval_error& err) {
-    handle_math_error(err, smap, input);
+    handle_math_error(err, opts.smap, opts.input);
     std::exit(1);
   }
 }
 
-void cmd_simp(mparse::ast_node_ptr ast, mparse::source_map,
-              std::string_view, util::span<const char* const> argv) {
+void cmd_simp(subcommand_opts opts) {
   auto vscope = ast_ops::builtin_var_scope();
-  parse_vardefs(vscope, argv);
+  parse_vardefs(vscope, opts.argv);
 
   try {
-    ast_ops::simplify(ast, vscope, ast_ops::builtin_func_scope());
-    std::cout << ast_ops::pretty_print(ast.get()) << "\n";
+    ast_ops::simplify(opts.ast, vscope, ast_ops::builtin_func_scope());
+    std::cout << ast_ops::pretty_print(opts.ast.get()) << "\n";
   } catch (const ast_ops::eval_error& err) {
     mparse::source_map smap;
-    std::string expr = ast_ops::pretty_print(ast.get(), &smap);
+    std::string expr = ast_ops::pretty_print(opts.ast.get(), &smap);
     handle_math_error(err, smap, expr);
     std::exit(1);
   }
@@ -155,8 +153,8 @@ int main(int argc, const char* const* argv) {
   auto [ast, smap] = parse_diag(input);
 
   if (auto it = commands.find(argv[1]); it != commands.end()) {
-    it->second.func(std::move(ast), std::move(smap), input,
-                    util::span{argv, argc}.last(argc - 3));
+    it->second.func({std::move(ast), std::move(smap), input,
+                     util::span{argv, argc}.last(argc - 3)});
   } else {
     print_help(argv[0], commands);
   }
