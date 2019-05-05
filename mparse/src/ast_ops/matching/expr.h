@@ -109,27 +109,18 @@ template <typename Pred, typename Inner>
 constexpr bool is_match_expr<unary_op_pred_expr<Pred, Inner>> = true;
 
 
-// TODO: use template<auto> when MSVC bug is fixed
-// See
-// https://developercommunity.visualstudio.com/content/problem/337503/c2664-when-using-auto-template-parameter-with-enum.html
-
-template <mparse::binary_op_type Val>
-struct bin_type_eq_pred {
-  constexpr bool operator()(mparse::binary_op_type val) { return val == Val; }
-};
-
-template <mparse::unary_op_type Val>
-struct un_type_eq_pred {
-  constexpr bool operator()(mparse::unary_op_type val) { return val == Val; }
+template <auto Val>
+struct type_eq_pred {
+  constexpr bool operator()(decltype(Val) val) { return val == Val; }
 };
 
 template <mparse::binary_op_type Type, typename Lhs, typename Rhs,
           bool Commute = is_commutative(Type)>
 using binary_op_expr =
-    binary_op_pred_expr<bin_type_eq_pred<Type>, Lhs, Rhs, Commute>;
+    binary_op_pred_expr<type_eq_pred<Type>, Lhs, Rhs, Commute>;
 
 template <mparse::unary_op_type Type, typename Inner>
-using unary_op_expr = unary_op_pred_expr<un_type_eq_pred<Type>, Inner>;
+using unary_op_expr = unary_op_pred_expr<type_eq_pred<Type>, Inner>;
 
 
 template <typename Inner, typename = std::enable_if_t<is_match_expr<Inner>>>
