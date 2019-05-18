@@ -5,6 +5,7 @@
 #include "mparse/ast/ast_node.h"
 #include "mparse/ast/ast_visitor.h"
 #include "mparse/ast/cast.h"
+#include "mparse/ast/func_node.h"
 #include "mparse/ast/id_node.h"
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
@@ -22,6 +23,7 @@ struct compare_visitor : mparse::const_ast_visitor {
   void visit(const mparse::abs_node& node) override;
   void visit(const mparse::unary_op_node& node) override;
   void visit(const mparse::binary_op_node& node) override;
+  void visit(const mparse::func_node& node) override;
   void visit(const mparse::id_node& node) override;
   void visit(const mparse::literal_node& node) override;
 
@@ -76,6 +78,16 @@ void compare_visitor<Comp>::visit(const mparse::binary_op_node& node) {
 }
 
 template <typename Comp>
+void compare_visitor<Comp>::visit(const mparse::func_node& node) {
+  if (auto* other_func =
+          mparse::ast_node_cast<const mparse::func_node>(other)) {
+    result = comp.compare_func(node, *other_func);
+    return;
+  }
+  result = false;
+}
+
+template <typename Comp>
 void compare_visitor<Comp>::visit(const mparse::id_node& node) {
   if (auto* other_id = mparse::ast_node_cast<const mparse::id_node>(other)) {
     result = comp.compare_id(node, *other_id);
@@ -124,6 +136,20 @@ struct basic_expr_comparer_base {
                          static_cast<const Der&>(*this)) &&
            compare_exprs(first.rhs(), second.rhs(),
                          static_cast<const Der&>(*this));
+  }
+
+  bool compare_func(const mparse::func_node& first,
+                    const mparse::func_node& second) const {
+    const auto& first_args = first.args();
+    const auto& second_args = second.args();
+
+    return first.name() == second.name() &&
+           std::equal(first_args.begin(), first_args.end(), second_args.begin(),
+                      second_args.end(),
+                      [&](const auto& arg1, const auto& arg2) {
+                        return compare_exprs(arg1.get(), arg2.get(),
+                                             static_cast<const Der&>(*this));
+                      });
   }
 
   bool compare_id(const mparse::id_node& first,
