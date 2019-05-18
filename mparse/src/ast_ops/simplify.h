@@ -30,6 +30,7 @@ void simplify(mparse::ast_node_ptr& node, const var_scope& vscope = {},
 
 
 inline namespace simp_matching {
+
 template <int N>
 struct cmplx_lit_tag {};
 
