@@ -222,6 +222,22 @@ constexpr matching::rewriter_list const_eval_rewriters = {
         matching::capture_expr_tag<1>{}),
 };
 
+constexpr auto one = cmplx_lit_val(1);
+
+// clang-format off
+
+constexpr matching::rewriter_list const_migrate_rewriters = {
+    add_nocomm(capture_as<1>(!cmplx_lit), cc1), cc1 + cap<1>,
+    mul_nocomm(capture_as<1>(!cmplx_lit), cc1), cc1 * cap<1>
+};
+
+constexpr matching::rewriter_list reassoc_rewriters = {
+    add_nocomm(x, one * pow(y + z, one)), one * pow(x + y, one) + z,
+    mul_nocomm(x, (y * z)), (x * y) * z
+};
+
+// clang-format on
+
 } // namespace
 
 
@@ -245,6 +261,15 @@ void simplify(mparse::ast_node_ptr& node, const var_scope& vscope,
       }
 
       has_work |= eval_funcs(node, eval_fscope);
+
+      while (matching::apply_rewriters_recursively(node,
+                                                   const_migrate_rewriters)) {
+        has_work = true;
+      }
+
+      while (matching::apply_rewriters_recursively(node, reassoc_rewriters)) {
+        has_work = true;
+      }
     }
   });
   uncanonicalize(node);
