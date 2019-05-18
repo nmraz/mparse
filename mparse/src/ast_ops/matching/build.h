@@ -34,6 +34,20 @@ struct get_build_tags<E, std::void_t<typename builder_traits<E>::tags>> {
 template <typename E>
 using get_build_tags_t = typename get_build_tags<E>::type;
 
+
+template <typename BuildTags, typename Tag, typename Ctx>
+auto get_build_result(Ctx&& ctx) {
+  auto&& stored = get_result<Tag>(std::forward<Ctx>(ctx));
+
+  if constexpr ((util::type_list_count_v<Tag, BuildTags>) > 1) {
+    // used several times - clone for safety
+    return ast_ops::clone(stored.get());
+  } else {
+    // only required once - no need to copy
+    return std::forward<decltype(stored)>(stored);
+  }
+}
+
 } // namespace impl
 
 
@@ -43,7 +57,7 @@ struct builder_traits<custom_builder_expr<F, Tags...>> {
 
   template <typename BuildTags, typename Ctx>
   static auto build(const custom_builder_expr<F, Tags...>& expr, Ctx&& ctx) {
-    return expr.func(get_result<Tags>(std::forward<Ctx>(ctx))...);
+    return expr.func(impl::get_build_result<BuildTags, Tags>(std::forward<Ctx>(ctx))...);
   }
 };
 
@@ -124,24 +138,6 @@ struct builder_traits<binary_op_expr<Type, Lhs, Rhs, Commute>> {
         Type, std::move(lhs_node), std::move(rhs_node));
   }
 };
-
-
-namespace impl {
-
-template <typename BuildTags, typename Tag, typename Ctx>
-auto get_build_result(Ctx&& ctx) {
-  auto&& stored = get_result<Tag>(std::forward<Ctx>(ctx));
-
-  if constexpr ((util::type_list_count_v<Tag, BuildTags>) > 1) {
-    // used several times - clone for safety
-    return ast_ops::clone(stored.get());
-  } else {
-    // only required once - no need to copy
-    return std::forward<decltype(stored)>(stored);
-  }
-}
-
-} // namespace impl
 
 template <typename Tag, typename Expr>
 struct builder_traits<capture_expr_impl<Tag, Expr>> {
