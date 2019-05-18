@@ -330,6 +330,12 @@ constexpr literal_expr operator""_lit(unsigned long long val) {
 }
 
 
+template <typename Tag, typename Expr,
+          typename = std::enable_if_t<is_match_expr<Expr>>>
+constexpr capture_expr_impl<Tag, Expr> capture_as_impl(Expr expr) {
+  return {expr};
+}
+
 template <int N, typename Expr,
           typename = std::enable_if_t<is_match_expr<Expr>>>
 constexpr capture_expr<N, Expr> capture_as(Expr expr) {
