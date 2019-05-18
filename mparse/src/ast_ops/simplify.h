@@ -62,6 +62,10 @@ constexpr auto cmplx_lit_cap = impl::cmplx_lit_expr(
     matching::capture_as_impl<cmplx_lit_real_tag<N>>(matching::lit),
     matching::capture_as_impl<cmplx_lit_imag_tag<N>>(matching::lit));
 
+constexpr auto cc1 = cmplx_lit_cap<1>;
+constexpr auto cc2 = cmplx_lit_cap<2>;
+constexpr auto cc3 = cmplx_lit_cap<3>;
+
 mparse::ast_node_ptr build_cmplx_lit(number val);
 
 } // namespace simp_matching
