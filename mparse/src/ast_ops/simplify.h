@@ -32,7 +32,10 @@ void simplify(mparse::ast_node_ptr& node, const var_scope& vscope = {},
 inline namespace simp_matching {
 
 template <int N>
-struct cmplx_lit_tag {};
+struct cmplx_lit_real_tag {};
+
+template <int N>
+struct cmplx_lit_imag_tag {};
 
 } // namespace simp_matching
 
@@ -40,10 +43,9 @@ namespace impl {
 
 constexpr std::string_view cmplx_lit_func_name = "$l";
 
-template <int N, typename Expr>
-constexpr matching::capture_expr_impl<cmplx_lit_tag<N>, Expr>
-capture_as_cmplx_lit(Expr expr) {
-  return {expr};
+template <typename R, typename I>
+constexpr auto cmplx_lit_expr(R real, I imag) {
+  return func(cmplx_lit_func_name, real, imag);
 }
 
 } // namespace impl
@@ -51,17 +53,17 @@ capture_as_cmplx_lit(Expr expr) {
 inline namespace simp_matching {
 
 constexpr auto cmplx_lit_val(number val) {
-  return func(impl::cmplx_lit_func_name, matching::literal_expr{val.real()},
-              matching::literal_expr{val.imag()});
+  return impl::cmplx_lit_expr(matching::literal_expr{val.real()},
+                              matching::literal_expr{val.imag()});
 }
 
-constexpr auto cmplx_lit =
-    func(impl::cmplx_lit_func_name, matching::lit, matching::lit);
+constexpr auto cmplx_lit = impl::cmplx_lit_expr(matching::lit, matching::lit);
 
 template <int N>
-constexpr auto cmplx_lit_cap = impl::capture_as_cmplx_lit<N>(cmplx_lit);
+constexpr auto cmplx_lit_cap = impl::cmplx_lit_expr(
+    matching::capture_as_impl<cmplx_lit_real_tag<N>>(matching::lit),
+    matching::capture_as_impl<cmplx_lit_imag_tag<N>>(matching::lit));
 
-number get_cmplx_lit_val(const mparse::func_node& node);
 mparse::ast_node_ptr build_cmplx_lit(number val);
 
 } // namespace simp_matching

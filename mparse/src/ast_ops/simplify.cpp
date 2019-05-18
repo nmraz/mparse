@@ -214,13 +214,6 @@ void simplify(mparse::ast_node_ptr& node, const var_scope& vscope,
 
 inline namespace simp_matching {
 
-number get_cmplx_lit_val(const mparse::func_node& node) {
-  const auto& args = node.args();
-
-  return {static_cast<const mparse::literal_node*>(args[0].get())->val(),
-          static_cast<const mparse::literal_node*>(args[1].get())->val()};
-}
-
 mparse::ast_node_ptr build_cmplx_lit(number val) {
   return mparse::make_ast_node<mparse::func_node>(
       std::string(impl::cmplx_lit_func_name),
@@ -253,13 +246,13 @@ constexpr matching::rewriter_list insert_cmplx_lit_rewriter = {
 constexpr matching::rewriter_list remove_cmplx_lit_rewriter = {
     cmplx_lit_cap<1>,
     build_custom(
-        [](auto&& cc1) { return build_lit(get_cmplx_lit_val(*cc1).real()); },
-        cmplx_lit_tag<1>{}) +
+        [](auto&& real) { return build_lit(real->val()); },
+        cmplx_lit_real_tag<1>{}) +
         id("i") * build_custom(
-                      [](auto&& cc1) {
-                        return build_lit(get_cmplx_lit_val(*cc1).imag());
+                      [](auto&& imag) {
+                        return build_lit(imag->val());
                       },
-                      cmplx_lit_tag<1>{}),
+                      cmplx_lit_imag_tag<1>{}),
 };
 
 } // namespace
