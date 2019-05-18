@@ -245,14 +245,11 @@ constexpr matching::rewriter_list insert_cmplx_lit_rewriter = {
 
 constexpr matching::rewriter_list remove_cmplx_lit_rewriter = {
     cmplx_lit_cap<1>,
-    build_custom(
-        [](auto&& real) { return build_lit(real->val()); },
-        cmplx_lit_real_tag<1>{}) +
-        id("i") * build_custom(
-                      [](auto&& imag) {
-                        return build_lit(imag->val());
-                      },
-                      cmplx_lit_imag_tag<1>{}),
+    build_custom([](auto&& real) { return build_lit(real->val()); },
+                 cmplx_lit_real_tag<1>{}) +
+        id("i") *
+            build_custom([](auto&& imag) { return build_lit(imag->val()); },
+                         cmplx_lit_imag_tag<1>{}),
 };
 
 } // namespace
