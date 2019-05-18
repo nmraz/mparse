@@ -240,8 +240,14 @@ constexpr matching::rewriter_list reassoc_rewriters = {
 constexpr matching::rewriter_list simp_rewriters = {
     pow(any, zero), one,
     any * zero, zero,
+
     x + zero, x,
+    
+    // Two versions are necessary here because the first two subexpressions
+    // will bind in order.
     x * y + x * z, x * pow(y + z, one),
+    y * x + x * z, x * pow(y + z, one),
+    
     pow(pow(x, y), z), pow(x, y * z),
     pow(x, y) * pow(z, y), pow(x * z, y),
     pow(x, y) * pow(x, z), pow(x, one * pow(y + z, one))
