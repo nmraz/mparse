@@ -23,8 +23,6 @@ void uncanonicalize_ops(mparse::ast_node_ptr& node);
 void uncanonicalize(mparse::ast_node_ptr& node);
 
 
-void propagate_vars(mparse::ast_node_ptr& node, const var_scope& vscope);
-
 void simplify(mparse::ast_node_ptr& node, const var_scope& vscope = {},
               const func_scope& fscope = {});
 

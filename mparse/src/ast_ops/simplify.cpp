@@ -4,6 +4,7 @@
 #include "mparse/ast/func_node.h"
 #include "mparse/ast/literal_node.h"
 #include "mparse/ast/operator_nodes.h"
+#include <algorithm>
 
 using namespace ast_ops::matching::literals;
 
@@ -151,6 +152,8 @@ void uncanonicalize(mparse::ast_node_ptr& node) {
 
 /* SIMPLIFICATION */
 
+namespace {
+
 void propagate_vars(mparse::ast_node_ptr& node, const var_scope& vscope) {
   matching::apply_recursively(node, [&](mparse::ast_node_ptr& cur_node) {
     if (auto* id_node =
@@ -162,8 +165,23 @@ void propagate_vars(mparse::ast_node_ptr& node, const var_scope& vscope) {
   });
 }
 
+void eval_funcs(mparse::ast_node_ptr& node, const func_scope& fscope) {
+  matching::apply_recursively(node, [&](mparse::ast_node_ptr& cur_node) {
+    if (auto* func_node =
+            mparse::ast_node_cast<mparse::func_node>(cur_node.get())) {
+      const auto& args = func_node->args();
 
-namespace {
+      if (std::all_of(args.begin(), args.end(), [](const auto& arg) {
+            return matching::exec_match(cmplx_lit, arg);
+          })) {
+        if (auto* func = fscope.lookup(func_node->name())) {
+          cur_node = build_cmplx_lit(eval(cur_node.get(), {}, fscope));
+        }
+      }
+    }
+  });
+}
+
 
 template <typename Lhs, typename Rhs>
 constexpr matching::binary_op_pred_expr<matching::always_true_pred, Lhs, Rhs,
