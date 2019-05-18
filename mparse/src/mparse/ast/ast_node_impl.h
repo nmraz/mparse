@@ -33,6 +33,17 @@ public:
     Base::apply_visitor(vis); // visit bases first
     vis.visit(static_cast<const Der&>(*this));
   }
+
+  static constexpr const void* get_id() {
+    return &id_;
+  }
+
+  bool has_id(const void* id) const override {
+    return id == get_id() || Base::has_id(id);
+  }
+
+private:
+  static inline constexpr char id_ = 0;
 };
 
 } // namespace mparse

@@ -14,4 +14,8 @@ void ast_node::apply_visitor(const_ast_visitor& vis) const {
   vis.visit(*this);
 }
 
+bool ast_node::has_id(const void*) const {
+  return false;
+}
+
 } // namespace mparse
