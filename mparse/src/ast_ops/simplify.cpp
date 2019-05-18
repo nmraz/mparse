@@ -165,17 +165,21 @@ void propagate_vars(mparse::ast_node_ptr& node, const var_scope& vscope) {
   });
 }
 
+bool has_constant_args(const mparse::func_node* node) {
+  const auto& args = node->args();
+
+  return std::all_of(args.begin(), args.end(), [](const auto& arg) {
+    return matching::exec_match(cmplx_lit, arg);
+  });
+}
+
 bool eval_funcs(mparse::ast_node_ptr& node, const func_scope& fscope) {
   bool changed = false;
 
   matching::apply_recursively(node, [&](mparse::ast_node_ptr& cur_node) {
     if (auto* func_node =
-            mparse::ast_node_cast<mparse::func_node>(cur_node.get())) {
-      const auto& args = func_node->args();
-
-      if (std::all_of(args.begin(), args.end(), [](const auto& arg) {
-            return matching::exec_match(cmplx_lit, arg);
-          })) {
+            mparse::ast_node_cast<const mparse::func_node>(cur_node.get())) {
+      if (has_constant_args(func_node)) {
         if (auto* func = fscope.lookup(func_node->name())) {
           cur_node = build_cmplx_lit(eval(cur_node.get(), {}, fscope));
           changed = true;
