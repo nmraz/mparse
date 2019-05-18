@@ -188,11 +188,11 @@ const func_scope lit_eval_func_scope = {
 
 constexpr matching::rewriter_list const_eval_rewriters = {
     capture_as<1>(match_unop(cmplx_lit) || match_binop(cmplx_lit, cmplx_lit)),
-    build_custom([](auto&& res) {
-      return build_cmplx_lit(
-          eval(matching::get_capture<1>(std::move(res)).get(), {},
-               lit_eval_func_scope));
-    }),
+    build_custom(
+        [](auto&& cap) {
+          return build_cmplx_lit(eval(cap.get(), {}, lit_eval_func_scope));
+        },
+        matching::capture_expr_tag<1>{}),
 };
 
 } // namespace
@@ -213,6 +213,14 @@ void simplify(mparse::ast_node_ptr& node, const var_scope& vscope,
 /* MATCHING UTILITIES */
 
 inline namespace simp_matching {
+
+number get_cmplx_lit_val(const mparse::func_node& node) {
+  const auto& args = node.args();
+
+  return {static_cast<const mparse::literal_node*>(args[0].get())->val(),
+          static_cast<const mparse::literal_node*>(args[1].get())->val()};
+}
+
 mparse::ast_node_ptr build_cmplx_lit(number val) {
   return mparse::make_ast_node<mparse::func_node>(
       std::string(impl::cmplx_lit_func_name),
@@ -238,21 +246,18 @@ mparse::ast_node_ptr build_lit(double val) {
 
 constexpr matching::rewriter_list insert_cmplx_lit_rewriter = {
     c1,
-    build_custom(
-        [](auto&& res) {
-          return build_cmplx_lit(matching::get_constant<1>(res)->val());
-        },
-        matching::constant_expr_tag<1>{}),
+    build_custom([](auto&& c1) { return build_cmplx_lit(c1->val()); },
+                 matching::constant_expr_tag<1>{}),
 };
 
 constexpr matching::rewriter_list remove_cmplx_lit_rewriter = {
     cmplx_lit_cap<1>,
     build_custom(
-        [](auto&& res) { return build_lit(get_cmplx_lit_val<1>(res).real()); },
+        [](auto&& cc1) { return build_lit(get_cmplx_lit_val(*cc1).real()); },
         cmplx_lit_tag<1>{}) +
         id("i") * build_custom(
-                      [](auto&& res) {
-                        return build_lit(get_cmplx_lit_val<1>(res).imag());
+                      [](auto&& cc1) {
+                        return build_lit(get_cmplx_lit_val(*cc1).imag());
                       },
                       cmplx_lit_tag<1>{}),
 };
