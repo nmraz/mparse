@@ -24,19 +24,8 @@ public:
   virtual bool has_id(const void* id) const;
 };
 
-namespace impl {
-
 template <typename T>
-struct get_node_ptr {
-  static_assert(std::is_base_of_v<ast_node, T>,
-                "node_ptr can only be used for AST nodes");
-  using type = std::shared_ptr<T>;
-};
-
-} // namespace impl
-
-template <typename T>
-using node_ptr = typename impl::get_node_ptr<T>::type;
+using node_ptr = std::shared_ptr<T>;
 using ast_node_ptr = node_ptr<ast_node>;
 
 template <typename Node, typename... Args>
