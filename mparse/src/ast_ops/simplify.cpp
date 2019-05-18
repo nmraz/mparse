@@ -165,7 +165,9 @@ void propagate_vars(mparse::ast_node_ptr& node, const var_scope& vscope) {
   });
 }
 
-void eval_funcs(mparse::ast_node_ptr& node, const func_scope& fscope) {
+bool eval_funcs(mparse::ast_node_ptr& node, const func_scope& fscope) {
+  bool changed = false;
+
   matching::apply_recursively(node, [&](mparse::ast_node_ptr& cur_node) {
     if (auto* func_node =
             mparse::ast_node_cast<mparse::func_node>(cur_node.get())) {
@@ -176,10 +178,13 @@ void eval_funcs(mparse::ast_node_ptr& node, const func_scope& fscope) {
           })) {
         if (auto* func = fscope.lookup(func_node->name())) {
           cur_node = build_cmplx_lit(eval(cur_node.get(), {}, fscope));
+          changed = true;
         }
       }
     }
   });
+
+  return changed;
 }
 
 
@@ -218,10 +223,24 @@ constexpr matching::rewriter_list const_eval_rewriters = {
 
 void simplify(mparse::ast_node_ptr& node, const var_scope& vscope,
               const func_scope& fscope) {
+  func_scope eval_fscope = fscope;
+  eval_fscope.set_binding(std::string(impl::cmplx_lit_func_name),
+                          eval_cmplx_lit);
+
   canonicalize(node);
   run_with_cmplx_lits(node, [&] {
     propagate_vars(node, vscope);
-    while (matching::apply_rewriters_recursively(node, const_eval_rewriters)) {
+
+    bool has_work = true;
+    while (has_work) {
+      has_work = false;
+
+      while (
+          matching::apply_rewriters_recursively(node, const_eval_rewriters)) {
+        has_work = true;
+      }
+
+      has_work |= eval_funcs(node, eval_fscope);
     }
   });
   uncanonicalize(node);
