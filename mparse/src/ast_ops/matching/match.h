@@ -113,12 +113,17 @@ struct matcher_traits<binary_op_pred_expr<Pred, Lhs, Rhs, Commute>> {
       auto node_lhs = bin_node->ref_lhs();
       auto node_rhs = bin_node->ref_rhs();
 
+      // Save original context so that it can be restored if necessary.
+      auto old_ctx = ctx;
+
       if (matcher_traits<Lhs>::match(expr.lhs, node_lhs, ctx) &&
           matcher_traits<Rhs>::match(expr.rhs, node_rhs, ctx)) {
         return true;
       }
 
       if constexpr (Commute) {
+        ctx = std::move(old_ctx);
+
         if (matcher_traits<Lhs>::match(expr.lhs, node_rhs, ctx) &&
             matcher_traits<Rhs>::match(expr.rhs, node_lhs, ctx)) {
           return true;
