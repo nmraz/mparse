@@ -352,7 +352,9 @@ constexpr node_type_expr<mparse::literal_node> lit{};
 constexpr constant_expr<1> c1{};
 constexpr constant_expr<2> c2{};
 constexpr constant_expr<3> c3{};
+constexpr constant_expr<4> c4{};
 
+constexpr subexpr_expr<'w'> w{};
 constexpr subexpr_expr<'x'> x{};
 constexpr subexpr_expr<'y'> y{};
 constexpr subexpr_expr<'z'> z{};
