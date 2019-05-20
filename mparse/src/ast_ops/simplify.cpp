@@ -57,13 +57,23 @@ constexpr matching::rewriter_list canon_rewriters = {
     x / y, x * pow(y, -1_lit)
 };
 
-constexpr matching::rewriter_list uncanon_rewriters = {
+constexpr matching::rewriter_list uncanon_basic_rewriters = {
     -1_lit * x, -x,
-    x + -y, x - y,
-
     pow(x, -1_lit), 1_lit / x,
-    pow(x, -c1), 1_lit / pow(x, c1),
     x * (1_lit / y), x / y
+};
+
+constexpr matching::rewriter_list extract_neg_rewriter = {
+    -x * y, -(x * y)
+};
+
+constexpr matching::rewriter_list insert_neg_rewriter = {
+  -(x * y), -x * y
+};
+
+constexpr matching::rewriter_list uncanon_neg_rewriters = {
+    x + -y, x - y,
+    pow(x, -y), 1_lit / pow(x, y),
 };
 
 // clang-format on
@@ -77,7 +87,15 @@ void canonicalize(mparse::ast_node_ptr& node) {
 }
 
 void uncanonicalize(mparse::ast_node_ptr& node) {
-  matching::apply_rewriters_recursively(node, uncanon_rewriters);
+  matching::apply_rewriters_recursively(node, uncanon_basic_rewriters);
+
+  while (matching::apply_rewriters_recursively(node, extract_neg_rewriter)) {
+  }
+
+  matching::apply_rewriters_recursively(node, uncanon_neg_rewriters);
+
+  while (matching::apply_rewriters_recursively(node, insert_neg_rewriter)) {
+  }
 }
 
 
