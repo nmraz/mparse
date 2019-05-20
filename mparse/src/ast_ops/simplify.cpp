@@ -60,7 +60,7 @@ constexpr matching::rewriter_list canon_rewriters = {
 constexpr matching::rewriter_list uncanon_rewriters = {
     -1_lit * x, -x,
     x + -y, x - y,
-    
+
     pow(x, -1_lit), 1_lit / x,
     pow(x, -c1), 1_lit / pow(x, c1),
     x * (1_lit / y), x / y
@@ -164,24 +164,32 @@ constexpr matching::rewriter_list const_migrate_rewriters = {
 };
 
 constexpr matching::rewriter_list reassoc_rewriters = {
-    add_nocomm(x, one * pow(y + z, one)), one * pow(x + y, one) + z,
-    mul_nocomm(x, (y * z)), (x * y) * z
+    add_nocomm(x, y + z), (x + y) + z,
+    mul_nocomm(x, y * z), (x * y) * z
 };
 
 constexpr matching::rewriter_list simp_rewriters = {
-    pow(any, zero), one,
-    any * zero, zero,
-
     x + zero, x,
-    
-    // Two versions are necessary here because the first two subexpressions
-    // will bind in order.
-    x * y + x * z, x * pow(y + z, one),
-    y * x + x * z, x * pow(y + z, one),
-    
+
+    any * zero, zero,
+    x * one, x,
+
+    pow(x, one), x,
+    pow(any, zero), one,
+    pow(one, any), one,
+
+    x * y + z * x, x * (y + z),
+    x + x * y, (one + y) * x,
+    x + y * x, (one + y) * x,
+    x + x, cmplx_lit_val(2) * x,
+
     pow(pow(x, y), z), pow(x, y * z),
+
     pow(x, y) * pow(z, y), pow(x * z, y),
-    pow(x, y) * pow(x, z), pow(x, one * pow(y + z, one))
+
+    pow(x, y) * pow(x, z), pow(x, y + z),
+    pow(x, y) * x, pow(x, one + y),
+    x * x, pow(x, cmplx_lit_val(2))
 };
 
 // clang-format on
