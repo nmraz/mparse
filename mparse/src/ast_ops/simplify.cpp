@@ -61,6 +61,7 @@ constexpr matching::rewriter_list uncanon_rewriters = {
     -1_lit * x, -x,
     x + -y, x - y,
     
+    pow(x, -1_lit), 1_lit / x,
     pow(x, -c1), 1_lit / pow(x, c1),
     x * (1_lit / y), x / y
 };
