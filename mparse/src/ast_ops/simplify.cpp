@@ -339,6 +339,16 @@ constexpr matching::rewriter_list remove_cmplx_lit_rewriter = {
                          cmplx_lit_imag_tag<1>{}),
 };
 
+// clang-format off
+
+constexpr matching::rewriter_list remove_identity_rewriters = {
+    1_lit * x, x,
+    0_lit * any, 0_lit,
+    x + 0_lit, x
+};
+
+// clang-format on
+
 } // namespace
 
 void insert_cmplx_lits(mparse::ast_node_ptr& node) {
@@ -347,7 +357,7 @@ void insert_cmplx_lits(mparse::ast_node_ptr& node) {
 
 void remove_cmplx_lits(mparse::ast_node_ptr& node) {
   matching::apply_rewriters_recursively(node, remove_cmplx_lit_rewriter);
-  uncanonicalize_ident(node);
+  matching::apply_rewriters_recursively(node, remove_identity_rewriters);
 }
 
 } // namespace impl
