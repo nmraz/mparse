@@ -7,6 +7,16 @@
 
 namespace mparse {
 
+class unary_node;
+class paren_node;
+class abs_node;
+class unary_op_node;
+class binary_op_node;
+class func_node;
+class literal_node;
+class id_node;
+
+
 class ast_node {
 public:
   using derived_types = util::type_list<unary_node, binary_op_node, func_node,

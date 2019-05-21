@@ -7,16 +7,6 @@ namespace mparse {
 
 class ast_node;
 
-class unary_node;
-class paren_node;
-class abs_node;
-class unary_op_node;
-class binary_op_node;
-class func_node;
-class literal_node;
-class id_node;
-
-
 template <typename T>
 using node_ptr = std::shared_ptr<T>;
 using ast_node_ptr = node_ptr<ast_node>;
