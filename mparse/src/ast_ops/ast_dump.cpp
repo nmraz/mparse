@@ -30,9 +30,6 @@ struct ast_dump_visitor : mparse::const_ast_visitor1<ast_dump_visitor> {
   ast_dump_visitor(std::string prefix, bool last_node,
                    const mparse::source_map* smap, std::ostream& stream);
 
-  template <typename T>
-  void operator()(T&&) {}
-
   void operator()(const mparse::ast_node& node);
   void operator()(const mparse::paren_node& node);
   void operator()(const mparse::abs_node& node);
