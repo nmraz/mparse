@@ -63,10 +63,6 @@ public:
   }
 
 
-  bool has_id(const void* id) const override {
-    return id == get_id() || Base::has_id(id);
-  }
-
   static bool classof(const ast_node& node) {
     return do_classof(node.id_, impl::get_flattened_derived_types_t<Der>{});
   }

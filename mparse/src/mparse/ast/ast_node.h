@@ -26,8 +26,6 @@ public:
   virtual void apply_visitor(ast_visitor& vis);
   virtual void apply_visitor(const_ast_visitor& vis) const;
 
-  virtual bool has_id(const void* id) const;
-
 private:
   template <typename Der, typename Base>
   friend class ast_node_impl;
