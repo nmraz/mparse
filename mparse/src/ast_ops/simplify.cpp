@@ -90,13 +90,9 @@ void canonicalize(mparse::ast_node_ptr& node) {
 void uncanonicalize(mparse::ast_node_ptr& node) {
   matching::apply_rewriters_bottom_up(node, uncanon_basic_rewriters);
 
-  while (matching::apply_rewriters_bottom_up(node, extract_neg_rewriter)) {
-  }
-
+  matching::apply_rewriters_bottom_up(node, extract_neg_rewriter);
   matching::apply_rewriters_bottom_up(node, uncanon_neg_rewriters);
-
-  while (matching::apply_rewriters_bottom_up(node, insert_neg_rewriter)) {
-  }
+  matching::apply_rewriters_top_down(node, insert_neg_rewriter);
 }
 
 
@@ -105,7 +101,7 @@ void uncanonicalize(mparse::ast_node_ptr& node) {
 namespace {
 
 void propagate_vars(mparse::ast_node_ptr& node, const var_scope& vscope) {
-  matching::apply_bottom_up(node, [&](mparse::ast_node_ptr& cur_node) {
+  matching::apply_top_down(node, [&](mparse::ast_node_ptr& cur_node) {
     if (auto* id_node =
             mparse::ast_node_cast<mparse::id_node>(cur_node.get())) {
       if (auto val = vscope.lookup(id_node->name())) {
@@ -126,7 +122,7 @@ bool has_constant_args(const mparse::func_node* node) {
 bool eval_funcs(mparse::ast_node_ptr& node, const func_scope& fscope) {
   bool changed = false;
 
-  matching::apply_bottom_up(node, [&](mparse::ast_node_ptr& cur_node) {
+  matching::apply_top_down(node, [&](mparse::ast_node_ptr& cur_node) {
     if (auto* func_node =
             mparse::ast_node_cast<const mparse::func_node>(cur_node.get())) {
       if (has_constant_args(func_node) &&
@@ -239,20 +235,15 @@ void simplify(mparse::ast_node_ptr& node, const var_scope& vscope,
 
     bool has_work = true;
     while (has_work) {
-      has_work = false;
-
-      while (matching::apply_rewriters_bottom_up(node, const_eval_rewriters)) {
-        has_work = true;
-      }
+      has_work =
+          matching::apply_rewriters_bottom_up(node, const_eval_rewriters);
 
       has_work |= eval_funcs(node, eval_fscope);
 
-      while (
-          matching::apply_rewriters_bottom_up(node, const_migrate_rewriters)) {
-        has_work = true;
-      }
+      has_work |=
+          matching::apply_rewriters_bottom_up(node, const_migrate_rewriters);
 
-      while (matching::apply_rewriters_bottom_up(node, reassoc_rewriters)) {
+      while (matching::apply_rewriters_top_down(node, reassoc_rewriters)) {
         has_work = true;
       }
 
