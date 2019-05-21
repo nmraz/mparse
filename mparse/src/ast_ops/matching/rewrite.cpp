@@ -1,7 +1,6 @@
 #include "rewrite.h"
 
 #include "mparse/ast.h"
-#include "mparse/ast/ast_visitor.h"
 
 namespace ast_ops::matching {
 namespace {

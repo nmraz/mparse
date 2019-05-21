@@ -1,6 +1,5 @@
 #pragma once
 
-#include "mparse/ast/ast_visitor.h"
 #include "util/meta.h"
 #include <memory>
 
@@ -62,16 +61,6 @@ public:
   using derived_types = util::type_list<>;
 
   constexpr ast_node_impl() { this->id_ = get_id(); }
-
-  void apply_visitor(ast_visitor& vis) override {
-    Base::apply_visitor(vis); // visit bases first
-    vis.visit(static_cast<Der&>(*this));
-  }
-
-  void apply_visitor(const_ast_visitor& vis) const override {
-    Base::apply_visitor(vis); // visit bases first
-    vis.visit(static_cast<const Der&>(*this));
-  }
 
 private:
   template <typename D, typename B>

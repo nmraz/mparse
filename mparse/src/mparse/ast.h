@@ -21,9 +21,6 @@ public:
 
   virtual ~ast_node() = 0;
 
-  virtual void apply_visitor(ast_visitor& vis);
-  virtual void apply_visitor(const_ast_visitor& vis) const;
-
 private:
   template <typename Der, typename Base>
   friend class ast_node_impl;
