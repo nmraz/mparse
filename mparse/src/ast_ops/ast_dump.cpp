@@ -26,7 +26,7 @@ std::string stringify_source_locs(const mparse::ast_node& node,
   return ret;
 }
 
-struct ast_dump_visitor {
+struct ast_dump_visitor : mparse::const_ast_visitor1<ast_dump_visitor> {
   ast_dump_visitor(std::string prefix, bool last_node,
                    const mparse::source_map* smap, std::ostream& stream);
 
