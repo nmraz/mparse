@@ -122,7 +122,7 @@ bool has_constant_args(const mparse::func_node* node) {
 bool eval_funcs(mparse::ast_node_ptr& node, const func_scope& fscope) {
   bool changed = false;
 
-  matching::apply_top_down(node, [&](mparse::ast_node_ptr& cur_node) {
+  matching::apply_bottom_up(node, [&](mparse::ast_node_ptr& cur_node) {
     if (auto* func_node =
             mparse::ast_node_cast<const mparse::func_node>(cur_node.get())) {
       if (has_constant_args(func_node) &&
