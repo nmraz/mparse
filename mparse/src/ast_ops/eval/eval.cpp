@@ -40,16 +40,16 @@ number check_errno(F func) {
 }
 
 
-struct eval_visitor : mparse::const_ast_visitor {
+struct eval_visitor : mparse::const_ast_visitor1<eval_visitor> {
   eval_visitor(const var_scope& vscope, const func_scope& fscope);
 
-  void visit(const mparse::unary_node& node) override;
-  void visit(const mparse::abs_node& node) override;
-  void visit(const mparse::unary_op_node& node) override;
-  void visit(const mparse::binary_op_node& node) override;
-  void visit(const mparse::func_node& node) override;
-  void visit(const mparse::literal_node& node) override;
-  void visit(const mparse::id_node& node) override;
+  void operator()(const mparse::unary_node& node);
+  void operator()(const mparse::abs_node& node);
+  void operator()(const mparse::unary_op_node& node);
+  void operator()(const mparse::binary_op_node& node);
+  void operator()(const mparse::func_node& node);
+  void operator()(const mparse::literal_node& node);
+  void operator()(const mparse::id_node& node);
 
   const var_scope& vscope;
   const func_scope& fscope;
@@ -59,25 +59,25 @@ struct eval_visitor : mparse::const_ast_visitor {
 eval_visitor::eval_visitor(const var_scope& vscope, const func_scope& fscope)
     : vscope(vscope), fscope(fscope) {}
 
-void eval_visitor::visit(const mparse::unary_node& node) {
-  node.child()->apply_visitor(*this);
+void eval_visitor::operator()(const mparse::unary_node& node) {
+  mparse::apply_visitor(*this, *node.child());
 }
 
-void eval_visitor::visit(const mparse::abs_node& node) {
+void eval_visitor::operator()(const mparse::abs_node& node) {
   result = check_range([&] { return std::abs(result); }, node);
 }
 
-void eval_visitor::visit(const mparse::unary_op_node& node) {
+void eval_visitor::operator()(const mparse::unary_op_node& node) {
   if (node.type() == mparse::unary_op_type::neg) {
     result = check_range([&] { return -result; }, node);
   }
 }
 
-void eval_visitor::visit(const mparse::binary_op_node& node) {
-  node.lhs()->apply_visitor(*this);
+void eval_visitor::operator()(const mparse::binary_op_node& node) {
+  mparse::apply_visitor(*this, *node.lhs());
   number lhs_val = result;
 
-  node.rhs()->apply_visitor(*this);
+  mparse::apply_visitor(*this, *node.rhs());
   number rhs_val = result;
 
   result = check_range(
@@ -114,7 +114,7 @@ void eval_visitor::visit(const mparse::binary_op_node& node) {
       node);
 }
 
-void eval_visitor::visit(const mparse::func_node& node) {
+void eval_visitor::operator()(const mparse::func_node& node) {
   auto* func = fscope.lookup(node.name());
   if (!func) {
     throw eval_error("Function '" + node.name() + "' not found",
@@ -123,7 +123,7 @@ void eval_visitor::visit(const mparse::func_node& node) {
 
   std::vector<number> args;
   for (const auto& arg : node.args()) {
-    arg->apply_visitor(*this);
+    mparse::apply_visitor(*this, *arg);
     args.push_back(result);
   }
 
@@ -136,11 +136,11 @@ void eval_visitor::visit(const mparse::func_node& node) {
   }
 }
 
-void eval_visitor::visit(const mparse::literal_node& node) {
+void eval_visitor::operator()(const mparse::literal_node& node) {
   result = check_range([&] { return node.val(); }, node);
 }
 
-void eval_visitor::visit(const mparse::id_node& node) {
+void eval_visitor::operator()(const mparse::id_node& node) {
   if (auto val = vscope.lookup(node.name())) {
     result = check_range([&] { return *val; }, node);
   } else {
@@ -155,7 +155,7 @@ void eval_visitor::visit(const mparse::id_node& node) {
 number eval(const mparse::ast_node& node, const var_scope& vscope,
             const func_scope& fscope) {
   eval_visitor vis(vscope, fscope);
-  node.apply_visitor(vis);
+  mparse::apply_visitor(vis, node);
   return vis.result;
 }
 
