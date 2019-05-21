@@ -106,7 +106,7 @@ private:
     if constexpr (sizeof...(Ds) > 0) {
       return do_classof(id, util::type_list<Ds...>{});
     } else {
-      return true;
+      return false;
     }
   }
 
