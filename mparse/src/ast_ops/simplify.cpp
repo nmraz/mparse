@@ -32,11 +32,11 @@ constexpr matching::rewriter_list insert_paren_rewriters = {
 
 
 void strip_parens(mparse::ast_node_ptr& node) {
-  matching::apply_rewriters_recursively(node, strip_paren_rewriters);
+  matching::apply_rewriters_bottom_up(node, strip_paren_rewriters);
 }
 
 void insert_parens(mparse::ast_node_ptr& node) {
-  matching::apply_rewriters_recursively(node, insert_paren_rewriters);
+  matching::apply_rewriters_bottom_up(node, insert_paren_rewriters);
 }
 
 
@@ -84,18 +84,18 @@ constexpr matching::rewriter_list uncanon_neg_rewriters = {
 
 void canonicalize(mparse::ast_node_ptr& node) {
   strip_parens(node);
-  matching::apply_rewriters_recursively(node, canon_rewriters);
+  matching::apply_rewriters_bottom_up(node, canon_rewriters);
 }
 
 void uncanonicalize(mparse::ast_node_ptr& node) {
-  matching::apply_rewriters_recursively(node, uncanon_basic_rewriters);
+  matching::apply_rewriters_bottom_up(node, uncanon_basic_rewriters);
 
-  while (matching::apply_rewriters_recursively(node, extract_neg_rewriter)) {
+  while (matching::apply_rewriters_bottom_up(node, extract_neg_rewriter)) {
   }
 
-  matching::apply_rewriters_recursively(node, uncanon_neg_rewriters);
+  matching::apply_rewriters_bottom_up(node, uncanon_neg_rewriters);
 
-  while (matching::apply_rewriters_recursively(node, insert_neg_rewriter)) {
+  while (matching::apply_rewriters_bottom_up(node, insert_neg_rewriter)) {
   }
 }
 
@@ -105,7 +105,7 @@ void uncanonicalize(mparse::ast_node_ptr& node) {
 namespace {
 
 void propagate_vars(mparse::ast_node_ptr& node, const var_scope& vscope) {
-  matching::apply_recursively(node, [&](mparse::ast_node_ptr& cur_node) {
+  matching::apply_bottom_up(node, [&](mparse::ast_node_ptr& cur_node) {
     if (auto* id_node =
             mparse::ast_node_cast<mparse::id_node>(cur_node.get())) {
       if (auto val = vscope.lookup(id_node->name())) {
@@ -126,7 +126,7 @@ bool has_constant_args(const mparse::func_node* node) {
 bool eval_funcs(mparse::ast_node_ptr& node, const func_scope& fscope) {
   bool changed = false;
 
-  matching::apply_recursively(node, [&](mparse::ast_node_ptr& cur_node) {
+  matching::apply_bottom_up(node, [&](mparse::ast_node_ptr& cur_node) {
     if (auto* func_node =
             mparse::ast_node_cast<const mparse::func_node>(cur_node.get())) {
       if (has_constant_args(func_node) &&
@@ -241,23 +241,22 @@ void simplify(mparse::ast_node_ptr& node, const var_scope& vscope,
     while (has_work) {
       has_work = false;
 
-      while (
-          matching::apply_rewriters_recursively(node, const_eval_rewriters)) {
+      while (matching::apply_rewriters_bottom_up(node, const_eval_rewriters)) {
         has_work = true;
       }
 
       has_work |= eval_funcs(node, eval_fscope);
 
-      while (matching::apply_rewriters_recursively(node,
-                                                   const_migrate_rewriters)) {
+      while (
+          matching::apply_rewriters_bottom_up(node, const_migrate_rewriters)) {
         has_work = true;
       }
 
-      while (matching::apply_rewriters_recursively(node, reassoc_rewriters)) {
+      while (matching::apply_rewriters_bottom_up(node, reassoc_rewriters)) {
         has_work = true;
       }
 
-      while (matching::apply_rewriters_recursively(node, simp_rewriters)) {
+      while (matching::apply_rewriters_bottom_up(node, simp_rewriters)) {
         has_work = true;
       }
     }
@@ -328,11 +327,11 @@ constexpr matching::rewriter_list remove_cmplx_lit_rewriter = {
 } // namespace
 
 void insert_cmplx_lits(mparse::ast_node_ptr& node) {
-  matching::apply_rewriters_recursively(node, insert_cmplx_lit_rewriter);
+  matching::apply_rewriters_bottom_up(node, insert_cmplx_lit_rewriter);
 }
 
 void remove_cmplx_lits(mparse::ast_node_ptr& node) {
-  matching::apply_rewriters_recursively(node, remove_cmplx_lit_rewriter);
+  matching::apply_rewriters_bottom_up(node, remove_cmplx_lit_rewriter);
 }
 
 } // namespace impl
