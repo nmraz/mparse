@@ -30,7 +30,7 @@ struct compare_visitor : mparse::const_ast_visitor {
   const mparse::ast_node* other;
   Comp& comp;
 
-  bool result;
+  bool result = false;
 };
 
 template <typename Comp>
