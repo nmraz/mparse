@@ -155,35 +155,35 @@ namespace impl {
 
 template <typename V, typename N, template <typename> typename AddCv>
 struct visit_helper {
-  static void do_visit(V&&, N&, util::type_list<>) {}
+  static void do_apply_visitor(V&&, N&, util::type_list<>) {}
 
   template <typename D, typename... Ds>
-  static void do_visit(V&& vis, N& node, util::type_list<D, Ds...>) {
+  static void do_apply_visitor(V&& vis, N& node, util::type_list<D, Ds...>) {
     if (auto* der_node = ast_node_cast<AddCv<D>>(&node)) {
       std::forward<V>(vis)(*der_node);
-      do_visit(std::forward<V>(vis), node, typename D::derived_types{});
+      do_apply_visitor(std::forward<V>(vis), node, typename D::derived_types{});
     } else {
-      do_visit(std::forward<V>(vis), node, util::type_list<Ds...>{});
+      do_apply_visitor(std::forward<V>(vis), node, util::type_list<Ds...>{});
     }
   }
 
-  static void visit(V&& vis, N& node) {
+  static void apply_visitor(V&& vis, N& node) {
     std::forward<V>(vis)(node);
-    do_visit(std::forward<V>(vis), node, typename N::derived_types{});
+    do_apply_visitor(std::forward<V>(vis), node, typename N::derived_types{});
   }
 };
 
 } // namespace impl
 
 template <typename V>
-void visit(V&& vis, ast_node& node) {
-  impl::visit_helper<V, ast_node, util::identity>::visit(std::forward<V>(vis),
-                                                         node);
+void apply_visitor(V&& vis, ast_node& node) {
+  impl::visit_helper<V, ast_node, util::identity>::apply_visitor(
+      std::forward<V>(vis), node);
 }
 
 template <typename V>
-void visit(V&& vis, const ast_node& node) {
-  impl::visit_helper<V, const ast_node, std::add_const_t>::visit(
+void apply_visitor(V&& vis, const ast_node& node) {
+  impl::visit_helper<V, const ast_node, std::add_const_t>::apply_visitor(
       std::forward<V>(vis), node);
 }
 
