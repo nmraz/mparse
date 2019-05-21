@@ -138,7 +138,18 @@ bool eval_funcs(mparse::ast_node_ptr& node, const func_scope& fscope) {
   });
 
   return changed;
-} // namespace
+}
+
+
+number eval_cmplx_lit(util::span<const number> args) {
+  return {args[0].real(), args[1].real()};
+}
+
+const func_scope& lit_eval_fscope() {
+  static const func_scope fscope = {
+      {std::string(impl::cmplx_lit_func_name), eval_cmplx_lit}};
+  return fscope;
+}
 
 
 template <typename Lhs, typename Rhs>
@@ -154,19 +165,12 @@ constexpr matching::unary_expr<mparse::unary_node, Inner> match_unop(
   return {inner};
 }
 
-number eval_cmplx_lit(util::span<const number> args) {
-  return {args[0].real(), args[1].real()};
-}
-
-const func_scope lit_eval_func_scope = {
-    {std::string(impl::cmplx_lit_func_name), eval_cmplx_lit},
-};
 
 constexpr matching::rewriter_list const_eval_rewriters = {
     capture_as<1>(match_unop(cmplx_lit) || match_binop(cmplx_lit, cmplx_lit)),
     build_custom(
         [](auto&& cap) {
-          return build_cmplx_lit(eval(cap.get(), {}, lit_eval_func_scope));
+          return build_cmplx_lit(eval(cap.get(), {}, lit_eval_fscope()));
         },
         matching::capture_expr_tag<1>{}),
 };
@@ -226,7 +230,7 @@ constexpr matching::rewriter_list simp_rewriters = {
 
 void simplify(mparse::ast_node_ptr& node, const var_scope& vscope,
               const func_scope& fscope) {
-  func_scope eval_fscope = lit_eval_func_scope;
+  func_scope eval_fscope = lit_eval_fscope();
   eval_fscope.set_parent(&fscope);
 
   canonicalize(node);
