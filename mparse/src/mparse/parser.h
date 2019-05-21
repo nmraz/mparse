@@ -10,7 +10,7 @@ namespace mparse {
 
 class parser {
 public:
-  parser(source_stream& stream, source_map* smap = nullptr);
+  explicit parser(source_stream& stream, source_map* smap = nullptr);
   ~parser();
 
   void begin_parse();

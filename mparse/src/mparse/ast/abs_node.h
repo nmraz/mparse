@@ -8,7 +8,7 @@ namespace mparse {
 class abs_node : public ast_node_impl<abs_node, unary_node> {
 public:
   constexpr abs_node() = default;
-  abs_node(ast_node_ptr child);
+  explicit abs_node(ast_node_ptr child);
 };
 
 } // namespace mparse

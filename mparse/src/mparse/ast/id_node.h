@@ -8,7 +8,7 @@ namespace mparse {
 class id_node : public ast_node_impl<id_node> {
 public:
   id_node() = default;
-  id_node(std::string name);
+  explicit id_node(std::string name);
 
   const std::string& name() const { return name_; }
   void set_name(std::string name);

@@ -7,7 +7,7 @@ namespace util {
 template <typename F>
 class finally {
 public:
-  explicit constexpr finally(F func) : func_(std::move(func)) {}
+  constexpr explicit finally(F func) : func_(std::move(func)) {}
   ~finally() { func_(); }
 
 private:

@@ -79,7 +79,7 @@ struct parser::parser_impl {
   };
 
 
-  parser_impl(source_stream& stream, source_map* smap = nullptr);
+  parser_impl(source_stream& stream, source_map* smap);
 
   void begin_parse();
   void end_parse();

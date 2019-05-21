@@ -17,7 +17,7 @@ namespace impl {
 
 template <typename Comp>
 struct compare_visitor : mparse::const_ast_visitor {
-  explicit compare_visitor(const mparse::ast_node* other, Comp& comp);
+  compare_visitor(const mparse::ast_node* other, Comp& comp);
 
   void visit(const mparse::paren_node& node) override;
   void visit(const mparse::abs_node& node) override;

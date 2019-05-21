@@ -15,7 +15,7 @@ public:
   using pos_type = std::size_t;
 
 
-  explicit constexpr source_stream(source_type source) : source_(source) {}
+  constexpr explicit source_stream(source_type source) : source_(source) {}
 
   source_type source() const { return source_; }
   source_type token(pos_type token_start) const;

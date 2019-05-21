@@ -7,7 +7,7 @@ namespace mparse {
 class literal_node : public ast_node_impl<literal_node> {
 public:
   constexpr literal_node() = default;
-  constexpr literal_node(double val) : val_(val) {}
+  constexpr explicit literal_node(double val) : val_(val) {}
 
   constexpr double val() const { return val_; }
   constexpr void set_val(double val) { val_ = val; }

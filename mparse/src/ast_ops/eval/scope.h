@@ -20,8 +20,8 @@ public:
   explicit var_scope(const var_scope* parent);
 
   var_scope(std::initializer_list<impl_type::value_type> ilist);
-  explicit var_scope(const var_scope* parent,
-                     std::initializer_list<impl_type::value_type> ilist);
+  var_scope(const var_scope* parent,
+            std::initializer_list<impl_type::value_type> ilist);
 
   void set_binding(std::string name, number val);
   void remove_binding(std::string_view name);
@@ -54,8 +54,8 @@ public:
   explicit func_scope(const func_scope* parent);
 
   func_scope(std::initializer_list<impl_type::value_type> ilist);
-  explicit func_scope(const func_scope* parent,
-                      std::initializer_list<impl_type::value_type> ilist);
+  func_scope(const func_scope* parent,
+             std::initializer_list<impl_type::value_type> ilist);
 
   void set_binding(std::string name, func_wrapper func);
   void remove_binding(std::string_view name);
