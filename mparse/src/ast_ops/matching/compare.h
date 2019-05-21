@@ -8,7 +8,7 @@ namespace ast_ops::matching {
 namespace impl {
 
 template <typename Comp>
-struct compare_visitor : mparse::const_ast_visitor1<compare_visitor<Comp>> {
+struct compare_visitor : mparse::const_ast_visitor<compare_visitor<Comp>> {
   compare_visitor(const mparse::ast_node* other, Comp& comp);
 
   void operator()(const mparse::paren_node& node);

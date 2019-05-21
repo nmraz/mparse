@@ -40,7 +40,7 @@ number check_errno(F func) {
 }
 
 
-struct eval_visitor : mparse::const_ast_visitor1<eval_visitor> {
+struct eval_visitor : mparse::const_ast_visitor<eval_visitor> {
   eval_visitor(const var_scope& vscope, const func_scope& fscope);
 
   void operator()(const mparse::unary_node& node);

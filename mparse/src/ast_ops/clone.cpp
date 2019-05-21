@@ -5,7 +5,7 @@
 namespace ast_ops {
 namespace {
 
-struct clone_visitor : mparse::const_ast_visitor1<clone_visitor> {
+struct clone_visitor : mparse::const_ast_visitor<clone_visitor> {
   void operator()(const mparse::unary_node& node);
   void operator()(const mparse::paren_node& node);
   void operator()(const mparse::abs_node& node);

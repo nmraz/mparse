@@ -5,7 +5,7 @@
 namespace ast_ops::matching {
 namespace {
 
-struct child_apply_visitor : mparse::ast_visitor1<child_apply_visitor> {
+struct child_apply_visitor : mparse::ast_visitor<child_apply_visitor> {
   explicit child_apply_visitor(const basic_rewriter_func& func) : func(func) {}
 
   void operator()(mparse::unary_node& node);

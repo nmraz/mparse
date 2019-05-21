@@ -176,19 +176,19 @@ struct visit_helper {
 } // namespace impl
 
 template <typename D>
-struct ast_visitor1 {};
+struct ast_visitor {};
 
 template <typename D>
-struct const_ast_visitor1 {};
+struct const_ast_visitor {};
 
 template <typename V>
-void apply_visitor(ast_visitor1<V>& vis, ast_node& node) {
+void apply_visitor(ast_visitor<V>& vis, ast_node& node) {
   impl::visit_helper<V, ast_node, util::identity>::apply_visitor(
       static_cast<V&>(vis), node);
 }
 
 template <typename V>
-void apply_visitor(const_ast_visitor1<V>& vis, const ast_node& node) {
+void apply_visitor(const_ast_visitor<V>& vis, const ast_node& node) {
   impl::visit_helper<V, const ast_node, std::add_const_t>::apply_visitor(
       static_cast<V&>(vis), node);
 }
