@@ -13,7 +13,7 @@ public:
   func_node() = default;
   func_node(std::string name, arg_list args);
 
-  std::string name() const { return name_; }
+  const std::string& name() const { return name_; }
   void set_name(std::string name);
 
   const arg_list& args() const { return args_; }

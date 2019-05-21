@@ -10,7 +10,7 @@ public:
   id_node() = default;
   id_node(std::string name);
 
-  std::string name() const { return name_; }
+  const std::string& name() const { return name_; }
   void set_name(std::string name);
 
 private:
