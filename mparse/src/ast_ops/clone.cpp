@@ -5,52 +5,55 @@
 namespace ast_ops {
 namespace {
 
-struct clone_visitor : mparse::const_ast_visitor {
-  void visit(const mparse::unary_node& node) override;
-  void visit(const mparse::paren_node& node) override;
-  void visit(const mparse::abs_node& node) override;
-  void visit(const mparse::unary_op_node& node) override;
-  void visit(const mparse::binary_op_node& node) override;
-  void visit(const mparse::func_node& node) override;
-  void visit(const mparse::literal_node& node) override;
-  void visit(const mparse::id_node& node) override;
+struct clone_visitor {
+  template <typename T>
+  void operator()(T&&) {}
+
+  void operator()(const mparse::unary_node& node);
+  void operator()(const mparse::paren_node& node);
+  void operator()(const mparse::abs_node& node);
+  void operator()(const mparse::unary_op_node& node);
+  void operator()(const mparse::binary_op_node& node);
+  void operator()(const mparse::func_node& node);
+  void operator()(const mparse::literal_node& node);
+  void operator()(const mparse::id_node& node);
 
   mparse::ast_node_ptr cloned = nullptr;
 };
 
 
-void clone_visitor::visit(const mparse::unary_node& node) {
-  node.child()->apply_visitor(*this);
+void clone_visitor::operator()(const mparse::unary_node& node) {
+  mparse::apply_visitor(*this, *node.child());
 }
 
-void clone_visitor::visit(const mparse::paren_node&) {
+void clone_visitor::operator()(const mparse::paren_node&) {
   cloned = mparse::make_ast_node<mparse::paren_node>(std::move(cloned));
 }
 
-void clone_visitor::visit(const mparse::abs_node&) {
+void clone_visitor::operator()(const mparse::abs_node&) {
   cloned = mparse::make_ast_node<mparse::abs_node>(std::move(cloned));
 }
 
-void clone_visitor::visit(const mparse::unary_op_node& node) {
+void clone_visitor::operator()(const mparse::unary_op_node& node) {
   cloned = mparse::make_ast_node<mparse::unary_op_node>(node.type(),
                                                         std::move(cloned));
 }
 
-void clone_visitor::visit(const mparse::binary_op_node& node) {
-  node.lhs()->apply_visitor(*this);
+void clone_visitor::operator()(const mparse::binary_op_node& node) {
+  mparse::apply_visitor(*this, *node.lhs());
   auto cloned_lhs = std::move(cloned);
 
-  node.rhs()->apply_visitor(*this);
+  mparse::apply_visitor(*this, *node.rhs());
   auto cloned_rhs = std::move(cloned);
 
   cloned = mparse::make_ast_node<mparse::binary_op_node>(
       node.type(), std::move(cloned_lhs), std::move(cloned_rhs));
 }
 
-void clone_visitor::visit(const mparse::func_node& node) {
+void clone_visitor::operator()(const mparse::func_node& node) {
   mparse::func_node::arg_list cloned_args;
   for (const auto& arg : node.args()) {
-    arg->apply_visitor(*this);
+    mparse::apply_visitor(*this, *arg);
     cloned_args.push_back(std::move(cloned));
   }
 
@@ -58,11 +61,11 @@ void clone_visitor::visit(const mparse::func_node& node) {
                                                     std::move(cloned_args));
 }
 
-void clone_visitor::visit(const mparse::literal_node& node) {
+void clone_visitor::operator()(const mparse::literal_node& node) {
   cloned = mparse::make_ast_node<mparse::literal_node>(node.val());
 }
 
-void clone_visitor::visit(const mparse::id_node& node) {
+void clone_visitor::operator()(const mparse::id_node& node) {
   cloned = mparse::make_ast_node<mparse::id_node>(node.name());
 }
 
@@ -71,7 +74,7 @@ void clone_visitor::visit(const mparse::id_node& node) {
 
 mparse::ast_node_ptr clone(const mparse::ast_node& node) {
   clone_visitor vis;
-  node.apply_visitor(vis);
+  mparse::apply_visitor(vis, node);
   return vis.cloned;
 }
 
