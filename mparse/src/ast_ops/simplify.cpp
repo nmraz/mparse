@@ -44,10 +44,6 @@ void insert_parens(mparse::ast_node_ptr& node) {
 
 namespace {
 
-constexpr auto lit_or_neg = lit || -any;
-constexpr auto non_mul = !(any * any || lit_or_neg);
-
-
 // clang-format off
 
 constexpr matching::rewriter_list canon_rewriters = {
