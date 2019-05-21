@@ -19,7 +19,7 @@ public:
   ast_node& operator=(const ast_node&) = delete;
   ast_node& operator=(ast_node&&) = delete;
 
-  virtual ~ast_node() = 0;
+  virtual ~ast_node() = 0 {}
 
 private:
   template <typename Der, typename Base>
@@ -41,6 +41,8 @@ public:
   void set_child(ast_node_ptr child);
   ast_node_ptr take_child();
   ast_node_ptr ref_child();
+
+  ~unary_node() = 0 {}
 
 private:
   ast_node_ptr child_;

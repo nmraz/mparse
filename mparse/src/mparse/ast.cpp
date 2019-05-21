@@ -2,11 +2,6 @@
 
 namespace mparse {
 
-ast_node::~ast_node() { // definition provided because base dtors are always
-                        // called (even when pure virtual)
-}
-
-
 void unary_node::set_child(ast_node_ptr child) {
   child_ = std::move(child);
 }
