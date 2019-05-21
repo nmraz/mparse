@@ -21,7 +21,7 @@ struct get_derived_types {
 
 template <typename T>
 struct get_derived_types<T, std::void_t<typename T::derived_types>> {
-  using type = typename T::child_types;
+  using type = typename T::derived_types;
 };
 
 template <typename T>
@@ -40,6 +40,10 @@ struct flatten_derived_types<T, util::type_list<Ds...>> {
                                      get_flattened_derived_types_t<Ds>...>;
 };
 
+template <typename Der, typename Base>
+constexpr bool is_listed_as_derived =
+    util::type_list_count_v<Der, get_derived_types_t<Base>>;
+
 } // namespace impl
 
 template <typename Der, typename Base>
@@ -49,6 +53,8 @@ public:
                 "AST nodes must derive from ast_node");
   static_assert(impl::has_visit_overload<ast_visitor, Der>,
                 "Missing ast_visitor overload");
+  static_assert(impl::is_listed_as_derived<Der, Base>,
+                "Type not listed in Base::derived_types");
 
   constexpr ast_node_impl() { this->id_ = get_id(); }
 
