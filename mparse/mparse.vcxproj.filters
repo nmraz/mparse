@@ -18,15 +18,6 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\mparse\ast\operator_nodes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\mparse\ast\paren_node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\mparse\ast\ast_node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\mparse\source_stream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -34,9 +25,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\mparse\parser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\mparse\ast\unary_node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\mparse\source_map.cpp">
@@ -48,16 +36,7 @@
     <ClCompile Include="src\ast_ops\pretty_print.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\mparse\ast\id_node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ast_ops\eval\eval.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\mparse\ast\abs_node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\mparse\ast\func_node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ast_ops\eval\scope.cpp">
@@ -101,21 +80,6 @@
     <ClInclude Include="src\mparse\source_range.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\mparse\ast\ast_node.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\mparse\ast\ast_visitor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\mparse\ast\literal_node.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\mparse\ast\operator_nodes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\mparse\ast\paren_node.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\mparse\source_stream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -123,9 +87,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\mparse\parser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\mparse\ast\unary_node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\util\span.h">
@@ -146,22 +107,7 @@
     <ClInclude Include="src\ast_ops\pretty_print.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\mparse\ast\id_node.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\ast_ops\eval\eval.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\mparse\ast\abs_node.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\mparse\ast\ast_node_impl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\mparse\ast\cast.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\mparse\ast\func_node.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ast_ops\eval\scope.h">
@@ -228,6 +174,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\mparse\ast_impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mparse\ast\ast_visitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

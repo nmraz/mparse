@@ -2,10 +2,7 @@
 
 #include "ast_ops/matching/compare.h"
 #include "ast_ops/matching/util.h"
-#include "mparse/ast/abs_node.h"
-#include "mparse/ast/ast_node.h"
-#include "mparse/ast/paren_node.h"
-#include "mparse/ast/unary_node.h"
+#include "mparse/ast.h"
 #include <string_view>
 #include <tuple>
 #include <type_traits>

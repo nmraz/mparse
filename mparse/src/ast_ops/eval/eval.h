@@ -2,7 +2,7 @@
 
 #include "ast_ops/eval/scope.h"
 #include "ast_ops/eval/types.h"
-#include "mparse/ast/ast_node.h"
+#include "mparse/ast.h"
 #include <stdexcept>
 #include <string_view>
 #include <vector>

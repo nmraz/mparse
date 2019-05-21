@@ -1,8 +1,7 @@
 #include "error_handling.h"
 
 #include "diagnostics.h"
-#include "mparse/ast/func_node.h"
-#include "mparse/ast/operator_nodes.h"
+#include "mparse/ast.h"
 #include <iostream>
 #include <sstream>
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ast_ops/matching/expr.h"
-#include "mparse/ast/ast_node.h"
+#include "mparse/ast.h"
 #include "util/meta.h"
 #include <type_traits>
 #include <utility>

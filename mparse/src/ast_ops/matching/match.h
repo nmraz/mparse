@@ -3,12 +3,7 @@
 #include "ast_ops/matching/compare.h"
 #include "ast_ops/matching/expr.h"
 #include "ast_ops/matching/match_results.h"
-#include "mparse/ast/ast_node.h"
-#include "mparse/ast/cast.h"
-#include "mparse/ast/func_node.h"
-#include "mparse/ast/id_node.h"
-#include "mparse/ast/literal_node.h"
-#include "mparse/ast/operator_nodes.h"
+#include "mparse/ast.h"
 #include "util/meta.h"
 #include <optional>
 

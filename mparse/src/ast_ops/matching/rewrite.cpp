@@ -1,8 +1,7 @@
 #include "rewrite.h"
 
+#include "mparse/ast.h"
 #include "mparse/ast/ast_visitor.h"
-#include "mparse/ast/func_node.h"
-#include "mparse/ast/operator_nodes.h"
 
 namespace ast_ops::matching {
 namespace {

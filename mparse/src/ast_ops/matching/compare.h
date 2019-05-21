@@ -1,15 +1,7 @@
 #pragma once
 
 #include "ast_ops/matching/util.h"
-#include "mparse/ast/abs_node.h"
-#include "mparse/ast/ast_node.h"
-#include "mparse/ast/ast_visitor.h"
-#include "mparse/ast/cast.h"
-#include "mparse/ast/func_node.h"
-#include "mparse/ast/id_node.h"
-#include "mparse/ast/literal_node.h"
-#include "mparse/ast/operator_nodes.h"
-#include "mparse/ast/paren_node.h"
+#include "mparse/ast.h"
 #include <type_traits>
 
 namespace ast_ops::matching {

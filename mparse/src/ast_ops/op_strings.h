@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mparse/ast/operator_nodes.h"
+#include "mparse/ast.h"
 #include <string_view>
 
 namespace ast_ops {

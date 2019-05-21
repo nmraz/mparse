@@ -1,13 +1,6 @@
 #include "clone.h"
 
-#include "mparse/ast/abs_node.h"
-#include "mparse/ast/ast_visitor.h"
-#include "mparse/ast/func_node.h"
-#include "mparse/ast/id_node.h"
-#include "mparse/ast/literal_node.h"
-#include "mparse/ast/operator_nodes.h"
-#include "mparse/ast/paren_node.h"
-#include "mparse/ast/unary_node.h"
+#include "mparse/ast.h"
 
 namespace ast_ops {
 namespace {

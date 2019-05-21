@@ -1,9 +1,7 @@
 #include "simplify.h"
 
 #include "ast_ops/eval/eval.h"
-#include "mparse/ast/func_node.h"
-#include "mparse/ast/literal_node.h"
-#include "mparse/ast/operator_nodes.h"
+#include "mparse/ast.h"
 #include <algorithm>
 
 using namespace ast_ops::matching::literals;

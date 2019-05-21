@@ -3,11 +3,7 @@
 #include "ast_ops/clone.h"
 #include "ast_ops/matching/expr.h"
 #include "ast_ops/matching/match_results.h"
-#include "mparse/ast/ast_node.h"
-#include "mparse/ast/func_node.h"
-#include "mparse/ast/id_node.h"
-#include "mparse/ast/literal_node.h"
-#include "mparse/ast/operator_nodes.h"
+#include "mparse/ast.h"
 #include "util/meta.h"
 #include <utility>
 
@@ -57,7 +53,8 @@ struct builder_traits<custom_builder_expr<F, Tags...>> {
 
   template <typename BuildTags, typename Ctx>
   static auto build(const custom_builder_expr<F, Tags...>& expr, Ctx&& ctx) {
-    return expr.func(impl::get_build_result<BuildTags, Tags>(std::forward<Ctx>(ctx))...);
+    return expr.func(
+        impl::get_build_result<BuildTags, Tags>(std::forward<Ctx>(ctx))...);
   }
 };
 

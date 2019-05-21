@@ -3,7 +3,7 @@
 #include "ast_ops/matching/build.h"
 #include "ast_ops/matching/match.h"
 #include "ast_ops/matching/match_results.h"
-#include "mparse/ast/ast_node.h"
+#include "mparse/ast.h"
 #include <functional>
 #include <tuple>
 #include <type_traits>

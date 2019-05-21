@@ -4,9 +4,7 @@
 #include "ast_ops/eval/types.h"
 #include "ast_ops/matching/match_results.h"
 #include "ast_ops/matching/rewrite.h"
-#include "mparse/ast/ast_node.h"
-#include "mparse/ast/cast.h"
-#include "mparse/ast/literal_node.h"
+#include "mparse/ast.h"
 #include "util/finally.h"
 #include <string_view>
 

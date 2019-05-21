@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mparse/ast/ast_node.h"
+#include "mparse/ast.h"
 #include "util/span.h"
 #include <stdexcept>
 #include <string_view>
