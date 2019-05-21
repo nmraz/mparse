@@ -95,7 +95,7 @@ T* ast_node_cast(U* node) {
   } else { // downcast
     static_assert(std::is_base_of_v<U, T>, "Crosscasts are not supported");
 
-    if (!node || !T::classof(*node)) {
+    if (!node || !T::classof(static_cast<const ast_node&>(*node))) {
       return nullptr;
     }
 
