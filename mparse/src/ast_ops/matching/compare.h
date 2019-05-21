@@ -8,16 +8,16 @@ namespace ast_ops::matching {
 namespace impl {
 
 template <typename Comp>
-struct compare_visitor : mparse::const_ast_visitor {
+struct compare_visitor : mparse::const_ast_visitor1<compare_visitor<Comp>> {
   compare_visitor(const mparse::ast_node* other, Comp& comp);
 
-  void visit(const mparse::paren_node& node) override;
-  void visit(const mparse::abs_node& node) override;
-  void visit(const mparse::unary_op_node& node) override;
-  void visit(const mparse::binary_op_node& node) override;
-  void visit(const mparse::func_node& node) override;
-  void visit(const mparse::id_node& node) override;
-  void visit(const mparse::literal_node& node) override;
+  void operator()(const mparse::paren_node& node);
+  void operator()(const mparse::abs_node& node);
+  void operator()(const mparse::unary_op_node& node);
+  void operator()(const mparse::binary_op_node& node);
+  void operator()(const mparse::func_node& node);
+  void operator()(const mparse::id_node& node);
+  void operator()(const mparse::literal_node& node);
 
   const mparse::ast_node* other;
   Comp& comp;
@@ -31,7 +31,7 @@ compare_visitor<Comp>::compare_visitor(const mparse::ast_node* other,
     : other(other), comp(comp) {}
 
 template <typename Comp>
-void compare_visitor<Comp>::visit(const mparse::paren_node& node) {
+void compare_visitor<Comp>::operator()(const mparse::paren_node& node) {
   if (auto* other_paren =
           mparse::ast_node_cast<const mparse::paren_node>(other)) {
     result = comp.compare_paren(node, *other_paren);
@@ -41,7 +41,7 @@ void compare_visitor<Comp>::visit(const mparse::paren_node& node) {
 }
 
 template <typename Comp>
-void compare_visitor<Comp>::visit(const mparse::abs_node& node) {
+void compare_visitor<Comp>::operator()(const mparse::abs_node& node) {
   if (auto* other_abs = mparse::ast_node_cast<const mparse::abs_node>(other)) {
     result = comp.compare_abs(node, *other_abs);
     return;
@@ -50,7 +50,7 @@ void compare_visitor<Comp>::visit(const mparse::abs_node& node) {
 }
 
 template <typename Comp>
-void compare_visitor<Comp>::visit(const mparse::unary_op_node& node) {
+void compare_visitor<Comp>::operator()(const mparse::unary_op_node& node) {
   if (auto* other_unary =
           mparse::ast_node_cast<const mparse::unary_op_node>(other)) {
     result = comp.compare_unary(node, *other_unary);
@@ -60,7 +60,7 @@ void compare_visitor<Comp>::visit(const mparse::unary_op_node& node) {
 }
 
 template <typename Comp>
-void compare_visitor<Comp>::visit(const mparse::binary_op_node& node) {
+void compare_visitor<Comp>::operator()(const mparse::binary_op_node& node) {
   if (auto* other_binary =
           mparse::ast_node_cast<const mparse::binary_op_node>(other)) {
     result = comp.compare_binary(node, *other_binary);
@@ -70,7 +70,7 @@ void compare_visitor<Comp>::visit(const mparse::binary_op_node& node) {
 }
 
 template <typename Comp>
-void compare_visitor<Comp>::visit(const mparse::func_node& node) {
+void compare_visitor<Comp>::operator()(const mparse::func_node& node) {
   if (auto* other_func =
           mparse::ast_node_cast<const mparse::func_node>(other)) {
     result = comp.compare_func(node, *other_func);
@@ -80,7 +80,7 @@ void compare_visitor<Comp>::visit(const mparse::func_node& node) {
 }
 
 template <typename Comp>
-void compare_visitor<Comp>::visit(const mparse::id_node& node) {
+void compare_visitor<Comp>::operator()(const mparse::id_node& node) {
   if (auto* other_id = mparse::ast_node_cast<const mparse::id_node>(other)) {
     result = comp.compare_id(node, *other_id);
     return;
@@ -89,7 +89,7 @@ void compare_visitor<Comp>::visit(const mparse::id_node& node) {
 }
 
 template <typename Comp>
-void compare_visitor<Comp>::visit(const mparse::literal_node& node) {
+void compare_visitor<Comp>::operator()(const mparse::literal_node& node) {
   if (auto* other_lit =
           mparse::ast_node_cast<const mparse::literal_node>(other)) {
     result = comp.compare_literal(node, *other_lit);
@@ -177,7 +177,7 @@ template <typename Comp>
 bool compare_exprs(const mparse::ast_node& first,
                    const mparse::ast_node& second, Comp&& comp) {
   impl::compare_visitor<std::remove_reference_t<Comp>> vis(&second, comp);
-  first.apply_visitor(vis);
+  mparse::apply_visitor(vis, first);
   return vis.result;
 }
 
