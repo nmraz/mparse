@@ -17,10 +17,17 @@ class var_scope {
 
 public:
   var_scope() = default;
+  explicit var_scope(const var_scope* parent);
+
   var_scope(std::initializer_list<impl_type::value_type> ilist);
+  explicit var_scope(const var_scope* parent,
+                     std::initializer_list<impl_type::value_type> ilist);
 
   void set_binding(std::string name, number val);
   void remove_binding(std::string_view name);
+
+  const var_scope* parent() const { return parent_; }
+  void set_parent(const var_scope* parent) { parent_ = parent; }
 
   void clear() { map_.clear(); }
 
@@ -28,6 +35,7 @@ public:
 
 private:
   impl_type map_;
+  const var_scope* parent_ = nullptr;
 };
 
 
@@ -43,17 +51,25 @@ class func_scope {
 
 public:
   func_scope() = default;
+  explicit func_scope(const func_scope* parent);
+
   func_scope(std::initializer_list<impl_type::value_type> ilist);
-  
+  explicit func_scope(const func_scope* parent,
+                      std::initializer_list<impl_type::value_type> ilist);
+
   void set_binding(std::string name, func_wrapper func);
   void remove_binding(std::string_view name);
-  
+
+  const func_scope* parent() const { return parent_; }
+  void set_parent(const func_scope* parent) { parent_ = parent; }
+
   void clear() { map_.clear(); }
 
   const function* lookup(std::string_view name) const;
 
 private:
   impl_type map_;
+  const func_scope* parent_ = nullptr;
 };
 
 } // namespace ast_ops
