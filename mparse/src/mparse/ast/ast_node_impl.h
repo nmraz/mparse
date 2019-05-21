@@ -62,7 +62,6 @@ public:
     vis.visit(static_cast<const Der&>(*this));
   }
 
-  static constexpr const void* get_id() { return &id_dummy; }
 
   bool has_id(const void* id) const override {
     return id == get_id() || Base::has_id(id);
@@ -73,6 +72,11 @@ public:
   }
 
 private:
+  template <typename D, typename B>
+  friend class ast_node_impl;
+
+  static constexpr const void* get_id() { return &id_dummy; }
+
   template <typename D, typename... Ds>
   static bool do_classof(const void* id, util::type_list<D, Ds...>) {
     if (id == D::get_id()) {
