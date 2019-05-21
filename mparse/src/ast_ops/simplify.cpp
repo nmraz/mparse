@@ -131,7 +131,7 @@ bool eval_funcs(mparse::ast_node_ptr& node, const func_scope& fscope) {
             mparse::ast_node_cast<const mparse::func_node>(cur_node.get())) {
       if (has_constant_args(func_node) &&
           fscope.parent()->lookup(func_node->name())) {
-        cur_node = build_cmplx_lit(eval(cur_node.get(), {}, fscope));
+        cur_node = build_cmplx_lit(eval(*cur_node, {}, fscope));
         changed = true;
       }
     }
@@ -170,7 +170,7 @@ constexpr matching::rewriter_list const_eval_rewriters = {
     capture_as<1>(match_unop(cmplx_lit) || match_binop(cmplx_lit, cmplx_lit)),
     build_custom(
         [](auto&& cap) {
-          return build_cmplx_lit(eval(cap.get(), {}, lit_eval_fscope()));
+          return build_cmplx_lit(eval(*cap, {}, lit_eval_fscope()));
         },
         matching::capture_expr_tag<1>{}),
 };

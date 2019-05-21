@@ -112,29 +112,29 @@ template <typename Der>
 struct basic_expr_comparer_base {
   bool compare_paren(const mparse::paren_node& first,
                      const mparse::paren_node& second) const {
-    return compare_exprs(first.child(), second.child(),
+    return compare_exprs(*first.child(), *second.child(),
                          static_cast<const Der&>(*this));
   }
 
   bool compare_abs(const mparse::abs_node& first,
                    const mparse::abs_node& second) const {
-    return compare_exprs(first.child(), second.child(),
+    return compare_exprs(*first.child(), *second.child(),
                          static_cast<const Der&>(*this));
   }
 
   bool compare_unary(const mparse::unary_op_node& first,
                      const mparse::unary_op_node& second) const {
     return first.type() == second.type() &&
-           compare_exprs(first.child(), second.child(),
+           compare_exprs(*first.child(), *second.child(),
                          static_cast<const Der&>(*this));
   }
 
   bool compare_binary(const mparse::binary_op_node& first,
                       const mparse::binary_op_node& second) const {
     return first.type() == second.type() &&
-           compare_exprs(first.lhs(), second.lhs(),
+           compare_exprs(*first.lhs(), *second.lhs(),
                          static_cast<const Der&>(*this)) &&
-           compare_exprs(first.rhs(), second.rhs(),
+           compare_exprs(*first.rhs(), *second.rhs(),
                          static_cast<const Der&>(*this));
   }
 
@@ -147,7 +147,7 @@ struct basic_expr_comparer_base {
            std::equal(first_args.begin(), first_args.end(), second_args.begin(),
                       second_args.end(),
                       [&](const auto& arg1, const auto& arg2) {
-                        return compare_exprs(arg1.get(), arg2.get(),
+                        return compare_exprs(*arg1, *arg2,
                                              static_cast<const Der&>(*this));
                       });
   }
@@ -174,15 +174,15 @@ struct commutative_expr_comparer_base : public basic_expr_comparer_base<Der> {
       return false;
     }
 
-    if (compare_exprs(first.lhs(), second.lhs(),
+    if (compare_exprs(*first.lhs(), *second.lhs(),
                       static_cast<const Der&>(*this)) &&
-        compare_exprs(first.rhs(), second.rhs(),
+        compare_exprs(*first.rhs(), *second.rhs(),
                       static_cast<const Der&>(*this))) {
       return true;
     } else if (is_commutative(first.type()) &&
-               compare_exprs(first.lhs(), second.rhs(),
+               compare_exprs(*first.lhs(), *second.rhs(),
                              static_cast<const Der&>(*this)) &&
-               compare_exprs(first.rhs(), second.lhs(),
+               compare_exprs(*first.rhs(), *second.lhs(),
                              static_cast<const Der&>(*this))) {
       return true;
     }
@@ -196,16 +196,16 @@ struct commutative_expr_comparer
 
 
 template <typename Comp>
-bool compare_exprs(const mparse::ast_node* first,
-                   const mparse::ast_node* second, Comp&& comp) {
-  impl::compare_visitor<std::remove_reference_t<Comp>> vis(second, comp);
-  first->apply_visitor(vis);
+bool compare_exprs(const mparse::ast_node& first,
+                   const mparse::ast_node& second, Comp&& comp) {
+  impl::compare_visitor<std::remove_reference_t<Comp>> vis(&second, comp);
+  first.apply_visitor(vis);
   return vis.result;
 }
 
 template <typename Comp = commutative_expr_comparer>
-bool compare_exprs(const mparse::ast_node* first,
-                   const mparse::ast_node* second) {
+bool compare_exprs(const mparse::ast_node& first,
+                   const mparse::ast_node& second) {
   return compare_exprs(first, second, Comp{});
 }
 

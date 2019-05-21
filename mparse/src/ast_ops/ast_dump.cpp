@@ -143,13 +143,13 @@ void ast_dump_visitor::dump_last_child(const mparse::ast_node& node) {
 } // namespace
 
 
-void dump_ast(const mparse::ast_node* node, const mparse::source_map* smap,
+void dump_ast(const mparse::ast_node& node, const mparse::source_map* smap,
               std::ostream& stream) {
   ast_dump_visitor vis("", false, smap, stream);
-  node->apply_visitor(vis);
+  node.apply_visitor(vis);
 }
 
-void dump_ast(const mparse::ast_node* node, const mparse::source_map* smap) {
+void dump_ast(const mparse::ast_node& node, const mparse::source_map* smap) {
   dump_ast(node, smap, std::cout);
 }
 

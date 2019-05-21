@@ -73,22 +73,22 @@ auto parse_diag(std::string_view input) {
 
 
 void cmd_dump(subcommand_opts opts) {
-  ast_ops::dump_ast(opts.ast.get(), &opts.smap);
+  ast_ops::dump_ast(*opts.ast, &opts.smap);
 }
 
 void cmd_pretty(subcommand_opts opts) {
-  std::cout << ast_ops::pretty_print(opts.ast.get()) << "\n";
+  std::cout << ast_ops::pretty_print(*opts.ast) << "\n";
 }
 
 void cmd_strip(subcommand_opts opts) {
   ast_ops::strip_parens(opts.ast);
-  std::cout << ast_ops::pretty_print(opts.ast.get()) << "\n";
+  std::cout << ast_ops::pretty_print(*opts.ast) << "\n";
 }
 
 void cmd_paren(subcommand_opts opts) {
   ast_ops::strip_parens(opts.ast);
   ast_ops::insert_parens(opts.ast);
-  std::cout << ast_ops::pretty_print(opts.ast.get()) << "\n";
+  std::cout << ast_ops::pretty_print(*opts.ast) << "\n";
 }
 
 void cmd_eval(subcommand_opts opts) {
@@ -97,7 +97,7 @@ void cmd_eval(subcommand_opts opts) {
 
   try {
     auto result =
-        ast_ops::eval(opts.ast.get(), vscope, ast_ops::builtin_func_scope());
+        ast_ops::eval(*opts.ast, vscope, ast_ops::builtin_func_scope());
     print_number(std::cout, result) << '\n';
   } catch (const ast_ops::eval_error& err) {
     handle_math_error(err, opts.smap, opts.input);
@@ -111,10 +111,10 @@ void cmd_simp(subcommand_opts opts) {
 
   try {
     ast_ops::simplify(opts.ast, vscope, ast_ops::builtin_func_scope());
-    std::cout << ast_ops::pretty_print(opts.ast.get()) << "\n";
+    std::cout << ast_ops::pretty_print(*opts.ast) << "\n";
   } catch (const ast_ops::eval_error& err) {
     mparse::source_map smap;
-    std::string expr = ast_ops::pretty_print(opts.ast.get(), &smap);
+    std::string expr = ast_ops::pretty_print(*opts.ast, &smap);
     handle_math_error(err, smap, expr);
     std::exit(1);
   }

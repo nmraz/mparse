@@ -272,7 +272,7 @@ struct matcher_traits<subexpr_expr<C, Comp>> {
         return true;
       }
 
-      return compare_exprs(saved.get(), node.get(), expr.comp);
+      return compare_exprs(*saved, *node, expr.comp);
     } else {
       // expression appears only once - don't even try to compare
 

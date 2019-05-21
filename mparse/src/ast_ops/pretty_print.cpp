@@ -287,10 +287,10 @@ void print_visitor::set_locs(const mparse::ast_node& node,
 } // namespace
 
 
-std::string pretty_print(const mparse::ast_node* node,
+std::string pretty_print(const mparse::ast_node& node,
                          mparse::source_map* smap) {
   print_visitor vis(smap);
-  node->apply_visitor(vis);
+  node.apply_visitor(vis);
   return vis.result;
 }
 

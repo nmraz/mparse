@@ -76,9 +76,9 @@ void clone_visitor::visit(const mparse::id_node& node) {
 } // namespace
 
 
-mparse::ast_node_ptr clone(const mparse::ast_node* node) {
+mparse::ast_node_ptr clone(const mparse::ast_node& node) {
   clone_visitor vis;
-  node->apply_visitor(vis);
+  node.apply_visitor(vis);
   return vis.cloned;
 }
 
