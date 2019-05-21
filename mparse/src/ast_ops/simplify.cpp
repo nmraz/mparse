@@ -58,6 +58,7 @@ constexpr matching::rewriter_list canon_rewriters = {
 };
 
 constexpr matching::rewriter_list uncanon_basic_rewriters = {
+    1_lit * x, x,
     -1_lit * x, -x,
     pow(x, -1_lit), 1_lit / x,
     x * (1_lit / y), x / y
@@ -294,6 +295,25 @@ mparse::ast_node_ptr build_lit(double val) {
   return mparse::make_ast_node<mparse::literal_node>(val);
 }
 
+mparse::ast_node_ptr build_user_imag(double val) {
+  return mparse::make_ast_node<mparse::binary_op_node>(
+      mparse::binary_op_type::mult, build_lit(val),
+      mparse::make_ast_node<mparse::id_node>("i"));
+}
+
+mparse::ast_node_ptr build_user_cmplx_lit(double real, double imag) {
+  if (!imag) {
+    return build_lit(real);
+  }
+
+  if (!real) {
+    return build_user_imag(imag);
+  }
+
+  return mparse::make_ast_node<mparse::binary_op_node>(
+      mparse::binary_op_type::add, build_lit(real), build_user_imag(imag));
+}
+
 constexpr matching::rewriter_list insert_cmplx_lit_rewriter = {
     c1,
     build_custom([](auto&& c1) { return build_cmplx_lit(c1->val()); },
@@ -301,23 +321,11 @@ constexpr matching::rewriter_list insert_cmplx_lit_rewriter = {
 };
 
 constexpr matching::rewriter_list remove_cmplx_lit_rewriter = {
-    cc1,
-    build_custom([](auto&& real) { return build_lit(real->val()); },
-                 cmplx_lit_real_tag<1>{}) +
-        id("i") *
-            build_custom([](auto&& imag) { return build_lit(imag->val()); },
-                         cmplx_lit_imag_tag<1>{}),
-};
-
-// clang-format off
-
-constexpr matching::rewriter_list remove_identity_rewriters = {
-    1_lit * x, x,
-    0_lit * any, 0_lit,
-    x + 0_lit, x
-};
-
-// clang-format on
+    cc1, build_custom(
+             [](auto&& real, auto&& imag) {
+               return build_user_cmplx_lit(real->val(), imag->val());
+             },
+             cmplx_lit_real_tag<1>{}, cmplx_lit_imag_tag<1>{})};
 
 } // namespace
 
@@ -327,7 +335,6 @@ void insert_cmplx_lits(mparse::ast_node_ptr& node) {
 
 void remove_cmplx_lits(mparse::ast_node_ptr& node) {
   matching::apply_rewriters_recursively(node, remove_cmplx_lit_rewriter);
-  matching::apply_rewriters_recursively(node, remove_identity_rewriters);
 }
 
 } // namespace impl
