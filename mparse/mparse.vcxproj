@@ -160,6 +160,7 @@
     <ClCompile Include="src\diagnostics.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\error_handling.cpp" />
+    <ClCompile Include="src\mparse\ast.cpp" />
     <ClCompile Include="src\mparse\ast\abs_node.cpp" />
     <ClCompile Include="src\mparse\ast\ast_node.cpp" />
     <ClCompile Include="src\mparse\ast\func_node.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="src\ast_ops\eval\builtins.h" />
     <ClInclude Include="src\diagnostics.h" />
     <ClInclude Include="src\error_handling.h" />
+    <ClInclude Include="src\mparse\ast.h" />
     <ClInclude Include="src\mparse\ast\abs_node.h" />
     <ClInclude Include="src\mparse\ast\ast_node.h" />
     <ClInclude Include="src\mparse\ast\ast_node_impl.h" />
@@ -205,6 +207,7 @@
     <ClInclude Include="src\mparse\ast\operator_nodes.h" />
     <ClInclude Include="src\mparse\ast\paren_node.h" />
     <ClInclude Include="src\mparse\ast\unary_node.h" />
+    <ClInclude Include="src\mparse\ast_impl.h" />
     <ClInclude Include="src\mparse\parse_error.h" />
     <ClInclude Include="src\mparse\lex.h" />
     <ClInclude Include="src\mparse\parser.h" />
