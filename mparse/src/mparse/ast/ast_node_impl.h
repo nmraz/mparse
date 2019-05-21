@@ -42,13 +42,15 @@ struct flatten_derived_types<T, util::type_list<Ds...>> {
 
 } // namespace impl
 
-template <typename Der, typename Base = ast_node>
+template <typename Der, typename Base>
 class ast_node_impl : public Base {
 public:
   static_assert(std::is_base_of_v<ast_node, Base>,
                 "AST nodes must derive from ast_node");
   static_assert(impl::has_visit_overload<ast_visitor, Der>,
                 "Missing ast_visitor overload");
+
+  constexpr ast_node_impl() { this->id_ = get_id(); }
 
   void apply_visitor(ast_visitor& vis) override {
     Base::apply_visitor(vis); // visit bases first
@@ -60,14 +62,32 @@ public:
     vis.visit(static_cast<const Der&>(*this));
   }
 
-  static constexpr const void* get_id() { return &id_; }
+  static constexpr const void* get_id() { return &id_dummy; }
 
   bool has_id(const void* id) const override {
     return id == get_id() || Base::has_id(id);
   }
 
+  template <typename Der2 = Der>
+  static bool classof(const ast_node& node) {
+    return do_classof(node.id_, impl::get_flattened_derived_types_t<Der2>{});
+  }
+
 private:
-  static inline char id_;
+  template <typename D, typename... Ds>
+  static bool do_classof(const void* id, util::type_list<D, Ds...>) {
+    if (id == D::get_id()) {
+      return true;
+    }
+
+    if constexpr (sizeof...(Ds) > 0) {
+      return do_classof(id, util::type_list<Ds...>{});
+    } else {
+      return true;
+    }
+  }
+
+  static inline char id_dummy;
 };
 
 } // namespace mparse
