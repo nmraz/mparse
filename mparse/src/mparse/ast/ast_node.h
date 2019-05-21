@@ -2,18 +2,27 @@
 
 #include "mparse/ast/ast_visitor.h"
 #include "mparse/source_range.h"
+#include "util/meta.h"
 #include <memory>
-#include <type_traits>
 
 namespace mparse {
 
 class ast_node;
+
+class binary_op_node;
+class unary_node;
+class func_node;
+class id_node;
+class literal_node;
 
 template <typename Der, typename Base = ast_node>
 class ast_node_impl;
 
 class ast_node {
 public:
+  using derived_types = util::type_list<unary_node, binary_op_node, func_node,
+                                        id_node, literal_node>;
+
   constexpr ast_node() = default;
 
   ast_node(const ast_node&) = delete;

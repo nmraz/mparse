@@ -14,35 +14,22 @@ constexpr bool has_visit_overload<
     V, T, std::void_t<decltype(static_cast<void (V::*)(T&)>(&V::visit))>> =
     true;
 
-template <typename T, typename = void>
-struct get_derived_types {
-  using type = util::type_list<>;
-};
-
-template <typename T>
-struct get_derived_types<T, std::void_t<typename T::derived_types>> {
-  using type = typename T::derived_types;
-};
-
-template <typename T>
-using get_derived_types_t = typename get_derived_types<T>::type;
-
 template <typename T, typename D>
 struct flatten_derived_types;
 
 template <typename T>
 using get_flattened_derived_types_t =
-    typename flatten_derived_types<T, get_derived_types_t<T>>::type;
+    typename flatten_derived_types<T, typename T::derived_types>::type;
 
 template <typename T, typename... Ds>
 struct flatten_derived_types<T, util::type_list<Ds...>> {
-  using type = util::type_list_cat_t<util::type_list<T, Ds...>,
+  using type = util::type_list_cat_t<util::type_list<T>,
                                      get_flattened_derived_types_t<Ds>...>;
 };
 
 template <typename Der, typename Base>
 constexpr bool is_listed_as_derived =
-    util::type_list_count_v<Der, get_derived_types_t<Base>>;
+    util::type_list_count_v<Der, typename Base::derived_types>;
 
 } // namespace impl
 
@@ -55,6 +42,8 @@ public:
                 "Missing ast_visitor overload");
   static_assert(impl::is_listed_as_derived<Der, Base>,
                 "Type not listed in Base::derived_types");
+
+  using derived_types = util::type_list<>;
 
   constexpr ast_node_impl() { this->id_ = get_id(); }
 
@@ -69,15 +58,18 @@ public:
   }
 
 
-  static bool classof(const ast_node& node) {
-    return do_classof(node.id_, impl::get_flattened_derived_types_t<Der>{});
-  }
-
 private:
   template <typename D, typename B>
   friend class ast_node_impl;
 
+  template <typename T, typename U>
+  friend T* ast_node_cast(U* node);
+
   static constexpr const void* get_id() { return &id_dummy; }
+
+  static bool classof(const ast_node& node) {
+    return do_classof(node.id_, impl::get_flattened_derived_types_t<Der>{});
+  }
 
   template <typename D, typename... Ds>
   static bool do_classof(const void* id, util::type_list<D, Ds...>) {
