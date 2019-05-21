@@ -287,7 +287,7 @@ using constant_expr = capture_expr_impl<constant_expr_tag<N>,
 template <char C>
 struct subexpr_expr_tag {};
 
-template <char C, typename Comp = commutative_expr_comparer>
+template <char C, typename Comp = default_expr_comparer>
 struct subexpr_expr {
   const Comp comp{};
 };
