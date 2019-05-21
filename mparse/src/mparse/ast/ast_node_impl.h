@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mparse/ast/ast_node.h"
-#include <type_traits>
+#include "util/meta.h"
 
 namespace mparse {
 namespace impl {
@@ -13,6 +13,32 @@ template <typename V, typename T>
 constexpr bool has_visit_overload<
     V, T, std::void_t<decltype(static_cast<void (V::*)(T&)>(&V::visit))>> =
     true;
+
+template <typename T, typename = void>
+struct get_derived_types {
+  using type = util::type_list<>;
+};
+
+template <typename T>
+struct get_derived_types<T, std::void_t<typename T::derived_types>> {
+  using type = typename T::child_types;
+};
+
+template <typename T>
+using get_derived_types_t = typename get_derived_types<T>::type;
+
+template <typename T, typename D>
+struct flatten_derived_types;
+
+template <typename T>
+using get_flattened_derived_types_t =
+    typename flatten_derived_types<T, get_derived_types_t<T>>::type;
+
+template <typename T, typename... Ds>
+struct flatten_derived_types<T, util::type_list<Ds...>> {
+  using type = util::type_list_cat<util::type_list<T, Ds...>,
+                                   get_flattened_derived_types_t<Ds>...>;
+};
 
 } // namespace impl
 
