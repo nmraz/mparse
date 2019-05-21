@@ -84,16 +84,19 @@ bool should_parenthesize(op_precedence parent_precedence,
 }
 
 
-struct print_visitor : mparse::const_ast_visitor {
+struct print_visitor : mparse::const_ast_visitor1<print_visitor> {
   explicit print_visitor(mparse::source_map* smap) : smap(smap) {}
 
-  void visit(const mparse::paren_node& node) override;
-  void visit(const mparse::abs_node& node) override;
-  void visit(const mparse::unary_op_node& node) override;
-  void visit(const mparse::binary_op_node& node) override;
-  void visit(const mparse::func_node& node) override;
-  void visit(const mparse::literal_node& node) override;
-  void visit(const mparse::id_node& node) override;
+  template <typename T>
+  void operator()(T&&) {}
+
+  void operator()(const mparse::paren_node& node);
+  void operator()(const mparse::abs_node& node);
+  void operator()(const mparse::unary_op_node& node);
+  void operator()(const mparse::binary_op_node& node);
+  void operator()(const mparse::func_node& node);
+  void operator()(const mparse::literal_node& node);
+  void operator()(const mparse::id_node& node);
 
   void set_locs(const mparse::ast_node& node,
                 std::vector<mparse::source_range> locs);
@@ -162,13 +165,13 @@ child_visitor_scope::child_visitor_scope(print_visitor& vis,
                            should_parenthesize_assoc(side, parent_assoc)) {}
 
 
-void print_visitor::visit(const mparse::paren_node& node) {
+void print_visitor::operator()(const mparse::paren_node& node) {
   mparse::source_range loc = record_loc([&] {
     result += "(";
     {
       child_visitor_scope scope(*this, op_precedence::unknown,
                                 associativity::none, branch_side::none);
-      node.child()->apply_visitor(*this);
+      mparse::apply_visitor(*this, *node.child());
     }
     result += ")";
   });
@@ -176,13 +179,13 @@ void print_visitor::visit(const mparse::paren_node& node) {
   set_locs(node, {loc});
 }
 
-void print_visitor::visit(const mparse::abs_node& node) {
+void print_visitor::operator()(const mparse::abs_node& node) {
   mparse::source_range loc = record_loc([&] {
     result += "|";
     {
       child_visitor_scope scope(*this, op_precedence::unknown,
                                 associativity::none, branch_side::none);
-      node.child()->apply_visitor(*this);
+      mparse::apply_visitor(*this, *node.child());
     }
     result += "|";
   });
@@ -190,7 +193,7 @@ void print_visitor::visit(const mparse::abs_node& node) {
   set_locs(node, {loc});
 }
 
-void print_visitor::visit(const mparse::unary_op_node& node) {
+void print_visitor::operator()(const mparse::unary_op_node& node) {
   mparse::source_range op_loc;
   mparse::source_range expr_loc = record_loc([&] {
     auto_parenthesizer paren(*this, op_precedence::unary);
@@ -199,13 +202,13 @@ void print_visitor::visit(const mparse::unary_op_node& node) {
 
     child_visitor_scope scope(*this, op_precedence::unary, associativity::none,
                               branch_side::none);
-    node.child()->apply_visitor(*this);
+    mparse::apply_visitor(*this, *node.child());
   });
 
   set_locs(node, {expr_loc, op_loc});
 }
 
-void print_visitor::visit(const mparse::binary_op_node& node) {
+void print_visitor::operator()(const mparse::binary_op_node& node) {
   op_precedence prec = get_precedence(node.type());
   associativity assoc = get_associativity(node.type());
 
@@ -215,7 +218,7 @@ void print_visitor::visit(const mparse::binary_op_node& node) {
 
     {
       child_visitor_scope scope(*this, prec, assoc, branch_side::left);
-      node.lhs()->apply_visitor(*this);
+      mparse::apply_visitor(*this, *node.lhs());
     }
 
     result += " ";
@@ -224,14 +227,14 @@ void print_visitor::visit(const mparse::binary_op_node& node) {
 
     {
       child_visitor_scope scope(*this, prec, assoc, branch_side::right);
-      node.rhs()->apply_visitor(*this);
+      mparse::apply_visitor(*this, *node.rhs());
     }
   });
 
   set_locs(node, {expr_loc, op_loc});
 }
 
-void print_visitor::visit(const mparse::func_node& node) {
+void print_visitor::operator()(const mparse::func_node& node) {
   mparse::source_range name_loc, open_loc;
   mparse::source_range expr_loc = record_loc([&] {
     name_loc = record_loc([&] { result += node.name(); });
@@ -244,7 +247,7 @@ void print_visitor::visit(const mparse::func_node& node) {
         if (arg != node.args().front()) {
           result += ", ";
         }
-        arg->apply_visitor(*this);
+        mparse::apply_visitor(*this, *arg);
       }
     }
 
@@ -254,7 +257,7 @@ void print_visitor::visit(const mparse::func_node& node) {
   set_locs(node, {expr_loc, name_loc, open_loc});
 }
 
-void print_visitor::visit(const mparse::literal_node& node) {
+void print_visitor::operator()(const mparse::literal_node& node) {
   std::ostringstream stream;
   stream << std::setprecision(std::numeric_limits<double>::digits10 + 1)
          << node.val();
@@ -264,7 +267,7 @@ void print_visitor::visit(const mparse::literal_node& node) {
   set_locs(node, {loc});
 }
 
-void print_visitor::visit(const mparse::id_node& node) {
+void print_visitor::operator()(const mparse::id_node& node) {
   mparse::source_range loc = record_loc([&] { result += node.name(); });
 
   set_locs(node, {loc});
@@ -284,7 +287,7 @@ void print_visitor::set_locs(const mparse::ast_node& node,
 std::string pretty_print(const mparse::ast_node& node,
                          mparse::source_map* smap) {
   print_visitor vis(smap);
-  node.apply_visitor(vis);
+  mparse::apply_visitor(vis, node);
   return vis.result;
 }
 
