@@ -26,18 +26,21 @@ std::string stringify_source_locs(const mparse::ast_node& node,
   return ret;
 }
 
-struct ast_dump_visitor : mparse::const_ast_visitor {
+struct ast_dump_visitor {
   ast_dump_visitor(std::string prefix, bool last_node,
                    const mparse::source_map* smap, std::ostream& stream);
 
-  void visit(const mparse::ast_node& node) override;
-  void visit(const mparse::paren_node& node) override;
-  void visit(const mparse::abs_node& node) override;
-  void visit(const mparse::unary_op_node& node) override;
-  void visit(const mparse::binary_op_node& node) override;
-  void visit(const mparse::func_node& node) override;
-  void visit(const mparse::literal_node& node) override;
-  void visit(const mparse::id_node& node) override;
+  template <typename T>
+  void operator()(T&&) {}
+
+  void operator()(const mparse::ast_node& node);
+  void operator()(const mparse::paren_node& node);
+  void operator()(const mparse::abs_node& node);
+  void operator()(const mparse::unary_op_node& node);
+  void operator()(const mparse::binary_op_node& node);
+  void operator()(const mparse::func_node& node);
+  void operator()(const mparse::literal_node& node);
+  void operator()(const mparse::id_node& node);
 
   void dump_child(const mparse::ast_node& node);
   void dump_last_child(const mparse::ast_node& node);
@@ -59,7 +62,7 @@ ast_dump_visitor::ast_dump_visitor(std::string prefix, bool last_node,
       stream(stream) {}
 
 
-void ast_dump_visitor::visit(const mparse::ast_node&) {
+void ast_dump_visitor::operator()(const mparse::ast_node&) {
   stream << prefix;
 
   if (last_node) {
@@ -70,26 +73,26 @@ void ast_dump_visitor::visit(const mparse::ast_node&) {
   stream << '-';
 }
 
-void ast_dump_visitor::visit(const mparse::paren_node& node) {
+void ast_dump_visitor::operator()(const mparse::paren_node& node) {
   stream << "paren" << stringify_source_locs(node, smap) << "\n";
 
   dump_last_child(*node.child());
 }
 
-void ast_dump_visitor::visit(const mparse::abs_node& node) {
+void ast_dump_visitor::operator()(const mparse::abs_node& node) {
   stream << "abs" << stringify_source_locs(node, smap) << "\n";
 
   dump_last_child(*node.child());
 }
 
-void ast_dump_visitor::visit(const mparse::unary_op_node& node) {
+void ast_dump_visitor::operator()(const mparse::unary_op_node& node) {
   stream << "unary '" << stringify_unary_op(node.type()) << "'"
          << stringify_source_locs(node, smap) << "\n";
 
   dump_last_child(*node.child());
 }
 
-void ast_dump_visitor::visit(const mparse::binary_op_node& node) {
+void ast_dump_visitor::operator()(const mparse::binary_op_node& node) {
   stream << "binary '" << stringify_binary_op(node.type()) << "'"
          << stringify_source_locs(node, smap) << "\n";
 
@@ -97,7 +100,7 @@ void ast_dump_visitor::visit(const mparse::binary_op_node& node) {
   dump_last_child(*node.rhs());
 }
 
-void ast_dump_visitor::visit(const mparse::func_node& node) {
+void ast_dump_visitor::operator()(const mparse::func_node& node) {
   stream << "func '" << node.name() << "'" << stringify_source_locs(node, smap)
          << "\n";
 
@@ -110,12 +113,12 @@ void ast_dump_visitor::visit(const mparse::func_node& node) {
   }
 }
 
-void ast_dump_visitor::visit(const mparse::literal_node& node) {
+void ast_dump_visitor::operator()(const mparse::literal_node& node) {
   stream << "number '" << node.val() << "'" << stringify_source_locs(node, smap)
          << "\n";
 }
 
-void ast_dump_visitor::visit(const mparse::id_node& node) {
+void ast_dump_visitor::operator()(const mparse::id_node& node) {
   stream << "variable '" << node.name() << "'"
          << stringify_source_locs(node, smap) << "\n";
 }
@@ -125,13 +128,13 @@ void ast_dump_visitor::dump_child(const mparse::ast_node& node) {
   util::auto_restore save_prefix(prefix);
   prefix += " |";
   last_node = false;
-  node.apply_visitor(*this);
+  mparse::apply_visitor(*this, node);
 }
 
 void ast_dump_visitor::dump_last_child(const mparse::ast_node& node) {
   prefix += " ";
   last_node = true;
-  node.apply_visitor(*this);
+  mparse::apply_visitor(*this, node);
 }
 
 } // namespace
@@ -140,7 +143,7 @@ void ast_dump_visitor::dump_last_child(const mparse::ast_node& node) {
 void dump_ast(const mparse::ast_node& node, const mparse::source_map* smap,
               std::ostream& stream) {
   ast_dump_visitor vis("", false, smap, stream);
-  node.apply_visitor(vis);
+  mparse::apply_visitor(vis, node);
 }
 
 void dump_ast(const mparse::ast_node& node, const mparse::source_map* smap) {
