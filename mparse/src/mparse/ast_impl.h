@@ -150,4 +150,41 @@ inline node_ptr<T> ast_node_ptr_cast(const node_ptr<U>& node) {
   return nullptr;
 }
 
+
+namespace impl {
+
+template <typename V, typename N, template <typename> typename AddCv>
+struct visit_helper {
+  static void do_visit(V&& vis, N& node, util::type_list<>) {}
+
+  template <typename D, typename... Ds>
+  static void do_visit(V&& vis, N& node, util::type_list<D, Ds...>) {
+    if (auto* der_node = ast_node_cast<AddCv<D>>(&node)) {
+      std::forward<V>(vis)(*der_node);
+      visit(std::forward<V>(vis), node, typename D::derived_types{});
+    } else {
+      visit(std::forward<V>(vis), node, util::type_list<Ds...>{});
+    }
+  }
+
+  static void visit(V&& vis, N& node) {
+    std::forward<V>(vis)(static_cast<AddCv<N>>(node));
+    do_visit(std::forward<V>(vis), node, typename N::derived_types{});
+  }
+};
+
+} // namespace impl
+
+template <typename V>
+void visit(V&& vis, ast_node& node) {
+  impl::visit_helper<V, ast_node, util::identity>::visit(std::forward<V>(vis),
+                                                         node);
+}
+
+template <typename V>
+void visit(V&& vis, const ast_node& node) {
+  impl::visit_helper<V, ast_node, std::add_const_t>::visit(std::forward<V>(vis),
+                                                           node);
+}
+
 } // namespace mparse
