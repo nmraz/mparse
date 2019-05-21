@@ -36,8 +36,8 @@ using get_flattened_derived_types_t =
 
 template <typename T, typename... Ds>
 struct flatten_derived_types<T, util::type_list<Ds...>> {
-  using type = util::type_list_cat<util::type_list<T, Ds...>,
-                                   get_flattened_derived_types_t<Ds>...>;
+  using type = util::type_list_cat_t<util::type_list<T, Ds...>,
+                                     get_flattened_derived_types_t<Ds>...>;
 };
 
 } // namespace impl
