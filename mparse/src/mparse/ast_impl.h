@@ -32,14 +32,6 @@ node_ptr<Node> make_ast_node(Args&&... args) {
 
 namespace impl {
 
-template <typename V, typename T, typename = void>
-constexpr bool has_visit_overload = false;
-
-template <typename V, typename T>
-constexpr bool has_visit_overload<
-    V, T, std::void_t<decltype(static_cast<void (V::*)(T&)>(&V::visit))>> =
-    true;
-
 template <typename T, typename D>
 struct flatten_derived_types;
 
@@ -64,8 +56,6 @@ class ast_node_impl : public Base {
 public:
   static_assert(std::is_base_of_v<ast_node, Base>,
                 "AST nodes must derive from ast_node");
-  static_assert(impl::has_visit_overload<ast_visitor, Der>,
-                "Missing ast_visitor overload");
   static_assert(impl::is_listed_as_derived<Der, Base>,
                 "Type not listed in Base::derived_types");
 
@@ -153,6 +143,27 @@ inline node_ptr<T> ast_node_ptr_cast(const node_ptr<U>& node) {
 
 namespace impl {
 
+template <typename V, typename N, typename = void>
+constexpr bool has_exact_overload = false;
+
+template <typename V, typename N>
+constexpr bool has_exact_overload<
+    V, N, std::void_t<decltype(static_cast<void (V::*)(N&)>(&V::operator()))>> =
+    true;
+
+template <typename V, typename N>
+void invoke_visitor([[maybe_unused]] V& vis, [[maybe_unused]] N& node) {
+  if constexpr (std::is_invocable_v<V&, N&>) {
+    static_assert(std::is_same_v<std::invoke_result_t<V&, N&>, void>,
+                  "All visitor overloads must return (non-cv) void");
+
+    // Avoid invoking overloads for bases on derived classes.
+    if constexpr (has_exact_overload<V, N>) {
+      vis(node);
+    }
+  }
+}
+
 template <typename V, typename N, template <typename> typename AddCv>
 struct visit_helper {
   static void do_apply_visitor(V&, N&, util::type_list<>) {}
@@ -160,7 +171,7 @@ struct visit_helper {
   template <typename D, typename... Ds>
   static void do_apply_visitor(V& vis, N& node, util::type_list<D, Ds...>) {
     if (auto* der_node = ast_node_cast<AddCv<D>>(&node)) {
-      vis(*der_node);
+      invoke_visitor(vis, *der_node);
       do_apply_visitor(vis, node, typename D::derived_types{});
     } else {
       do_apply_visitor(vis, node, util::type_list<Ds...>{});
@@ -168,7 +179,7 @@ struct visit_helper {
   }
 
   static void apply_visitor(V& vis, N& node) {
-    vis(node);
+    invoke_visitor(vis, node);
     do_apply_visitor(vis, node, typename N::derived_types{});
   }
 };
