@@ -216,6 +216,7 @@ constexpr matching::rewriter_list simp_rewriters = {
 
     (w * pow(x, y)) * pow(x, z), w * pow(x, y + z),
     (w * pow(x, y)) * x, w * pow(x, 1_clit + y),
+    (w * x) * pow(x, y), w * pow(x, 1_clit + y),
     (w * x) * x, w * pow(x, 2_clit)
 };
 
