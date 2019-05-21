@@ -129,17 +129,16 @@ bool eval_funcs(mparse::ast_node_ptr& node, const func_scope& fscope) {
   matching::apply_recursively(node, [&](mparse::ast_node_ptr& cur_node) {
     if (auto* func_node =
             mparse::ast_node_cast<const mparse::func_node>(cur_node.get())) {
-      if (has_constant_args(func_node)) {
-        if (auto* func = fscope.lookup(func_node->name())) {
-          cur_node = build_cmplx_lit(eval(cur_node.get(), {}, fscope));
-          changed = true;
-        }
+      if (has_constant_args(func_node) &&
+          fscope.parent()->lookup(func_node->name())) {
+        cur_node = build_cmplx_lit(eval(cur_node.get(), {}, fscope));
+        changed = true;
       }
     }
   });
 
   return changed;
-}
+} // namespace
 
 
 template <typename Lhs, typename Rhs>
@@ -227,9 +226,8 @@ constexpr matching::rewriter_list simp_rewriters = {
 
 void simplify(mparse::ast_node_ptr& node, const var_scope& vscope,
               const func_scope& fscope) {
-  func_scope eval_fscope = fscope;
-  eval_fscope.set_binding(std::string(impl::cmplx_lit_func_name),
-                          eval_cmplx_lit);
+  func_scope eval_fscope = lit_eval_func_scope;
+  eval_fscope.set_parent(&fscope);
 
   canonicalize(node);
   run_with_cmplx_lits(node, [&] {
