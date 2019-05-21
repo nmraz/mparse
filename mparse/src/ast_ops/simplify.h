@@ -52,6 +52,14 @@ constexpr auto cmplx_lit_val(number val) {
                               matching::literal_expr{val.imag()});
 }
 
+constexpr auto operator""_clit(long double val) {
+  return cmplx_lit_val(static_cast<double>(val));
+}
+
+constexpr auto operator""_clit(unsigned long long val) {
+  return cmplx_lit_val(static_cast<double>(val));
+}
+
 constexpr auto cmplx_lit = impl::cmplx_lit_expr(matching::lit, matching::lit);
 
 template <int N>

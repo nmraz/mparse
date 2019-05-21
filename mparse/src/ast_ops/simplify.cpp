@@ -172,10 +172,6 @@ constexpr matching::rewriter_list const_eval_rewriters = {
         matching::capture_expr_tag<1>{}),
 };
 
-constexpr auto one = cmplx_lit_val(1);
-constexpr auto zero = cmplx_lit_val(0);
-constexpr auto two = cmplx_lit_val(2);
-
 // clang-format off
 
 constexpr matching::rewriter_list const_migrate_rewriters = {
@@ -189,39 +185,39 @@ constexpr matching::rewriter_list reassoc_rewriters = {
 };
 
 constexpr matching::rewriter_list simp_rewriters = {
-    x + zero, x,
+    x + 0_clit, x,
 
-    any * zero, zero,
-    x * one, x,
+    any * 0_clit, 0_clit,
+    x * 1_clit, x,
 
-    pow(x, one), x,
-    pow(any, zero), one,
-    pow(one, any), one,
+    pow(x, 1_clit), x,
+    pow(any, 0_clit), 1_clit,
+    pow(1_clit, any), 1_clit,
 
     x * y + x * z, x * (y + z),
     y * x + x * z, x * (y + z),
-    x + x * y, (one + y) * x,
-    x + y * x, (one + y) * x,
-    x + x, two * x,
+    x + x * y, (1_clit + y) * x,
+    x + y * x, (1_clit + y) * x,
+    x + x, 2_clit * x,
 
     (w + x * y) + x * z, w + x * (y + z),
     (w + y * x) + x * z, w + x * (y + z),
-    (w + x * y) + x, w + x * (one + y),
-    (w + y * x) + x, w + x * (one + y),
-    (w + x) + y * x, w + x * (one + y),
-    (w + x) + x, w + two * x,
+    (w + x * y) + x, w + x * (1_clit + y),
+    (w + y * x) + x, w + x * (1_clit + y),
+    (w + x) + y * x, w + x * (1_clit + y),
+    (w + x) + x, w + 1_clit * x,
 
     pow(pow(x, y), z), pow(x, y * z),
 
     pow(x, y) * pow(z, y), pow(x * z, y),
 
     pow(x, y) * pow(x, z), pow(x, y + z),
-    pow(x, y) * x, pow(x, one + y),
-    x * x, pow(x, two),
+    pow(x, y) * x, pow(x, 1_clit + y),
+    x * x, pow(x, 2_clit),
 
     (w * pow(x, y)) * pow(x, z), w * pow(x, y + z),
-    (w * pow(x, y)) * x, w * pow(x, one + y),
-    (w * x) * x, w * pow(x, two)
+    (w * pow(x, y)) * x, w * pow(x, 1_clit + y),
+    (w * x) * x, w * pow(x, 2_clit)
 };
 
 // clang-format on
