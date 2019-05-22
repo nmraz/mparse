@@ -9,9 +9,6 @@ namespace util {
 template <typename T>
 constexpr bool always_false = false; // dependent false
 
-template <typename T>
-using identity = T;
-
 
 template <typename... Ts>
 struct type_list {

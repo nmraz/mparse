@@ -173,7 +173,7 @@ struct const_ast_visitor {};
 
 template <typename V>
 void apply_visitor(ast_visitor<V>& vis, ast_node& node) {
-  impl::visit_helper<V, ast_node, util::identity>::apply_visitor(
+  impl::visit_helper<V, ast_node, std::type_identity_t>::apply_visitor(
       static_cast<V&>(vis), node);
 }
 
