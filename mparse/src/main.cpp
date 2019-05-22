@@ -153,8 +153,10 @@ int main(int argc, const char* const* argv) {
   auto [ast, smap] = parse_diag(input);
 
   if (auto it = commands.find(argv[1]); it != commands.end()) {
-    it->second.func({std::move(ast), std::move(smap), input,
-                     util::span{argv, argc}.last(argc - 3)});
+    it->second.func({.ast = std::move(ast),
+                     .smap = std::move(smap),
+                     .input = input,
+                     .argv = util::span{argv, argc}.last(argc - 3)});
   } else {
     print_help(argv[0], commands);
   }

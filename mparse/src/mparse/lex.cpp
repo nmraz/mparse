@@ -29,37 +29,51 @@ token get_token(source_stream& stream) {
   source_stream::pos_type token_start = stream.pos();
 
   if (stream.eof()) {
-    return {token_type::eof, token_start, stream.token(token_start)};
+    return {.type = token_type::eof,
+            .loc = token_start,
+            .val = stream.token(token_start)};
   }
 
   if (stream.eat_one_of(delims)) {
-    return {token_type::delim, token_start, stream.token(token_start)};
+    return {.type = token_type::delim,
+            .loc = token_start,
+            .val = stream.token(token_start)};
   }
 
   if (stream.eat_while(is_digit)) {
     if (stream.eat('.')) {
       stream.eat_while(is_digit);
     }
-    return {token_type::literal, token_start, stream.token(token_start)};
+    return {.type = token_type::literal,
+            .loc = token_start,
+            .val = stream.token(token_start)};
   }
 
   if (stream.eat('.')) {
     if (stream.eat_while(is_digit)) {
-      return {token_type::literal, token_start, stream.token(token_start)};
+      return {.type = token_type::literal,
+              .loc = token_start,
+              .val = stream.token(token_start)};
     }
 
-    return {token_type::unknown, token_start, stream.token(token_start)};
+    return {.type = token_type::unknown,
+            .loc = token_start,
+            .val = stream.token(token_start)};
   }
 
   if (stream.eat(is_alpha)) {
     stream.eat_while([](char ch) { return is_alpha(ch) || is_digit(ch); });
 
-    return {token_type::ident, token_start, stream.token(token_start)};
+    return {.type = token_type::ident,
+            .loc = token_start,
+            .val = stream.token(token_start)};
   }
 
   // give up
   stream.next();
-  return {token_type::unknown, token_start, stream.token(token_start)};
+  return {.type = token_type::unknown,
+          .loc = token_start,
+          .val = stream.token(token_start)};
 }
 
 } // namespace mparse
